@@ -232,8 +232,29 @@
   })();
 </script>
 
-<!-- Composant principal + point d'entr&#233;e (transform&#233; par Babel au chargement) -->
-<script type="text/babel" data-presets="react" src="PoolApp.jsx"></script>
+<!-- Composant principal + point d'entr&#233;e : on r&#233;cup&#232;re le fichier
+     manuellement et on le transforme avec Babel en pr&#233;cisant runtime:
+     "classic" (React.createElement), car le runtime "automatic" par d&#233;faut
+     injecte un `import` ES qui ne peut pas s'ex&#233;cuter tel quel dans un
+     simple script de navigateur. -->
+<script>
+  fetch("PoolApp.jsx")
+    .then((res) => {
+      if (!res.ok) throw new Error("Impossible de charger PoolApp.jsx (HTTP " + res.status + ")");
+      return res.text();
+    })
+    .then((source) => {
+      var result = Babel.transform(source, {
+        presets: [["react", { runtime: "classic" }]],
+      });
+      // eslint-disable-next-line no-eval
+      (0, eval)(result.code);
+    })
+    .catch((err) => {
+      window.__bootErrors.push("Erreur de chargement/transformation de PoolApp.jsx :\n" + err.message);
+      window.__showBootError();
+    });
+</script>
 
 <!-- Service worker d&#233;sactiv&#233; pour l'instant : un SW d&#233;j&#224; install&#233; sur un
      appareil peut servir une version p&#233;rim&#233;e de l'app ind&#233;finiment, ce qui
