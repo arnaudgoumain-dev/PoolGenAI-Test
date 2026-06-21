@@ -33,20 +33,34 @@
     to { transform: rotate(360deg); }
   }
   @media print {
-    /* Cache toute l'interface de l'app, ne garde que le rapport */
-    body * {
-      visibility: hidden;
+    /* Le rapport (#report-printable) est imbriqué dans .app via un overlay
+       position:fixed. On neutralise ce fixed pour éviter la duplication de
+       contenu sur plusieurs pages, et on masque le reste de l'app derrière
+       avec display:none (pas visibility:hidden, qui garde les éléments
+       fixed dans le flux de pagination). */
+    html, body {
+      height: auto !important;
+      overflow: visible !important;
+      background: #ffffff !important;
     }
-    #report-printable, #report-printable * {
-      visibility: visible;
+    .app {
+      max-width: 100% !important;
+      min-height: auto !important;
+      display: block !important;
+    }
+    .app > *:not(.report-print-root) {
+      display: none !important;
+    }
+    .report-print-root {
+      position: static !important;
+      inset: auto !important;
+      overflow: visible !important;
+      height: auto !important;
     }
     #report-printable {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      max-width: 100%;
-      padding: 0 12px;
+      max-width: 100% !important;
+      padding: 0 12px !important;
+      margin: 0 !important;
     }
     .no-print {
       display: none !important;

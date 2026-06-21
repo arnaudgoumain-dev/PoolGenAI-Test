@@ -491,7 +491,7 @@ function PoolApp() {
   }
 
   return (
-    <div style={styles.app}>
+    <div style={styles.app} className="app">
       <Header
         poolName={activePool?.name}
         location={activePool?.location}
@@ -1561,7 +1561,10 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
       action: r.action,
       title: r.title,
       productName: r.productName,
-      appliedAmount: amounts[i] === "" || amounts[i] === undefined ? null : parseFloat(amounts[i]),
+      appliedAmount:
+        amounts[i] === "" || amounts[i] === undefined || amounts[i] === null
+          ? null
+          : parseFloat(amounts[i]),
       doseUnit: r.doseUnit,
     }));
     onSave(measure.id, steps, allApplied);
@@ -2194,7 +2197,7 @@ function ReportView({ pool, measures, applications, products, onClose }) {
   });
 
   return (
-    <div style={styles.reportOverlay}>
+    <div style={styles.reportOverlay} className="report-print-root">
       <div style={styles.reportToolbar} className="no-print">
         <button style={styles.reportCloseBtn} onClick={onClose}>
           <X size={18} /> Fermer
@@ -2295,7 +2298,11 @@ function ReportView({ pool, measures, applications, products, onClose }) {
                         {applied ? (
                           <span style={styles.reportAppliedTag}>
                             {" "}
-                            → appliqué : {applied.appliedAmount ?? "—"} {applied.doseUnit || ""}
+                            → appliqué :{" "}
+                            {applied.appliedAmount == null || Number.isNaN(applied.appliedAmount)
+                              ? "—"
+                              : applied.appliedAmount}{" "}
+                            {applied.doseUnit || ""}
                           </span>
                         ) : (
                           <span style={styles.reportNotAppliedTag}> — non confirmé</span>
