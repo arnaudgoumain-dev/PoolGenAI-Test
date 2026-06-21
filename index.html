@@ -32,6 +32,26 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
+  @media print {
+    /* Cache toute l'interface de l'app, ne garde que le rapport */
+    body * {
+      visibility: hidden;
+    }
+    #report-printable, #report-printable * {
+      visibility: visible;
+    }
+    #report-printable {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      max-width: 100%;
+      padding: 0 12px;
+    }
+    .no-print {
+      display: none !important;
+    }
+  }
   #boot-loader {
     position: fixed;
     inset: 0;

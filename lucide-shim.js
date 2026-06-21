@@ -101,5 +101,17 @@
     ]),
     Loader2: Icon([path("M21 12a9 9 0 1 1-6.219-8.56")]),
     Clock: Icon([circle(12, 12, 10), polyline("12 6 12 12 16 14")]),
+    FileText: Icon([
+      path("M14.5 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.5L14.5 4z"),
+      path("M14 4v5h5"),
+      line(8, 13, 16, 13),
+      line(8, 17, 16, 17),
+      line(8, 9, 10, 9),
+    ]),
+    Download: Icon([
+      path("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"),
+      polyline("7 10 12 15 17 10"),
+      line(12, 15, 12, 3),
+    ]),
   };
 })();

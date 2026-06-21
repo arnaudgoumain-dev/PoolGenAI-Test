@@ -4,7 +4,7 @@ const {
 } = Recharts;
 const {
   Plus, Trash2, Droplets, X, ChevronRight, ChevronDown, Settings2, AlertTriangle, CheckCircle2,
-  History, Beaker, Camera, Lock, Crown, ImageOff, Sparkles, Loader2, Clock
+  History, Beaker, Camera, Lock, Crown, ImageOff, Sparkles, Loader2, Clock, FileText, Download
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
@@ -97,6 +97,7 @@ const STORAGE_KEYS = {
   premium: "pool:premium",
   pools: "pool:pools",
   activePool: "pool:activePool",
+  applications: "pool:applications",
 };
 
 // ---------- Helpers ----------
@@ -223,9 +224,13 @@ function PoolApp() {
   const [showAddMeasure, setShowAddMeasure] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [editingMeasure, setEditingMeasure] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAddPool, setShowAddPool] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
+  const [applications, setApplications] = useState([]);
+  const [validatingMeasure, setValidatingMeasure] = useState(null);
+  const [showReport, setShowReport] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   // --- Chargement initial depuis le stockage persistant ---
@@ -293,6 +298,10 @@ function PoolApp() {
         const pr = await window.storage.get(STORAGE_KEYS.premium);
         if (pr?.value) setIsPremium(JSON.parse(pr.value) === true);
       } catch (e) {}
+      try {
+        const ap = await window.storage.get(STORAGE_KEYS.applications);
+        if (ap?.value) setApplications(JSON.parse(ap.value));
+      } catch (e) {}
       setLoaded(true);
     }
     load();
@@ -324,6 +333,11 @@ function PoolApp() {
     window.storage.set(STORAGE_KEYS.premium, JSON.stringify(isPremium)).catch(() => {});
   }, [isPremium, loaded]);
 
+  useEffect(() => {
+    if (!loaded) return;
+    window.storage.set(STORAGE_KEYS.applications, JSON.stringify(applications)).catch(() => {});
+  }, [applications, loaded]);
+
   const activePool = useMemo(
     () => pools.find((p) => p.id === activePoolId) || pools[0],
     [pools, activePoolId]
@@ -339,6 +353,11 @@ function PoolApp() {
     [products, activePoolId]
   );
 
+  const poolApplications = useMemo(
+    () => applications.filter((a) => a.poolId === activePoolId),
+    [applications, activePoolId]
+  );
+
   const sortedMeasures = useMemo(
     () => [...poolMeasures].sort((a, b) => new Date(b.date) - new Date(a.date)),
     [poolMeasures]
@@ -346,13 +365,51 @@ function PoolApp() {
   const latest = sortedMeasures[0] || null;
   const blockedByLimit = !isPremium && hasMeasureToday(measures);
 
+  const validatingMeasureRecs = useMemo(() => {
+    if (!validatingMeasure) return [];
+    return computeRecommendations(validatingMeasure, activePool?.volume || 0, poolProducts);
+  }, [validatingMeasure, activePool, poolProducts]);
+
+  const existingApplicationForValidating = useMemo(() => {
+    if (!validatingMeasure) return null;
+    return applications.find((a) => a.measureId === validatingMeasure.id) || null;
+  }, [validatingMeasure, applications]);
+
   function addMeasure(entry) {
-    setMeasures((prev) => [...prev, { id: uid(), poolId: activePoolId, ...entry }]);
+    if (entry.id) {
+      // Édition d'une mesure existante
+      setMeasures((prev) => prev.map((m) => (m.id === entry.id ? { ...m, ...entry } : m)));
+    } else {
+      setMeasures((prev) => [...prev, { id: uid(), poolId: activePoolId, ...entry }]);
+    }
     setShowAddMeasure(false);
+    setEditingMeasure(null);
   }
 
   function deleteMeasure(id) {
     setMeasures((prev) => prev.filter((m) => m.id !== id));
+  }
+
+  function deleteAllMeasuresForActivePool() {
+    setMeasures((prev) => prev.filter((m) => (m.poolId || "default") !== activePoolId));
+  }
+
+  function saveApplication(measureId, steps, allApplied) {
+    setApplications((prev) => {
+      const withoutThisMeasure = prev.filter((a) => a.measureId !== measureId);
+      return [
+        ...withoutThisMeasure,
+        {
+          id: uid(),
+          poolId: activePoolId,
+          measureId,
+          appliedAt: new Date().toISOString(),
+          allApplied: !!allApplied,
+          steps, // [{action, title, productName, appliedAmount, doseUnit}]
+        },
+      ];
+    });
+    setValidatingMeasure(null);
   }
 
   function saveProduct(p) {
@@ -375,12 +432,31 @@ function PoolApp() {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   }
 
+  function resetAllProducts() {
+    setProducts((prev) => prev.filter((p) => (p.poolId || "default") !== activePoolId));
+  }
+
   function handleOpenAddMeasure() {
     if (blockedByLimit) {
       setShowPaywall(true);
     } else {
       setShowAddMeasure(true);
     }
+  }
+
+  function handleEditMeasure(m) {
+    // Modifier une mesure existante ne crée pas de nouvelle entrée :
+    // pas concerné par la limite quotidienne gratuite.
+    setEditingMeasure(m);
+    setShowAddMeasure(true);
+  }
+
+  function handleValidateApplication(m) {
+    if (!isPremium) {
+      setShowPaywall(true);
+      return;
+    }
+    setValidatingMeasure(m);
   }
 
   function addPool(pool) {
@@ -432,6 +508,9 @@ function PoolApp() {
             volume={activePool?.volume || 0}
             products={poolProducts}
             onAddMeasure={handleOpenAddMeasure}
+            onEditMeasure={handleEditMeasure}
+            onValidateApplication={handleValidateApplication}
+            applicationForLatest={latest ? poolApplications.find((a) => a.measureId === latest.id) : null}
             blockedByLimit={blockedByLimit}
             isPremium={isPremium}
           />
@@ -440,7 +519,10 @@ function PoolApp() {
           <HistoryView
             measures={sortedMeasures}
             onDelete={deleteMeasure}
+            onEdit={handleEditMeasure}
             onAdd={handleOpenAddMeasure}
+            onValidateApplication={handleValidateApplication}
+            applications={poolApplications}
             isPremium={isPremium}
             poolName={activePool?.name}
           />
@@ -457,6 +539,7 @@ function PoolApp() {
               setShowAddProduct(true);
             }}
             onDelete={deleteProduct}
+            onResetAll={resetAllProducts}
             isPremium={isPremium}
             poolName={activePool?.name}
           />
@@ -469,6 +552,10 @@ function PoolApp() {
             onDeletePool={deletePool}
             onSwitchPool={setActivePoolId}
             onWantAddPool={handleWantAddPool}
+            onDeleteAllMeasures={deleteAllMeasuresForActivePool}
+            poolMeasureCount={poolMeasures.length}
+            onGenerateReport={() => setShowReport(true)}
+            onWantPremiumForReport={() => setShowPaywall(true)}
             isPremium={isPremium}
             setIsPremium={setIsPremium}
           />
@@ -479,11 +566,16 @@ function PoolApp() {
 
       {showAddMeasure && (
         <AddMeasureModal
-          onClose={() => setShowAddMeasure(false)}
+          measure={editingMeasure}
+          onClose={() => {
+            setShowAddMeasure(false);
+            setEditingMeasure(null);
+          }}
           onSave={addMeasure}
           isPremium={isPremium}
           onWantPremium={() => {
             setShowAddMeasure(false);
+            setEditingMeasure(null);
             setShowPaywall(true);
           }}
         />
@@ -518,6 +610,26 @@ function PoolApp() {
 
       {showAddPool && (
         <AddPoolModal onClose={() => setShowAddPool(false)} onSave={addPool} />
+      )}
+
+      {validatingMeasure && isPremium && (
+        <ValidateApplicationModal
+          measure={validatingMeasure}
+          recs={validatingMeasureRecs}
+          existingApplication={existingApplicationForValidating}
+          onClose={() => setValidatingMeasure(null)}
+          onSave={saveApplication}
+        />
+      )}
+
+      {showReport && isPremium && (
+        <ReportView
+          pool={activePool}
+          measures={poolMeasures}
+          applications={poolApplications}
+          products={poolProducts}
+          onClose={() => setShowReport(false)}
+        />
       )}
     </div>
   );
@@ -635,7 +747,7 @@ function TabBar({ tab, setTab }) {
 }
 
 // ---------- Dashboard ----------
-function Dashboard({ latest, volume, products, onAddMeasure, blockedByLimit, isPremium }) {
+function Dashboard({ latest, volume, products, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium }) {
   const recs = useMemo(
     () => (latest ? computeRecommendations(latest, volume, products) : []),
     [latest, volume, products]
@@ -665,7 +777,12 @@ function Dashboard({ latest, volume, products, onAddMeasure, blockedByLimit, isP
     <div>
       <div style={styles.sectionRow}>
         <span style={styles.sectionLabel}>Dernière mesure</span>
-        <span style={styles.sectionDate}>{formatDate(latest.date)}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={styles.sectionDate}>{formatDate(latest.date)}</span>
+          <button style={styles.editLinkBtn} onClick={() => onEditMeasure(latest)}>
+            <Settings2 size={13} /> Modifier
+          </button>
+        </div>
       </div>
 
       {latest.photo && (
@@ -712,6 +829,24 @@ function Dashboard({ latest, volume, products, onAddMeasure, blockedByLimit, isP
           {recs.map((r, i) => (
             <RecoCard key={i} reco={r} isLast={i === recs.length - 1} />
           ))}
+
+          {applicationForLatest ? (
+            <div style={styles.applyConfirmedCard}>
+              <CheckCircle2 size={16} color="#1f8a70" />
+              <span style={{ flex: 1 }}>
+                Conseils {applicationForLatest.allApplied ? "appliqués" : "partiellement appliqués"}{" "}
+                le {formatDate(applicationForLatest.appliedAt)}
+              </span>
+              <button style={styles.editLinkBtn} onClick={() => onValidateApplication(latest)}>
+                Ajuster
+              </button>
+            </div>
+          ) : (
+            <button style={styles.validateApplyBtn} onClick={() => onValidateApplication(latest)}>
+              <CheckCircle2 size={16} /> J'ai appliqué ces conseils
+              {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -799,6 +934,8 @@ function computeRecommendations(latest, volume, products) {
       doseText: prod
         ? `Voir dosage : ${prod.doseAmount} ${prod.doseUnit} → +${prod.effectAmount} mg/L sur ${prod.effectPer} m³`
         : "Aucun produit TAC+ dans ta liste — ajoute-en un dans l'onglet Produits.",
+      computedDoseAmount: prod?.doseAmount ?? null,
+      doseUnit: prod?.doseUnit || null,
       note: prod?.note || "Un TAC bas rend le pH instable.",
       waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["tac+"],
     });
@@ -811,6 +948,9 @@ function computeRecommendations(latest, volume, products) {
     if (phVal > TARGETS.pH.max) {
       const diff = phVal - targetMid;
       const prod = products.find((p) => p.action === "ph-");
+      const computedDose = prod
+        ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount))
+        : null;
       steps.push({
         action: "ph-",
         title: `pH trop haut (${phVal})`,
@@ -818,14 +958,19 @@ function computeRecommendations(latest, volume, products) {
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount))} ${prod.doseUnit} pour viser ${targetMid}`
+          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${targetMid}`
           : "Aucun produit pH- dans ta liste — ajoute-en un dans l'onglet Produits.",
+        computedDoseAmount: computedDose,
+        doseUnit: prod?.doseUnit || null,
         note: prod?.note,
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["ph-"],
       });
     } else if (phVal < TARGETS.pH.min) {
       const diff = targetMid - phVal;
       const prod = products.find((p) => p.action === "ph+");
+      const computedDose = prod
+        ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount))
+        : null;
       steps.push({
         action: "ph+",
         title: `pH trop bas (${phVal})`,
@@ -833,8 +978,10 @@ function computeRecommendations(latest, volume, products) {
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount))} ${prod.doseUnit} pour viser ${targetMid}`
+          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${targetMid}`
           : "Aucun produit pH+ dans ta liste — ajoute-en un dans l'onglet Produits.",
+        computedDoseAmount: computedDose,
+        doseUnit: prod?.doseUnit || null,
         note: prod?.note,
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["ph+"],
       });
@@ -850,6 +997,9 @@ function computeRecommendations(latest, volume, products) {
     if (combined !== null && combined > 0.5) {
       const targetFcl = Math.max(3, combined * 3);
       const prod = products.find((p) => p.action === "chlore");
+      const computedDose = prod
+        ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (targetFcl / prod.effectAmount))
+        : null;
       steps.push({
         action: "chlore",
         title: `Chlore combiné élevé (${combined.toFixed(2)} mg/L)`,
@@ -857,8 +1007,10 @@ function computeRecommendations(latest, volume, products) {
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${Math.round(prod.doseAmount * (volume / prod.effectPer) * (targetFcl / prod.effectAmount))} ${prod.doseUnit} ce soir (choc renforcé)`
+          ? `≈ ${computedDose} ${prod.doseUnit} ce soir (choc renforcé)`
           : "Aucun produit chlore choc dans ta liste — ajoute-en un dans l'onglet Produits.",
+        computedDoseAmount: computedDose,
+        doseUnit: prod?.doseUnit || null,
         note: "Chlore combiné = chloramines, signe d'une désinfection insuffisante. Verser le soir, filtration en continu.",
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["chlore"],
       });
@@ -866,6 +1018,9 @@ function computeRecommendations(latest, volume, products) {
       const targetFcl = 2;
       const diff = targetFcl - fCl;
       const prod = products.find((p) => p.action === "chlore");
+      const computedDose = prod
+        ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount))
+        : null;
       steps.push({
         action: "chlore",
         title: `Chlore libre trop bas (${fCl} mg/L)`,
@@ -873,8 +1028,10 @@ function computeRecommendations(latest, volume, products) {
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount))} ${prod.doseUnit} pour viser ${targetFcl} mg/L`
+          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${targetFcl} mg/L`
           : "Aucun produit chlore dans ta liste — ajoute-en un dans l'onglet Produits.",
+        computedDoseAmount: computedDose,
+        doseUnit: prod?.doseUnit || null,
         note: prod?.note,
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["chlore"],
       });
@@ -885,6 +1042,8 @@ function computeRecommendations(latest, volume, products) {
         productName: "Aucun produit nécessaire",
         productAvailable: true,
         doseText: "Laisser le chlore se dégrader naturellement au soleil, ne pas se baigner en attendant.",
+        computedDoseAmount: null,
+        doseUnit: null,
         waitHours: 0,
       });
     }
@@ -893,12 +1052,15 @@ function computeRecommendations(latest, volume, products) {
   // CYA
   const cya = parseFloat(latest.cya);
   if (!Number.isNaN(cya) && cya > TARGETS.cya.max) {
+    const renewalPercent = Math.round((1 - 40 / cya) * 100);
     steps.push({
       action: "renouvellement",
       title: `Stabilisant trop élevé (${cya} mg/L)`,
       productName: "Renouvellement d'eau partiel",
       productAvailable: true,
-      doseText: `Renouveler ≈ ${Math.round((1 - 40 / cya) * 100)} % du volume pour revenir vers 40 mg/L`,
+      doseText: `Renouveler ≈ ${renewalPercent} % du volume pour revenir vers 40 mg/L`,
+      computedDoseAmount: renewalPercent,
+      doseUnit: "%",
       note: "Aucun produit ne fait baisser le CYA chimiquement, seule la dilution fonctionne. Éviter le chlore stabilisé tant que le CYA est haut.",
       waitHours: 0,
     });
@@ -919,7 +1081,7 @@ function computeRecommendations(latest, volume, products) {
 }
 
 // ---------- Historique ----------
-function HistoryView({ measures, onDelete, onAdd, isPremium, poolName }) {
+function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication, applications, isPremium, poolName }) {
   const [activeParams, setActiveParams] = useState(["pH", "fCl"]);
 
   const chartData = useMemo(() => {
@@ -1059,14 +1221,22 @@ function HistoryView({ measures, onDelete, onAdd, isPremium, poolName }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {measures.map((m) => (
-          <MeasureRow key={m.id} measure={m} onDelete={() => onDelete(m.id)} />
+          <MeasureRow
+            key={m.id}
+            measure={m}
+            onDelete={() => onDelete(m.id)}
+            onEdit={() => onEdit(m)}
+            onValidateApplication={() => onValidateApplication(m)}
+            application={applications.find((a) => a.measureId === m.id)}
+            isPremium={isPremium}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function MeasureRow({ measure, onDelete }) {
+function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, application, isPremium }) {
   const [open, setOpen] = useState(false);
   const params = ["pH", "fCl", "tCl", "tac", "cya", "temp"].filter(
     (p) => measure[p] !== undefined && measure[p] !== "" && measure[p] !== null
@@ -1112,9 +1282,33 @@ function MeasureRow({ measure, onDelete }) {
             })}
           </div>
           {measure.note && <div style={styles.measureNote}>{measure.note}</div>}
-          <button style={styles.deleteBtn} onClick={onDelete}>
-            <Trash2 size={14} /> Supprimer
-          </button>
+
+          {application ? (
+            <div style={styles.applyConfirmedCard}>
+              <CheckCircle2 size={16} color="#1f8a70" />
+              <span style={{ flex: 1 }}>
+                Conseils {application.allApplied ? "appliqués" : "partiellement appliqués"} le{" "}
+                {formatDate(application.appliedAt)}
+              </span>
+              <button style={styles.editLinkBtn} onClick={onValidateApplication}>
+                Ajuster
+              </button>
+            </div>
+          ) : (
+            <button style={styles.validateApplyBtnSmall} onClick={onValidateApplication}>
+              <CheckCircle2 size={14} /> Conseils appliqués
+              {!isPremium && <Lock size={12} style={{ marginLeft: 2 }} />}
+            </button>
+          )}
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={styles.editBtn} onClick={onEdit}>
+              <Settings2 size={14} /> Modifier
+            </button>
+            <button style={styles.deleteBtn} onClick={onDelete}>
+              <Trash2 size={14} /> Supprimer
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -1122,17 +1316,20 @@ function MeasureRow({ measure, onDelete }) {
 }
 
 // ---------- Modal Ajout mesure ----------
-function AddMeasureModal({ onClose, onSave, isPremium, onWantPremium }) {
-  const [date, setDate] = useState(todayLocalDatetime());
-  const [method, setMethod] = useState("photometre"); // photometre | bandelette
-  const [pH, setPH] = useState("");
-  const [fCl, setFCl] = useState("");
-  const [tCl, setTCl] = useState("");
-  const [tac, setTac] = useState("");
-  const [cya, setCya] = useState("");
-  const [temp, setTemp] = useState("");
-  const [note, setNote] = useState("");
-  const [photo, setPhoto] = useState(null);
+function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium }) {
+  const isEditing = !!measure;
+  const [date, setDate] = useState(
+    measure ? new Date(measure.date).toISOString().slice(0, 16) : todayLocalDatetime()
+  );
+  const [method, setMethod] = useState(measure?.method || "photometre"); // photometre | bandelette
+  const [pH, setPH] = useState(measure?.pH ?? "");
+  const [fCl, setFCl] = useState(measure?.fCl ?? "");
+  const [tCl, setTCl] = useState(measure?.tCl ?? "");
+  const [tac, setTac] = useState(measure?.tac ?? "");
+  const [cya, setCya] = useState(measure?.cya ?? "");
+  const [temp, setTemp] = useState(measure?.temp ?? "");
+  const [note, setNote] = useState(measure?.note || "");
+  const [photo, setPhoto] = useState(measure?.photo || null);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState(null);
@@ -1178,7 +1375,19 @@ function AddMeasureModal({ onClose, onSave, isPremium, onWantPremium }) {
   }
 
   function handleSave() {
-    onSave({ date: new Date(date).toISOString(), method, pH, fCl, tCl, tac, cya, temp, note, photo });
+    onSave({
+      ...(isEditing ? { id: measure.id } : {}),
+      date: new Date(date).toISOString(),
+      method,
+      pH,
+      fCl,
+      tCl,
+      tac,
+      cya,
+      temp,
+      note,
+      photo,
+    });
   }
 
   const fields = [
@@ -1191,7 +1400,7 @@ function AddMeasureModal({ onClose, onSave, isPremium, onWantPremium }) {
   ];
 
   return (
-    <ModalShell onClose={onClose} title="Nouvelle mesure">
+    <ModalShell onClose={onClose} title={isEditing ? "Modifier la mesure" : "Nouvelle mesure"}>
       <label style={styles.fieldLabel}>Date et heure</label>
       <input
         type="datetime-local"
@@ -1327,14 +1536,99 @@ function AddMeasureModal({ onClose, onSave, isPremium, onWantPremium }) {
       />
 
       <button style={styles.primaryBtn} onClick={handleSave}>
-        Enregistrer la mesure
+        {isEditing ? "Enregistrer les modifications" : "Enregistrer la mesure"}
+      </button>
+    </ModalShell>
+  );
+}
+
+// ---------- Validation des conseils appliqués ----------
+function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave }) {
+  // Pré-remplit avec l'application existante si on revient ajuster, sinon
+  // avec la dose calculée par défaut pour chaque étape du plan.
+  const [amounts, setAmounts] = useState(() => {
+    const init = {};
+    recs.forEach((r, i) => {
+      const existing = existingApplication?.steps?.find((s) => s.action === r.action);
+      init[i] = existing ? existing.appliedAmount : r.computedDoseAmount;
+    });
+    return init;
+  });
+  const [allApplied, setAllApplied] = useState(true);
+
+  function handleSave() {
+    const steps = recs.map((r, i) => ({
+      action: r.action,
+      title: r.title,
+      productName: r.productName,
+      appliedAmount: amounts[i] === "" || amounts[i] === undefined ? null : parseFloat(amounts[i]),
+      doseUnit: r.doseUnit,
+    }));
+    onSave(measure.id, steps, allApplied);
+  }
+
+  return (
+    <ModalShell onClose={onClose} title="Conseils appliqués">
+      <p style={styles.helpText}>
+        Confirme ce que tu as réellement appliqué pour la mesure du {formatDate(measure.date)}.
+        Ajuste les quantités si besoin — ces informations serviront pour ton rapport.
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 4 }}>
+        {recs.map((r, i) => (
+          <div key={i} style={styles.applyStepCard}>
+            <div style={styles.applyStepTitle}>{r.title}</div>
+            <div style={styles.applyStepProduct}>{r.productName}</div>
+            {r.doseUnit ? (
+              <div style={styles.fieldGrid}>
+                <div>
+                  <label style={styles.fieldLabel}>Quantité appliquée</label>
+                  <input
+                    type="number"
+                    style={styles.input}
+                    value={amounts[i] ?? ""}
+                    onChange={(e) => setAmounts((prev) => ({ ...prev, [i]: e.target.value }))}
+                    placeholder={r.computedDoseAmount != null ? String(r.computedDoseAmount) : ""}
+                  />
+                </div>
+                <div>
+                  <label style={styles.fieldLabel}>Unité</label>
+                  <div style={styles.unitTag}>{r.doseUnit}</div>
+                </div>
+              </div>
+            ) : (
+              <p style={styles.helpTextSmall}>{r.doseText}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <label style={styles.checkboxRow}>
+        <input
+          type="checkbox"
+          checked={allApplied}
+          onChange={(e) => setAllApplied(e.target.checked)}
+        />
+        <span>J'ai appliqué l'ensemble de ce plan de traitement</span>
+      </label>
+
+      <button style={styles.primaryBtn} onClick={handleSave}>
+        Valider
       </button>
     </ModalShell>
   );
 }
 
 // ---------- Produits ----------
-function ProductsView({ products, onEdit, onAddNew, onDelete, isPremium, poolName }) {
+function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, poolName }) {
+  function handleResetAll() {
+    if (products.length === 0) return;
+    const ok = window.confirm(
+      `Supprimer les ${products.length} produit(s) de ce bassin ? Cette action est irréversible.`
+    );
+    if (ok) onResetAll();
+  }
+
   return (
     <div>
       {poolName && <div style={styles.poolNameTag}>{poolName}</div>}
@@ -1375,6 +1669,12 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, isPremium, poolNam
           <p style={styles.emptyText}>Aucun produit. Ajoute ton premier produit de traitement.</p>
         )}
       </div>
+
+      {products.length > 0 && (
+        <button style={styles.dangerLinkBtn} onClick={handleResetAll}>
+          <Trash2 size={14} /> Supprimer tous les produits de ce bassin
+        </button>
+      )}
     </div>
   );
 }
@@ -1555,8 +1855,16 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium }) {
 }
 
 // ---------- Réglages ----------
-function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, isPremium, setIsPremium }) {
+function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, isPremium, setIsPremium }) {
   const activePool = pools.find((p) => p.id === activePoolId) || pools[0];
+
+  function onDeleteAllMeasures() {
+    if (!poolMeasureCount) return;
+    const ok = window.confirm(
+      `Supprimer les ${poolMeasureCount} mesure(s) de "${activePool?.name}" ? Cette action est irréversible.`
+    );
+    if (ok) onDeleteAllMeasuresRaw();
+  }
 
   return (
     <div>
@@ -1653,6 +1961,31 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         paramètres (pH 7.2–7.4, chlore libre 1–3 mg/L, etc.) suivent les recommandations
         standards pour piscines privées et ne sont pas modifiables ici pour rester fiables.
       </p>
+
+      <div style={styles.sectionRow}>
+        <span style={styles.sectionLabel}>Rapport</span>
+      </div>
+      {isPremium ? (
+        <button style={styles.validateApplyBtn} onClick={onGenerateReport}>
+          <FileText size={16} /> Générer le rapport de ce bassin
+        </button>
+      ) : (
+        <button style={styles.photoLockedBtn} onClick={onWantPremiumForReport}>
+          <Lock size={16} />
+          <span>Rapport PDF réservé à la version illimitée</span>
+        </button>
+      )}
+      <p style={styles.helpTextSmall}>
+        Le rapport reprend l'historique des mesures, les conseils donnés et les quantités
+        réellement appliquées pour ce bassin.
+      </p>
+
+      <div style={styles.sectionRow}>
+        <span style={styles.sectionLabel}>Zone sensible</span>
+      </div>
+      <button style={styles.dangerLinkBtn} onClick={onDeleteAllMeasures}>
+        <Trash2 size={14} /> Supprimer toutes les mesures de ce bassin
+      </button>
     </div>
   );
 }
@@ -1814,6 +2147,173 @@ function AddPoolModal({ onClose, onSave }) {
   );
 }
 
+// ---------- Rapport ----------
+function ReportView({ pool, measures, applications, products, onClose }) {
+  const sortedMeasures = useMemo(
+    () => [...measures].sort((a, b) => new Date(a.date) - new Date(b.date)),
+    [measures]
+  );
+
+  const chartData = useMemo(
+    () =>
+      sortedMeasures.map((m) => ({
+        date: formatDateShort(m.date),
+        pH: m.pH !== undefined && m.pH !== "" ? parseFloat(m.pH) : null,
+        fCl: m.fCl !== undefined && m.fCl !== "" ? parseFloat(m.fCl) : null,
+        tCl: m.tCl !== undefined && m.tCl !== "" ? parseFloat(m.tCl) : null,
+        tac: m.tac !== undefined && m.tac !== "" ? parseFloat(m.tac) : null,
+        cya: m.cya !== undefined && m.cya !== "" ? parseFloat(m.cya) : null,
+        temp: m.temp !== undefined && m.temp !== "" ? parseFloat(m.temp) : null,
+      })),
+    [sortedMeasures]
+  );
+
+  const chartParams = [
+    { key: "pH", color: "#1f8a70", label: "pH", axis: "left" },
+    { key: "fCl", color: "#2b7fd9", label: "Chlore libre", axis: "left" },
+    { key: "tCl", color: "#8a6fd1", label: "Chlore total", axis: "left" },
+    { key: "tac", color: "#d98c2b", label: "TAC", axis: "right" },
+    { key: "cya", color: "#c4502f", label: "CYA", axis: "right" },
+    { key: "temp", color: "#e0578a", label: "Température", axis: "right" },
+  ];
+
+  // Pour chaque mesure : recalcule le plan de traitement qui avait été
+  // donné (avec les produits actuels) et retrouve l'application validée
+  // correspondante si elle existe.
+  const rows = useMemo(() => {
+    return sortedMeasures.map((m) => {
+      const recs = computeRecommendations(m, pool?.volume || 0, products);
+      const application = applications.find((a) => a.measureId === m.id) || null;
+      return { measure: m, recs, application };
+    });
+  }, [sortedMeasures, pool, products, applications]);
+
+  const generatedAt = new Date().toLocaleString("fr-FR", {
+    dateStyle: "long",
+    timeStyle: "short",
+  });
+
+  return (
+    <div style={styles.reportOverlay}>
+      <div style={styles.reportToolbar} className="no-print">
+        <button style={styles.reportCloseBtn} onClick={onClose}>
+          <X size={18} /> Fermer
+        </button>
+        <button style={styles.reportPrintBtn} onClick={() => window.print()}>
+          <Download size={16} /> Imprimer / Enregistrer en PDF
+        </button>
+      </div>
+
+      <div style={styles.reportPage} id="report-printable">
+        <div style={styles.reportHeader}>
+          <div style={styles.reportHeaderIcon}>
+            <Droplets size={20} color="#eaf6f4" />
+          </div>
+          <div>
+            <div style={styles.reportTitle}>Rapport de suivi — {pool?.name}</div>
+            <div style={styles.reportSubtitle}>
+              {pool?.location} · {pool?.volume} m³ · généré le {generatedAt}
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.reportSectionTitle}>Évolution des paramètres</div>
+        {chartData.length > 0 ? (
+          <div style={styles.reportChartWrap}>
+            <LineChart
+              width={760}
+              height={280}
+              data={chartData}
+              margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#e6ebe9" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#3a4a47" }} />
+              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "#3a4a47" }} width={30} />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                tick={{ fontSize: 10, fill: "#3a4a47" }}
+                width={30}
+              />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              {chartParams.map((cp) => (
+                <Line
+                  key={cp.key}
+                  yAxisId={cp.axis}
+                  type="monotone"
+                  dataKey={cp.key}
+                  name={cp.label}
+                  stroke={cp.color}
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  connectNulls
+                />
+              ))}
+            </LineChart>
+          </div>
+        ) : (
+          <p style={styles.helpTextSmall}>Aucune mesure à afficher.</p>
+        )}
+
+        <div style={styles.reportSectionTitle}>Historique détaillé</div>
+        {rows.length === 0 && (
+          <p style={styles.helpTextSmall}>Aucune mesure enregistrée pour ce bassin.</p>
+        )}
+        {rows.map(({ measure, recs, application }, i) => {
+          const params = ["pH", "fCl", "tCl", "tac", "cya", "temp"].filter(
+            (p) => measure[p] !== undefined && measure[p] !== "" && measure[p] !== null
+          );
+          return (
+            <div key={measure.id} style={styles.reportRow}>
+              <div style={styles.reportRowDate}>{formatDate(measure.date)}</div>
+
+              <table style={styles.reportTable}>
+                <tbody>
+                  <tr>
+                    {params.map((p) => (
+                      <td key={p} style={styles.reportTableCell}>
+                        <div style={styles.reportTableCellLabel}>{TARGETS[p].label}</div>
+                        <div style={styles.reportTableCellValue}>
+                          {measure[p]} {TARGETS[p].unit}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style={styles.reportSubLabel}>Conseils donnés</div>
+              {recs.length === 0 ? (
+                <p style={styles.reportConseilText}>Tous les paramètres étaient dans la cible.</p>
+              ) : (
+                <ul style={styles.reportConseilList}>
+                  {recs.map((r, j) => {
+                    const applied = application?.steps?.find((s) => s.action === r.action);
+                    return (
+                      <li key={j} style={styles.reportConseilItem}>
+                        <strong>{r.title}</strong> — {r.productName}
+                        {applied ? (
+                          <span style={styles.reportAppliedTag}>
+                            {" "}
+                            → appliqué : {applied.appliedAmount ?? "—"} {applied.doseUnit || ""}
+                          </span>
+                        ) : (
+                          <span style={styles.reportNotAppliedTag}> — non confirmé</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              {i < rows.length - 1 && <div style={styles.reportDivider} />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ---------- Modal shell ----------
 function ModalShell({ children, onClose, title, rightAction }) {
   return (
@@ -1851,6 +2351,115 @@ function formatDateShort(iso) {
 
 // ---------- Styles ----------
 const styles = {
+  reportOverlay: {
+    position: "fixed",
+    inset: 0,
+    background: "#ffffff",
+    zIndex: 200,
+    overflowY: "auto",
+  },
+  reportToolbar: {
+    position: "sticky",
+    top: 0,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "14px 16px",
+    background: "#0b3f3a",
+    zIndex: 5,
+  },
+  reportCloseBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    background: "transparent",
+    border: "none",
+    color: "#eaf6f4",
+    fontSize: 13.5,
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  reportPrintBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: 7,
+    background: "#1f8a70",
+    border: "none",
+    borderRadius: 10,
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: 700,
+    padding: "9px 14px",
+    cursor: "pointer",
+  },
+  reportPage: {
+    maxWidth: 820,
+    margin: "0 auto",
+    padding: "24px 20px 60px",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    color: "#16302c",
+  },
+  reportHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    paddingBottom: 16,
+    marginBottom: 18,
+    borderBottom: "2px solid #0f5e56",
+  },
+  reportHeaderIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 9,
+    background: "#0f5e56",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  reportTitle: { fontSize: 18, fontWeight: 800, color: "#16302c" },
+  reportSubtitle: { fontSize: 12.5, color: "#7a8a93", marginTop: 2 },
+  reportSectionTitle: {
+    fontSize: 14,
+    fontWeight: 800,
+    color: "#0f5e56",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    marginTop: 26,
+    marginBottom: 12,
+  },
+  reportChartWrap: {
+    display: "flex",
+    justifyContent: "center",
+    overflowX: "auto",
+    background: "#fafcfb",
+    borderRadius: 12,
+    padding: 8,
+  },
+  reportRow: { marginBottom: 18 },
+  reportRowDate: { fontSize: 14, fontWeight: 700, color: "#16302c", marginBottom: 8 },
+  reportTable: { width: "100%", borderCollapse: "collapse", marginBottom: 10 },
+  reportTableCell: {
+    border: "1px solid #e2e8e6",
+    padding: "7px 10px",
+    textAlign: "left",
+    verticalAlign: "top",
+  },
+  reportTableCellLabel: { fontSize: 10.5, color: "#7a8a93", textTransform: "uppercase" },
+  reportTableCellValue: { fontSize: 13, fontWeight: 700, color: "#16302c", marginTop: 1 },
+  reportSubLabel: {
+    fontSize: 11.5,
+    fontWeight: 700,
+    color: "#7a8a93",
+    textTransform: "uppercase",
+    marginBottom: 5,
+  },
+  reportConseilText: { fontSize: 12.5, color: "#7a8a93", fontStyle: "italic" },
+  reportConseilList: { margin: 0, paddingLeft: 18 },
+  reportConseilItem: { fontSize: 12.5, color: "#3a4a47", lineHeight: 1.6 },
+  reportAppliedTag: { color: "#1f8a70", fontWeight: 600 },
+  reportNotAppliedTag: { color: "#a8721a", fontStyle: "italic" },
+  reportDivider: { height: 1, background: "#e2e8e6", marginTop: 16 },
   app: {
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
@@ -2100,6 +2709,50 @@ const styles = {
     borderRadius: 14,
     padding: "14px 14px",
   },
+  validateApplyBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    width: "100%",
+    padding: "13px 0",
+    marginTop: 4,
+    borderRadius: 12,
+    border: "1.5px solid #0f5e56",
+    background: "#ffffff",
+    color: "#0f5e56",
+    fontWeight: 700,
+    fontSize: 13.5,
+    cursor: "pointer",
+  },
+  validateApplyBtnSmall: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    width: "100%",
+    padding: "9px 0",
+    borderRadius: 10,
+    border: "1.5px solid #0f5e56",
+    background: "#ffffff",
+    color: "#0f5e56",
+    fontWeight: 600,
+    fontSize: 12.5,
+    cursor: "pointer",
+  },
+  applyConfirmedCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: 9,
+    background: "#e9f6f1",
+    border: "1px solid #c9e8dc",
+    borderRadius: 12,
+    padding: "11px 14px",
+    fontSize: 12.5,
+    color: "#0f5e56",
+    fontWeight: 600,
+    marginTop: 4,
+  },
   recoCard: {
     background: "#fff7f2",
     border: "1px solid #f3d9c8",
@@ -2189,6 +2842,21 @@ const styles = {
   },
   emptyTitle: { fontSize: 16, fontWeight: 700, marginTop: 6 },
   emptyText: { fontSize: 13.5, color: "#7a8a93", lineHeight: 1.5, maxWidth: 280 },
+  dangerLinkBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    width: "100%",
+    marginTop: 18,
+    padding: "11px 0",
+    background: "transparent",
+    border: "none",
+    color: "#c4502f",
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer",
+  },
   primaryBtn: {
     marginTop: 12,
     display: "flex",
@@ -2285,6 +2953,29 @@ const styles = {
     gap: 5,
     fontSize: 12,
     color: "#c4502f",
+    background: "transparent",
+    border: "none",
+    padding: 0,
+    cursor: "pointer",
+  },
+  editBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
+    fontSize: 12,
+    color: "#0f5e56",
+    background: "transparent",
+    border: "none",
+    padding: 0,
+    cursor: "pointer",
+  },
+  editLinkBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+    fontSize: 12,
+    fontWeight: 600,
+    color: "#0f5e56",
     background: "transparent",
     border: "none",
     padding: 0,
@@ -2402,6 +3093,36 @@ const styles = {
     margin: "12px 2px 5px",
   },
   fieldGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
+  applyStepCard: {
+    background: "#f5f9f8",
+    borderRadius: 12,
+    padding: "12px 14px",
+    border: "1px solid #e6ebe9",
+  },
+  applyStepTitle: { fontSize: 13.5, fontWeight: 700, color: "#16302c", marginBottom: 2 },
+  applyStepProduct: { fontSize: 12.5, color: "#7a8a93", marginBottom: 8 },
+  unitTag: {
+    display: "flex",
+    alignItems: "center",
+    height: 42,
+    padding: "0 12px",
+    background: "#eef2f1",
+    borderRadius: 10,
+    fontSize: 13.5,
+    color: "#3a4a47",
+    fontWeight: 600,
+    boxSizing: "border-box",
+  },
+  checkboxRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 9,
+    marginTop: 16,
+    fontSize: 13.5,
+    color: "#16302c",
+    fontWeight: 500,
+  },
+  helpTextSmall: { fontSize: 12.5, color: "#7a8a93", lineHeight: 1.5 },
   input: {
     width: "100%",
     boxSizing: "border-box",
