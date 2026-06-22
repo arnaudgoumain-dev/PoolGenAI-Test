@@ -216,10 +216,10 @@ function statusFor(param, value, customTargets) {
 }
 
 function statusColor(status) {
-  if (status === "ok") return "#1f8a70";
+  if (status === "ok") return "#1a8fd1";
   if (status === "low") return "#d98c2b";
   if (status === "high") return "#c4502f";
-  return "#7a8a93";
+  return "#6a7d90";
 }
 
 function statusLabel(status) {
@@ -867,7 +867,7 @@ function Header({ poolName, location, isPremium, pools, activePoolId, onSwitchPo
   return (
     <header style={styles.header}>
       <div style={styles.headerIcon}>
-        <Droplets size={22} color="#eaf6f4" strokeWidth={2.2} />
+        <Droplets size={22} color="#e8f4fd" strokeWidth={2.2} />
       </div>
       <button
         style={styles.headerTitleBtn}
@@ -877,7 +877,7 @@ function Header({ poolName, location, isPremium, pools, activePoolId, onSwitchPo
           <span style={styles.headerTitle}>{poolName}</span>
           <ChevronDown
             size={16}
-            color="#eaf6f4"
+            color="#e8f4fd"
             strokeWidth={2.6}
             style={{
               transform: showSwitcher ? "rotate(180deg)" : "none",
@@ -913,13 +913,13 @@ function Header({ poolName, location, isPremium, pools, activePoolId, onSwitchPo
                 {p.photo ? (
                   <img src={p.photo} alt="" style={styles.poolSwitcherThumb} />
                 ) : (
-                  <Droplets size={16} color={p.id === activePoolId ? "#0f5e56" : "#7a8a93"} />
+                  <Droplets size={16} color={p.id === activePoolId ? "#0a6ebd" : "#6a7d90"} />
                 )}
                 <div style={{ flex: 1, textAlign: "left" }}>
-                  <div style={{ fontWeight: 700, fontSize: 13.5, color: "#16302c" }}>{p.name}</div>
-                  <div style={{ fontSize: 11.5, color: "#7a8a93" }}>{p.location} · {p.volume} m³ · {TREATMENT_TYPES.find((t) => t.value === p.treatmentType)?.label || "Chlore"}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{p.name}</div>
+                  <div style={{ fontSize: 11.5, color: "#6a7d90" }}>{p.location} · {p.volume} m³ · {TREATMENT_TYPES.find((t) => t.value === p.treatmentType)?.label || "Chlore"}</div>
                 </div>
-                {p.id === activePoolId && <CheckCircle2 size={16} color="#1f8a70" />}
+                {p.id === activePoolId && <CheckCircle2 size={16} color="#1a8fd1" />}
               </button>
             ))}
             <button
@@ -957,7 +957,7 @@ function TabBar({ tab, setTab }) {
             onClick={() => setTab(t.id)}
             style={{
               ...styles.tabBtn,
-              color: active ? "#0f5e56" : "#7a8a93",
+              color: active ? "#0a6ebd" : "#6a7d90",
             }}
           >
             <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
@@ -1036,7 +1036,7 @@ Réponds directement en français, sans titre ni introduction.`;
   if (!latest) {
     return (
       <div style={styles.emptyState}>
-        <Droplets size={40} color="#9fc9c3" strokeWidth={1.5} />
+        <Droplets size={40} color="#7ab8e8" strokeWidth={1.5} />
         <p style={styles.emptyTitle}>Aucune mesure enregistrée</p>
         <p style={styles.emptyText}>
           Ajoute ta première série de mesures pour voir l'état de ton bassin et les
@@ -1095,8 +1095,8 @@ Réponds directement en français, sans titre ni introduction.`;
 
       {recs.length === 0 ? (
         <div style={styles.allGoodCard}>
-          <CheckCircle2 size={22} color="#1f8a70" />
-          <span style={{ color: "#0f5e56", fontWeight: 600, fontSize: 14 }}>
+          <CheckCircle2 size={22} color="#1a8fd1" />
+          <span style={{ color: "#0a6ebd", fontWeight: 600, fontSize: 14 }}>
             Tous les paramètres mesurés sont dans la cible.
           </span>
         </div>
@@ -1114,7 +1114,7 @@ Réponds directement en français, sans titre ni introduction.`;
 
           {applicationForLatest ? (
             <div style={styles.applyConfirmedCard}>
-              <CheckCircle2 size={16} color="#1f8a70" />
+              <CheckCircle2 size={16} color="#1a8fd1" />
               <span style={{ flex: 1 }}>
                 Conseils {applicationForLatest.allApplied ? "appliqués" : "partiellement appliqués"}{" "}
                 le {formatDate(applicationForLatest.appliedAt)}
@@ -1228,7 +1228,7 @@ function RecoCard({ reco, isLast }) {
 
       {!!reco.waitHours && (
         <div style={styles.recoWait}>
-          <Clock size={13} color="#0f5e56" />
+          <Clock size={13} color="#0a6ebd" />
           Attendre {reco.waitHours}h avant {isLast ? "de mesurer à nouveau" : "le traitement suivant"}
         </div>
       )}
@@ -1488,7 +1488,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
   }, [measures]);
 
   const chartParams = [
-    { key: "pH", color: "#1f8a70", label: "pH", axis: "left" },
+    { key: "pH", color: "#1a8fd1", label: "pH", axis: "left" },
     { key: "fCl", color: "#2b7fd9", label: "Chlore libre", axis: "left" },
     { key: "tCl", color: "#8a6fd1", label: "Chlore total", axis: "left" },
     { key: "tac", color: "#d98c2b", label: "TAC", axis: "right" },
@@ -1512,7 +1512,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
   if (measures.length === 0) {
     return (
       <div style={styles.emptyState}>
-        <History size={40} color="#9fc9c3" strokeWidth={1.5} />
+        <History size={40} color="#7ab8e8" strokeWidth={1.5} />
         <p style={styles.emptyTitle}>Pas encore d'historique</p>
         <p style={styles.emptyText}>Tes mesures apparaîtront ici au fil du temps.</p>
         <button style={styles.primaryBtn} onClick={onAdd}>
@@ -1535,9 +1535,9 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
           style={{
             ...styles.chip,
             ...styles.chipAll,
-            background: allActive ? "#0f5e56" : "#f1f4f3",
-            borderColor: allActive ? "#0f5e56" : "#e2e8e6",
-            color: allActive ? "#ffffff" : "#3a4a47",
+            background: allActive ? "#0a6ebd" : "#f1f4f3",
+            borderColor: allActive ? "#0a6ebd" : "#d0e4f5",
+            color: allActive ? "#ffffff" : "#2d4a6e",
           }}
         >
           {allActive ? "Tout masquer" : "Tout afficher"}
@@ -1549,8 +1549,8 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
             style={{
               ...styles.chip,
               background: activeParams.includes(cp.key) ? cp.color + "22" : "#f1f4f3",
-              borderColor: activeParams.includes(cp.key) ? cp.color : "#e2e8e6",
-              color: activeParams.includes(cp.key) ? cp.color : "#7a8a93",
+              borderColor: activeParams.includes(cp.key) ? cp.color : "#d0e4f5",
+              color: activeParams.includes(cp.key) ? cp.color : "#6a7d90",
             }}
           >
             {cp.label}
@@ -1583,22 +1583,22 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
               domain={["dataMin", "dataMax"]}
               scale="time"
               tickFormatter={(ts) => formatDateShort(new Date(ts).toISOString())}
-              tick={{ fontSize: 10, fill: "#7a8a93" }}
+              tick={{ fontSize: 10, fill: "#6a7d90" }}
             />
             <YAxis
               yAxisId="left"
-              tick={{ fontSize: 10, fill: "#7a8a93" }}
+              tick={{ fontSize: 10, fill: "#6a7d90" }}
               width={28}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fontSize: 10, fill: "#7a8a93" }}
+              tick={{ fontSize: 10, fill: "#6a7d90" }}
               width={28}
             />
             <Tooltip
               labelFormatter={(ts) => formatDate(new Date(ts).toISOString())}
-              contentStyle={{ fontSize: 12, borderRadius: 10, border: "1px solid #e2e8e6" }}
+              contentStyle={{ fontSize: 12, borderRadius: 10, border: "1px solid #d0e4f5" }}
             />
             {chartParams
               .filter((cp) => activeParams.includes(cp.key))
@@ -1666,7 +1666,7 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
         </div>
         <ChevronRight
           size={16}
-          color="#7a8a93"
+          color="#6a7d90"
           style={{ transform: open ? "rotate(90deg)" : "none", transition: "transform .15s" }}
         />
       </button>
@@ -1696,7 +1696,7 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
 
           {application ? (
             <div style={styles.applyConfirmedCard}>
-              <CheckCircle2 size={16} color="#1f8a70" />
+              <CheckCircle2 size={16} color="#1a8fd1" />
               <span style={{ flex: 1 }}>
                 Conseils {application.allApplied ? "appliqués" : "partiellement appliqués"} le{" "}
                 {formatDate(application.appliedAt)}
@@ -1865,23 +1865,6 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
         </div>
       )}
 
-      <div style={styles.fieldGrid}>
-        {fields.map((f) => (
-          <div key={f.key}>
-            <label style={styles.fieldLabel}>{f.label}</label>
-            <input
-              type="number"
-              step={f.step}
-              inputMode="decimal"
-              placeholder={f.placeholder}
-              value={f.value}
-              onChange={(e) => f.set(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-        ))}
-      </div>
-
       <label style={styles.fieldLabel}>
         {method === "bandelette" ? "Photo tube + bandelette" : "Photo de la mesure"}
       </label>
@@ -1956,6 +1939,24 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
           </span>
         </button>
       )}
+
+
+      <div style={styles.fieldGrid}>
+        {fields.map((f) => (
+          <div key={f.key}>
+            <label style={styles.fieldLabel}>{f.label}</label>
+            <input
+              type="number"
+              step={f.step}
+              inputMode="decimal"
+              placeholder={f.placeholder}
+              value={f.value}
+              onChange={(e) => f.set(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+        ))}
+      </div>
 
       <label style={styles.fieldLabel}>Note (optionnel)</label>
       <textarea
@@ -2084,7 +2085,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
               <img src={p.photo} alt="" style={styles.productThumb} />
             ) : (
               <div style={styles.productThumbPlaceholder}>
-                <Beaker size={16} color="#9fc9c3" />
+                <Beaker size={16} color="#7ab8e8" />
               </div>
             )}
             <div style={{ flex: 1, textAlign: "left" }}>
@@ -2095,7 +2096,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                 {!!p.waitHours && ` · attente ${p.waitHours}h`}
               </div>
             </div>
-            <ChevronRight size={16} color="#7a8a93" />
+            <ChevronRight size={16} color="#6a7d90" />
           </button>
         ))}
         {products.length === 0 && (
@@ -2309,10 +2310,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Crown size={18} color={isPremium ? "#a8721a" : "#9aa9a5"} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 13.5, color: "#16302c" }}>
+            <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>
               {isPremium ? "Mode illimité actif" : "Version gratuite"}
             </div>
-            <div style={{ fontSize: 11.5, color: "#7a8a93" }}>
+            <div style={{ fontSize: 11.5, color: "#6a7d90" }}>
               Interrupteur de test — pas de vrai paiement ici
             </div>
           </div>
@@ -2339,20 +2340,20 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
             key={p.id}
             style={{
               ...styles.poolListRow,
-              borderColor: p.id === activePoolId ? "#0f5e56" : "#e6ebe9",
+              borderColor: p.id === activePoolId ? "#0a6ebd" : "#e6ebe9",
             }}
           >
             <button style={styles.poolListMain} onClick={() => onSwitchPool(p.id)}>
               {p.photo ? (
                 <img src={p.photo} alt="" style={styles.poolSwitcherThumb} />
               ) : (
-                <Droplets size={16} color={p.id === activePoolId ? "#0f5e56" : "#9fc9c3"} />
+                <Droplets size={16} color={p.id === activePoolId ? "#0a6ebd" : "#7ab8e8"} />
               )}
               <div style={{ flex: 1, textAlign: "left" }}>
-                <div style={{ fontWeight: 700, fontSize: 13.5, color: "#16302c" }}>{p.name}</div>
-                <div style={{ fontSize: 11.5, color: "#7a8a93" }}>{p.location} · {p.volume} m³ · {TREATMENT_TYPES.find((t) => t.value === p.treatmentType)?.label || "Chlore"}</div>
+                <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{p.name}</div>
+                <div style={{ fontSize: 11.5, color: "#6a7d90" }}>{p.location} · {p.volume} m³ · {TREATMENT_TYPES.find((t) => t.value === p.treatmentType)?.label || "Chlore"}</div>
               </div>
-              {p.id === activePoolId && <CheckCircle2 size={16} color="#1f8a70" />}
+              {p.id === activePoolId && <CheckCircle2 size={16} color="#1a8fd1" />}
             </button>
             {pools.length > 1 && (
               <button style={styles.poolListDeleteBtn} onClick={() => onDeletePool(p.id)}>
@@ -2404,7 +2405,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
             <div style={styles.treatmentOptionTop}>
               <span style={styles.treatmentOptionLabel}>{tt.label}</span>
               {activePool?.treatmentType === tt.value && (
-                <CheckCircle2 size={16} color="#0f5e56" />
+                <CheckCircle2 size={16} color="#0a6ebd" />
               )}
             </div>
             <div style={styles.treatmentOptionDesc}>{tt.description}</div>
@@ -2529,7 +2530,7 @@ function ToggleSwitch({ checked, onChange }) {
         height: 26,
         borderRadius: 99,
         border: "none",
-        background: checked ? "#0f5e56" : "#d8e2df",
+        background: checked ? "#0a6ebd" : "#d8e2df",
         position: "relative",
         cursor: "pointer",
         flexShrink: 0,
@@ -2572,7 +2573,7 @@ function PaywallModal({ onClose, onActivate }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "16px 2px" }}>
         {perks.map((perk, i) => (
           <div key={i} style={styles.paywallPerk}>
-            <CheckCircle2 size={16} color="#1f8a70" />
+            <CheckCircle2 size={16} color="#1a8fd1" />
             <span>{perk}</span>
           </div>
         ))}
@@ -2702,7 +2703,7 @@ function ReportView({ pool, measures, applications, products, onClose }) {
   );
 
   const chartParams = [
-    { key: "pH", color: "#1f8a70", label: "pH", axis: "left" },
+    { key: "pH", color: "#1a8fd1", label: "pH", axis: "left" },
     { key: "fCl", color: "#2b7fd9", label: "Chlore libre", axis: "left" },
     { key: "tCl", color: "#8a6fd1", label: "Chlore total", axis: "left" },
     { key: "tac", color: "#d98c2b", label: "TAC", axis: "right" },
@@ -2750,7 +2751,7 @@ function ReportView({ pool, measures, applications, products, onClose }) {
       <div style={styles.reportPage} id="report-printable">
         <div style={styles.reportHeader}>
           <div style={styles.reportHeaderIcon}>
-            <Droplets size={20} color="#eaf6f4" />
+            <Droplets size={20} color="#e8f4fd" />
           </div>
           <div>
             <div style={styles.reportTitle}>Rapport de suivi — {pool?.name}</div>
@@ -2776,13 +2777,13 @@ function ReportView({ pool, measures, applications, products, onClose }) {
                 domain={["dataMin", "dataMax"]}
                 scale="time"
                 tickFormatter={(ts) => formatDateShort(new Date(ts).toISOString())}
-                tick={{ fontSize: 10, fill: "#3a4a47" }}
+                tick={{ fontSize: 10, fill: "#2d4a6e" }}
               />
-              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "#3a4a47" }} width={30} />
+              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "#2d4a6e" }} width={30} />
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                tick={{ fontSize: 10, fill: "#3a4a47" }}
+                tick={{ fontSize: 10, fill: "#2d4a6e" }}
                 width={30}
               />
               <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -2924,7 +2925,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "14px 16px",
-    background: "#0b3f3a",
+    background: "#064a8a",
     zIndex: 5,
   },
   reportCloseBtn: {
@@ -2933,7 +2934,7 @@ const styles = {
     gap: 6,
     background: "transparent",
     border: "none",
-    color: "#eaf6f4",
+    color: "#e8f4fd",
     fontSize: 13.5,
     fontWeight: 600,
     cursor: "pointer",
@@ -2942,7 +2943,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: 7,
-    background: "#1f8a70",
+    background: "#1a8fd1",
     border: "none",
     borderRadius: 10,
     color: "#ffffff",
@@ -2955,7 +2956,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: 6,
-    color: "#eaf6f4",
+    color: "#e8f4fd",
     fontSize: 12.5,
     fontWeight: 500,
   },
@@ -2964,7 +2965,7 @@ const styles = {
     margin: "0 auto",
     padding: "24px 20px 60px",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    color: "#16302c",
+    color: "#0d2b4e",
   },
   reportHeader: {
     display: "flex",
@@ -2972,24 +2973,24 @@ const styles = {
     gap: 12,
     paddingBottom: 16,
     marginBottom: 18,
-    borderBottom: "2px solid #0f5e56",
+    borderBottom: "2px solid #0a6ebd",
   },
   reportHeaderIcon: {
     width: 36,
     height: 36,
     borderRadius: 9,
-    background: "#0f5e56",
+    background: "#0a6ebd",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
-  reportTitle: { fontSize: 18, fontWeight: 800, color: "#16302c" },
-  reportSubtitle: { fontSize: 12.5, color: "#7a8a93", marginTop: 2 },
+  reportTitle: { fontSize: 18, fontWeight: 800, color: "#0d2b4e" },
+  reportSubtitle: { fontSize: 12.5, color: "#6a7d90", marginTop: 2 },
   reportSectionTitle: {
     fontSize: 14,
     fontWeight: 800,
-    color: "#0f5e56",
+    color: "#0a6ebd",
     textTransform: "uppercase",
     letterSpacing: 0.4,
     marginTop: 26,
@@ -3004,46 +3005,46 @@ const styles = {
     padding: 8,
   },
   reportRow: { marginBottom: 18 },
-  reportRowDate: { fontSize: 14, fontWeight: 700, color: "#16302c", marginBottom: 8 },
+  reportRowDate: { fontSize: 14, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 },
   reportTable: { width: "100%", borderCollapse: "collapse", marginBottom: 10 },
   reportTableCell: {
-    border: "1px solid #e2e8e6",
+    border: "1px solid #d0e4f5",
     padding: "7px 10px",
     textAlign: "left",
     verticalAlign: "top",
   },
-  reportTableCellLabel: { fontSize: 10.5, color: "#7a8a93", textTransform: "uppercase" },
-  reportTableCellValue: { fontSize: 13, fontWeight: 700, color: "#16302c", marginTop: 1 },
+  reportTableCellLabel: { fontSize: 10.5, color: "#6a7d90", textTransform: "uppercase" },
+  reportTableCellValue: { fontSize: 13, fontWeight: 700, color: "#0d2b4e", marginTop: 1 },
   reportSubLabel: {
     fontSize: 11.5,
     fontWeight: 700,
-    color: "#7a8a93",
+    color: "#6a7d90",
     textTransform: "uppercase",
     marginBottom: 5,
   },
-  reportConseilText: { fontSize: 12.5, color: "#7a8a93", fontStyle: "italic" },
+  reportConseilText: { fontSize: 12.5, color: "#6a7d90", fontStyle: "italic" },
   reportConseilList: { margin: 0, paddingLeft: 18 },
-  reportConseilItem: { fontSize: 12.5, color: "#3a4a47", lineHeight: 1.6 },
-  reportAppliedTag: { color: "#1f8a70", fontWeight: 600 },
+  reportConseilItem: { fontSize: 12.5, color: "#2d4a6e", lineHeight: 1.6 },
+  reportAppliedTag: { color: "#1a8fd1", fontWeight: 600 },
   reportNotAppliedTag: { color: "#a8721a", fontStyle: "italic" },
-  reportDivider: { height: 1, background: "#e2e8e6", marginTop: 16 },
+  reportDivider: { height: 1, background: "#d0e4f5", marginTop: 16 },
   app: {
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    background: "#f5f8f7",
+    background: "#f0f6fb",
     minHeight: "100vh",
     maxWidth: 480,
     margin: "0 auto",
     display: "flex",
     flexDirection: "column",
-    color: "#16302c",
+    color: "#0d2b4e",
   },
   header: {
     display: "flex",
     alignItems: "center",
     gap: 12,
     padding: "20px 18px 16px",
-    background: "linear-gradient(135deg, #0f5e56, #0b3f3a)",
+    background: "linear-gradient(135deg, #0a6ebd, #064a8a)",
   },
   headerIcon: {
     width: 38,
@@ -3069,7 +3070,7 @@ const styles = {
     gap: 4,
   },
   headerTitle: { color: "#ffffff", fontSize: 17, fontWeight: 700, letterSpacing: -0.2 },
-  headerSub: { color: "#bcdbd6", fontSize: 12.5, marginTop: 1 },
+  headerSub: { color: "#a8d4f0", fontSize: 12.5, marginTop: 1 },
   premiumBadge: {
     display: "flex",
     alignItems: "center",
@@ -3102,7 +3103,7 @@ const styles = {
   poolSwitcherTitle: {
     fontSize: 11.5,
     fontWeight: 800,
-    color: "#7a8a93",
+    color: "#6a7d90",
     textTransform: "uppercase",
     letterSpacing: 0.4,
     padding: "6px 10px 8px",
@@ -3133,9 +3134,9 @@ const styles = {
     marginTop: 6,
     padding: "10px 0",
     borderRadius: 11,
-    border: "1.5px dashed #b9d3cf",
+    border: "1.5px dashed #90c4e8",
     background: "transparent",
-    color: "#0f5e56",
+    color: "#0a6ebd",
     fontWeight: 700,
     fontSize: 13,
     cursor: "pointer",
@@ -3144,7 +3145,7 @@ const styles = {
     display: "inline-block",
     fontSize: 11.5,
     fontWeight: 700,
-    color: "#0f5e56",
+    color: "#0a6ebd",
     background: "#e9f6f1",
     padding: "4px 10px",
     borderRadius: 99,
@@ -3190,8 +3191,8 @@ const styles = {
     justifyContent: "space-between",
     margin: "4px 2px 10px",
   },
-  sectionLabel: { fontSize: 13, fontWeight: 700, color: "#3a4a47", textTransform: "uppercase", letterSpacing: 0.4 },
-  sectionDate: { fontSize: 12.5, color: "#7a8a93" },
+  sectionLabel: { fontSize: 13, fontWeight: 700, color: "#2d4a6e", textTransform: "uppercase", letterSpacing: 0.4 },
+  sectionDate: { fontSize: 12.5, color: "#6a7d90" },
   grid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -3208,8 +3209,8 @@ const styles = {
   paramTop: { display: "flex", alignItems: "center", justifyContent: "space-between" },
   paramLabel: { fontSize: 12, color: "#5d6e6a", fontWeight: 600 },
   paramDot: { width: 8, height: 8, borderRadius: 99 },
-  paramValue: { fontSize: 24, fontWeight: 800, marginTop: 4, color: "#16302c" },
-  paramUnit: { fontSize: 12, fontWeight: 600, color: "#7a8a93", marginLeft: 3 },
+  paramValue: { fontSize: 24, fontWeight: 800, marginTop: 4, color: "#0d2b4e" },
+  paramUnit: { fontSize: 12, fontWeight: 600, color: "#6a7d90", marginLeft: 3 },
   paramStatus: { fontSize: 12, fontWeight: 700, marginTop: 2 },
   paramRange: { fontSize: 11, color: "#9aa9a5", marginTop: 2 },
   addMeasureBtn: {
@@ -3220,9 +3221,9 @@ const styles = {
     gap: 6,
     padding: "11px 0",
     borderRadius: 12,
-    border: "1.5px dashed #b9d3cf",
+    border: "1.5px dashed #90c4e8",
     background: "transparent",
-    color: "#0f5e56",
+    color: "#0a6ebd",
     fontWeight: 700,
     fontSize: 13.5,
     marginBottom: 22,
@@ -3285,9 +3286,9 @@ const styles = {
     padding: "13px 0",
     marginTop: 4,
     borderRadius: 12,
-    border: "1.5px solid #0f5e56",
+    border: "1.5px solid #0a6ebd",
     background: "#ffffff",
-    color: "#0f5e56",
+    color: "#0a6ebd",
     fontWeight: 700,
     fontSize: 13.5,
     cursor: "pointer",
@@ -3300,9 +3301,9 @@ const styles = {
     width: "100%",
     padding: "9px 0",
     borderRadius: 10,
-    border: "1.5px solid #0f5e56",
+    border: "1.5px solid #0a6ebd",
     background: "#ffffff",
-    color: "#0f5e56",
+    color: "#0a6ebd",
     fontWeight: 600,
     fontSize: 12.5,
     cursor: "pointer",
@@ -3316,7 +3317,7 @@ const styles = {
     borderRadius: 12,
     padding: "11px 14px",
     fontSize: 12.5,
-    color: "#0f5e56",
+    color: "#0a6ebd",
     fontWeight: 600,
     marginTop: 4,
   },
@@ -3365,12 +3366,12 @@ const styles = {
     borderRadius: 8,
     objectFit: "cover",
     flexShrink: 0,
-    border: "1px solid #e2e8e6",
+    border: "1px solid #d0e4f5",
   },
   recoProduct: {
     fontSize: 13,
     fontWeight: 600,
-    color: "#16302c",
+    color: "#0d2b4e",
     marginBottom: 2,
     display: "flex",
     alignItems: "center",
@@ -3388,17 +3389,17 @@ const styles = {
     padding: "2px 7px",
     borderRadius: 99,
   },
-  recoDose: { fontSize: 13, color: "#3a4a47" },
+  recoDose: { fontSize: 13, color: "#2d4a6e" },
   recoWait: {
     display: "flex",
     alignItems: "center",
     gap: 5,
     fontSize: 12,
     fontWeight: 600,
-    color: "#0f5e56",
+    color: "#0a6ebd",
     marginTop: 7,
   },
-  recoNote: { fontSize: 11.5, color: "#7a8a93", marginTop: 6, lineHeight: 1.4 },
+  recoNote: { fontSize: 11.5, color: "#6a7d90", marginTop: 6, lineHeight: 1.4 },
   emptyState: {
     display: "flex",
     flexDirection: "column",
@@ -3408,7 +3409,7 @@ const styles = {
     gap: 8,
   },
   emptyTitle: { fontSize: 16, fontWeight: 700, marginTop: 6 },
-  emptyText: { fontSize: 13.5, color: "#7a8a93", lineHeight: 1.5, maxWidth: 280 },
+  emptyText: { fontSize: 13.5, color: "#6a7d90", lineHeight: 1.5, maxWidth: 280 },
   dangerLinkBtn: {
     display: "flex",
     alignItems: "center",
@@ -3441,7 +3442,7 @@ const styles = {
     padding: "13px 0",
     borderRadius: 13,
     border: "none",
-    background: "#0f5e56",
+    background: "#0a6ebd",
     color: "#ffffff",
     fontWeight: 700,
     fontSize: 14.5,
@@ -3486,7 +3487,7 @@ const styles = {
     height: 28,
     borderRadius: 99,
     border: "none",
-    background: "#0f5e56",
+    background: "#0a6ebd",
     color: "#fff",
     display: "flex",
     alignItems: "center",
@@ -3509,7 +3510,7 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-  measureDate: { fontSize: 13.5, fontWeight: 600, color: "#16302c" },
+  measureDate: { fontSize: 13.5, fontWeight: 600, color: "#0d2b4e" },
   measureDetails: { padding: "0 14px 14px" },
   measureChips: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 },
   measureChip: {
@@ -3520,7 +3521,7 @@ const styles = {
     border: "1px solid",
     background: "#fafcfb",
   },
-  measureNote: { fontSize: 12, color: "#7a8a93", marginBottom: 8, fontStyle: "italic" },
+  measureNote: { fontSize: 12, color: "#6a7d90", marginBottom: 8, fontStyle: "italic" },
   deleteBtn: {
     display: "flex",
     alignItems: "center",
@@ -3537,7 +3538,7 @@ const styles = {
     alignItems: "center",
     gap: 5,
     fontSize: 12,
-    color: "#0f5e56",
+    color: "#0a6ebd",
     background: "transparent",
     border: "none",
     padding: 0,
@@ -3549,13 +3550,13 @@ const styles = {
     gap: 4,
     fontSize: 12,
     fontWeight: 600,
-    color: "#0f5e56",
+    color: "#0a6ebd",
     background: "transparent",
     border: "none",
     padding: 0,
     cursor: "pointer",
   },
-  helpText: { fontSize: 12, color: "#7a8a93", lineHeight: 1.5, margin: "4px 2px 14px" },
+  helpText: { fontSize: 12, color: "#6a7d90", lineHeight: 1.5, margin: "4px 2px 14px" },
   productRow: {
     display: "flex",
     alignItems: "center",
@@ -3567,8 +3568,8 @@ const styles = {
     cursor: "pointer",
     textAlign: "left",
   },
-  productName: { fontSize: 14, fontWeight: 700, color: "#16302c" },
-  productMeta: { fontSize: 11.5, color: "#7a8a93", marginTop: 2 },
+  productName: { fontSize: 14, fontWeight: 700, color: "#0d2b4e" },
+  productMeta: { fontSize: 11.5, color: "#6a7d90", marginTop: 2 },
   productThumb: {
     width: 40,
     height: 40,
@@ -3633,7 +3634,7 @@ const styles = {
     top: 0,
     background: "#ffffff",
   },
-  modalTitle: { fontSize: 16, fontWeight: 800, color: "#16302c" },
+  modalTitle: { fontSize: 16, fontWeight: 800, color: "#0d2b4e" },
   modalCloseBtn: {
     width: 30,
     height: 30,
@@ -3644,7 +3645,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    color: "#3a4a47",
+    color: "#2d4a6e",
   },
   modalDeleteBtn: {
     width: 30,
@@ -3673,17 +3674,17 @@ const styles = {
     padding: "12px 14px",
     border: "1px solid #e6ebe9",
   },
-  applyStepTitle: { fontSize: 13.5, fontWeight: 700, color: "#16302c", marginBottom: 2 },
-  applyStepProduct: { fontSize: 12.5, color: "#7a8a93", marginBottom: 8 },
+  applyStepTitle: { fontSize: 13.5, fontWeight: 700, color: "#0d2b4e", marginBottom: 2 },
+  applyStepProduct: { fontSize: 12.5, color: "#6a7d90", marginBottom: 8 },
   unitTag: {
     display: "flex",
     alignItems: "center",
     height: 42,
     padding: "0 12px",
-    background: "#eef2f1",
+    background: "#edf4fb",
     borderRadius: 10,
     fontSize: 13.5,
-    color: "#3a4a47",
+    color: "#2d4a6e",
     fontWeight: 600,
     boxSizing: "border-box",
   },
@@ -3693,13 +3694,13 @@ const styles = {
     gap: 9,
     marginTop: 16,
     fontSize: 13.5,
-    color: "#16302c",
+    color: "#0d2b4e",
     fontWeight: 500,
   },
-  helpTextSmall: { fontSize: 12.5, color: "#7a8a93", lineHeight: 1.5 },
+  helpTextSmall: { fontSize: 12.5, color: "#6a7d90", lineHeight: 1.5 },
   segmentedControl: {
     display: "flex",
-    background: "#eef2f1",
+    background: "#edf4fb",
     borderRadius: 12,
     padding: 3,
     gap: 3,
@@ -3711,7 +3712,7 @@ const styles = {
     border: "none",
     borderRadius: 10,
     background: "transparent",
-    color: "#5a6e69",
+    color: "#4a6480",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -3719,7 +3720,7 @@ const styles = {
   },
   segmentedBtnActive: {
     background: "#ffffff",
-    color: "#0f5e56",
+    color: "#0a6ebd",
     boxShadow: "0 1px 4px rgba(10,30,28,.14)",
   },
   apiKeyRow: {
@@ -3771,7 +3772,7 @@ const styles = {
     borderRadius: 10,
     border: "1px solid #e2d9f3",
     fontSize: 13.5,
-    color: "#16302c",
+    color: "#0d2b4e",
     lineHeight: 1.65,
     whiteSpace: "pre-wrap",
   },
@@ -3814,13 +3815,13 @@ const styles = {
     textAlign: "left",
     padding: "12px 14px",
     borderRadius: 12,
-    border: "1.5px solid #e2e8e6",
+    border: "1.5px solid #d0e4f5",
     background: "#ffffff",
     cursor: "pointer",
   },
   treatmentOptionActive: {
-    border: "1.5px solid #0f5e56",
-    background: "#f0f9f6",
+    border: "1.5px solid #0a6ebd",
+    background: "#eaf5fd",
   },
   treatmentOptionTop: {
     display: "flex",
@@ -3831,11 +3832,11 @@ const styles = {
   treatmentOptionLabel: {
     fontSize: 14,
     fontWeight: 700,
-    color: "#16302c",
+    color: "#0d2b4e",
   },
   treatmentOptionDesc: {
     fontSize: 12,
-    color: "#7a8a93",
+    color: "#6a7d90",
     lineHeight: 1.4,
   },
   treatmentOptionParams: {
@@ -3847,25 +3848,25 @@ const styles = {
   filtrationOption: {
     padding: "11px 8px",
     borderRadius: 10,
-    border: "1.5px solid #e2e8e6",
+    border: "1.5px solid #d0e4f5",
     background: "#ffffff",
-    color: "#5a6e69",
+    color: "#4a6480",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
     textAlign: "center",
   },
   filtrationOptionActive: {
-    border: "1.5px solid #0f5e56",
-    background: "#f0f9f6",
-    color: "#0f5e56",
+    border: "1.5px solid #0a6ebd",
+    background: "#eaf5fd",
+    color: "#0a6ebd",
   },
   stripHint: {
     fontSize: 12.5,
-    color: "#7a8a93",
+    color: "#6a7d90",
     lineHeight: 1.5,
     padding: "8px 12px",
-    background: "#f5f8f7",
+    background: "#f0f6fb",
     borderRadius: 9,
     border: "1px solid #e6ebe9",
     marginBottom: 4,
@@ -3875,11 +3876,11 @@ const styles = {
     boxSizing: "border-box",
     padding: "11px 12px",
     borderRadius: 11,
-    border: "1.5px solid #e2e8e6",
+    border: "1.5px solid #d0e4f5",
     fontSize: 14,
     fontFamily: "inherit",
     background: "#fafcfb",
-    color: "#16302c",
+    color: "#0d2b4e",
     outline: "none",
   },
   photoCaptureBtn: {
@@ -3890,9 +3891,9 @@ const styles = {
     width: "100%",
     padding: "13px 0",
     borderRadius: 12,
-    border: "1.5px dashed #b9d3cf",
+    border: "1.5px dashed #90c4e8",
     background: "#f5f9f8",
-    color: "#0f5e56",
+    color: "#0a6ebd",
     fontWeight: 600,
     fontSize: 13.5,
     cursor: "pointer",
@@ -3931,7 +3932,7 @@ const styles = {
     maxHeight: 200,
     objectFit: "cover",
     borderRadius: 12,
-    border: "1px solid #e2e8e6",
+    border: "1px solid #d0e4f5",
   },
   photoRemoveBtn: {
     marginTop: 7,
@@ -3963,14 +3964,14 @@ const styles = {
     padding: "14px 0 6px",
     textAlign: "center",
   },
-  paywallPrice: { fontSize: 22, fontWeight: 800, color: "#16302c", marginTop: 6 },
-  paywallPriceSub: { fontSize: 12.5, color: "#7a8a93" },
+  paywallPrice: { fontSize: 22, fontWeight: 800, color: "#0d2b4e", marginTop: 6 },
+  paywallPriceSub: { fontSize: 12.5, color: "#6a7d90" },
   paywallPerk: {
     display: "flex",
     alignItems: "center",
     gap: 9,
     fontSize: 13.5,
-    color: "#3a4a47",
+    color: "#2d4a6e",
     fontWeight: 500,
   },
 };
