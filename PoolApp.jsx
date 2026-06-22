@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.8";
+const APP_VERSION = "0.9-debug";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -400,6 +400,25 @@ Réponds UNIQUEMENT en JSON, sans aucun texte avant ou après, sans balises mark
 }
 
 // ---------- Composant principal ----------
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { error: error.message + "\n" + error.stack };
+  }
+  render() {
+    if (this.state.error) {
+      return React.createElement("div", {
+        style: { padding: 24, fontFamily: "monospace", fontSize: 12, color: "#c00", whiteSpace: "pre-wrap", overflowY: "auto", maxHeight: "100vh" }
+      }, "CRASH DÉTECTÉ:\n\n" + this.state.error);
+    }
+    return this.props.children;
+  }
+}
+
 function PoolApp() {
   const [pools, setPools] = useState([
     { id: "default", name: "Ma piscine", location: "Valbonne (06)", volume: 72, treatmentType: "chlore", filtration: "sable" },
@@ -4158,6 +4177,6 @@ const styles = {
 })();
 
 const __root = ReactDOM.createRoot(document.getElementById("root"));
-__root.render(React.createElement(PoolApp));
+__root.render(React.createElement(ErrorBoundary, null, React.createElement(PoolApp)));
 const __loader = document.getElementById("boot-loader");
 if (__loader) __loader.remove();
