@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.32";
+const APP_VERSION = "0.33";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -734,13 +734,13 @@ function PoolApp() {
     setShowAddMeasure(true);
   }
 
-  function handleValidateApplication(m, recsOverride, selectedRecsOverride) {
+  function handleValidateApplication(m, recsOverride, selectedRecsOverride, adjustMode) {
     if (!isPremium) {
       setShowPaywall(true);
       return;
     }
     setValidatingMeasure(m);
-    if (selectedRecsOverride) setValidatingSelectedRecs(selectedRecsOverride);
+    if (selectedRecsOverride) setValidatingSelectedRecs({ selected: selectedRecsOverride, adjustMode: !!adjustMode });
     else setValidatingSelectedRecs(null);
   }
 
@@ -793,6 +793,7 @@ function PoolApp() {
             latest={latest}
             volume={activePool?.volume || 0}
             products={poolProducts}
+            manageStock={!!activePool?.manageStock}
             onWantPremium={() => setShowPaywall(true)}
             onAddMeasure={handleOpenAddMeasure}
             onEditMeasure={handleEditMeasure}
@@ -933,6 +934,9 @@ function PoolApp() {
           onClose={() => { setValidatingMeasure(null); setValidatingSelectedRecs(null); }}
           onSave={saveApplication}
           preselected={validatingSelectedRecs}
+          products={poolProducts}
+          manageStock={!!activePool?.manageStock}
+          onWantAddProduct={() => { setValidatingMeasure(null); setValidatingSelectedRecs(null); setTab("products"); }}
         />
       )}
 
@@ -1069,7 +1073,7 @@ function TabBar({ tab, setTab }) {
 }
 
 // ---------- Dashboard ----------
-function Dashboard({ latest, volume, products, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys }) {
+function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys }) {
   const [aiComment, setAiComment] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
@@ -1229,6 +1233,8 @@ Réponds directement en français, sans titre ni introduction.`;
                   selectable={!applicationForLatest}
                   selected={!!selectedRecs[i]}
                   onToggle={() => setSelectedRecs((prev) => ({ ...prev, [i]: !prev[i] }))}
+                  manageStock={manageStock}
+                  products={products}
                 />
               ))}
 
@@ -1239,7 +1245,14 @@ Réponds directement en français, sans titre ni introduction.`;
                     Conseils {applicationForLatest.allApplied ? "appliqués" : "partiellement appliqués"}{" "}
                     le {formatDate(applicationForLatest.appliedAt)}
                   </span>
-                  <button style={styles.editLinkBtn} onClick={() => onValidateApplication(latest, recs)}>
+                  <button style={styles.editLinkBtn} onClick={() => {
+                    // Reconstruire selectedRecs depuis les steps de l'application existante
+                    const sel = {};
+                    recs.forEach((r, i) => {
+                      sel[i] = applicationForLatest.steps?.some((s) => s.action === r.action) ?? true;
+                    });
+                    onValidateApplication(latest, recs, sel, true);
+                  }}>
                     Ajuster
                   </button>
                 </div>
@@ -1334,7 +1347,7 @@ function ParamCard({ param, value, effectiveTargets }) {
   );
 }
 
-function RecoCard({ reco, isLast, selectable, selected, onToggle }) {
+function RecoCard({ reco, isLast, selectable, selected, onToggle, manageStock, products }) {
   return (
     <div
       style={{
@@ -1371,19 +1384,30 @@ function RecoCard({ reco, isLast, selectable, selected, onToggle }) {
         </div>
       )}
 
-      <div style={styles.recoProductRow}>
-        {reco.productPhoto && (
-          <img src={reco.productPhoto} alt="" style={styles.recoProductThumb} />
-        )}
-        <div style={styles.recoProduct}>
-          {reco.productName}
-          {reco.productAvailable === false && (
-            <span style={styles.recoMissingTag}>
-              <AlertTriangle size={11} /> non disponible dans tes produits
-            </span>
-          )}
-        </div>
-      </div>
+      {(() => {
+        const missingFromStock = manageStock && products && reco.productAvailable &&
+          !products.find((p) => p.name === reco.productName && (p.stockPercent ?? 100) > 0);
+        return (
+          <div style={styles.recoProductRow}>
+            {reco.productPhoto && (
+              <img src={reco.productPhoto} alt="" style={styles.recoProductThumb} />
+            )}
+            <div style={styles.recoProduct}>
+              {reco.productName}
+              {reco.productAvailable === false && (
+                <span style={styles.recoMissingTag}>
+                  <AlertTriangle size={11} /> non disponible dans tes produits
+                </span>
+              )}
+              {missingFromStock && (
+                <span style={{ ...styles.recoMissingTag, background: "#fdf0ef", color: "#c0392b", borderColor: "#f5c6c2" }}>
+                  <AlertTriangle size={11} /> stock épuisé
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })()}
       <div style={styles.recoDose}>{reco.doseText}</div>
 
       {!!reco.waitHours && (
@@ -2179,7 +2203,7 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
 }
 
 // ---------- Validation des conseils appliqués ----------
-function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave, preselected }) {
+function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave, preselected, products, manageStock, onWantAddProduct }) {
   function toDisplayUnit(amount, unit) {
     if (amount == null) return { value: "", displayUnit: unit };
     if (unit === "g" && amount >= 1000) return { value: parseFloat((amount / 1000).toFixed(3)), displayUnit: "kg" };
@@ -2196,9 +2220,10 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
 
   // Étape 1 : sélection des conseils à appliquer
   // Étape 2 : saisie des quantités pour les conseils sélectionnés
-  const [step, setStep] = useState(preselected ? "quantities" : "select");
+  const [step, setStep] = useState((preselected?.adjustMode || preselected?.selected) ? "quantities" : "select");
   const [selected, setSelected] = useState(() => {
-    if (preselected) return preselected;
+    if (preselected?.selected) return preselected.selected;
+    if (preselected && !preselected.selected) return preselected;
     const init = {};
     recs.forEach((_, i) => { init[i] = true; });
     return init;
@@ -2305,6 +2330,15 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
             <div key={i} style={styles.applyStepCard}>
               <div style={styles.applyStepTitle}>{r.title}</div>
               <div style={styles.applyStepProduct}>{r.productName}</div>
+              {manageStock && products && r.productAvailable &&
+                !products.find((p) => p.name === r.productName && (p.stockPercent ?? 100) > 0) && (
+                <div style={{ padding: "8px 10px", borderRadius: 8, background: "#fdf0ef", border: "1px solid #f5c6c2", marginBottom: 8, fontSize: 12, color: "#c0392b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span><AlertTriangle size={12} style={{ marginRight: 4 }} />Stock épuisé pour ce produit.</span>
+                  <button type="button" onClick={onWantAddProduct} style={{ background: "none", border: "none", color: "#c0392b", fontWeight: 700, fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>
+                    Ajouter →
+                  </button>
+                </div>
+              )}
               {r.doseUnit ? (
                 <div style={styles.fieldGrid}>
                   <div>
@@ -2330,13 +2364,13 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
           );
         })}
       </div>
-      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-        <button style={{ ...styles.primaryBtn, background: "#f0f6fb", color: "#0a6ebd", border: "1px solid #d0e4f5", flex: "0 0 auto" }}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+        <button style={styles.primaryBtn} onClick={handleSave}>
+          Valider
+        </button>
+        <button style={{ ...styles.primaryBtn, background: "#f0f6fb", color: "#0a6ebd", border: "1px solid #d0e4f5" }}
           onClick={() => setStep("select")}>
           ← Retour
-        </button>
-        <button style={{ ...styles.primaryBtn, flex: 1 }} onClick={handleSave}>
-          Valider
         </button>
       </div>
     </ModalShell>
