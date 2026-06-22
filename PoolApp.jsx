@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.24";
+const APP_VERSION = "0.26";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -107,9 +107,12 @@ const DEFAULT_PRODUCTS = [
     doseAmount: 30,
     doseUnit: "g",
     effectAmount: 0.1,
-    effectPer: 10, // par 10 m3
+    effectPer: 10,
     waitHours: 2,
     note: "Vérifier le pH avant chaque ajout. Max 1 kg/100 m³/jour, ou espacer de 2h.",
+    containerAmount: 1000,
+    containerUnit: "kg",
+    stockPercent: 100,
   },
   {
     id: "ph-plus",
@@ -121,6 +124,9 @@ const DEFAULT_PRODUCTS = [
     effectPer: 10,
     waitHours: 2,
     note: "Répartir sur tout le bassin, filtration en marche.",
+    containerAmount: 1000,
+    containerUnit: "kg",
+    stockPercent: 100,
   },
   {
     id: "chlore-choc",
@@ -129,9 +135,12 @@ const DEFAULT_PRODUCTS = [
     doseAmount: 150,
     doseUnit: "g",
     effectAmount: 1,
-    effectPer: 10, // 150g / 10m3 -> ~1 ppm
+    effectPer: 10,
     waitHours: 12,
     note: "À verser le soir, soleil couché. Ne stabilise pas (n'augmente pas le CYA).",
+    containerAmount: 1000,
+    containerUnit: "kg",
+    stockPercent: 100,
   },
   {
     id: "galets-stabilises",
@@ -143,6 +152,9 @@ const DEFAULT_PRODUCTS = [
     effectPer: 30,
     waitHours: 24,
     note: "Augmente le CYA à chaque utilisation. À éviter si CYA déjà > 50 mg/L.",
+    containerAmount: 1000,
+    containerUnit: "kg",
+    stockPercent: 100,
   },
 ];
 
@@ -2223,8 +2235,8 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                 {PRODUCT_ACTIONS.find((a) => a.value === p.action)?.label}
                 {!!p.waitHours && ` · attente ${p.waitHours}h`}
               </div>
-              {isPremium && p.stockPercent !== undefined && p.stockPercent !== null && (() => {
-                const pct = p.stockPercent;
+              {isPremium && (() => {
+                const pct = p.stockPercent ?? 100;
                 const low = pct <= 20;
                 const container = p.containerAmount || 1;
                 const cUnit = p.containerUnit || "kg";
@@ -3171,12 +3183,9 @@ function ReportView({ pool, measures, applications, products, onClose }) {
                         <strong>{r.title}</strong> — {r.productName}
                         {applied ? (
                           <span style={styles.reportAppliedTag}>
-                            {" "}
-                            → appliqué :{" "}
-                            {applied.appliedAmount == null || Number.isNaN(applied.appliedAmount)
+                            {" "}→ appliqué : {applied.appliedAmount == null || Number.isNaN(applied.appliedAmount)
                               ? "—"
-                              : applied.appliedAmount}{" "}
-                            {applied.doseUnit || ""}
+                              : formatDose(applied.appliedAmount, applied.doseUnit || "g")}
                           </span>
                         ) : (
                           <span style={styles.reportNotAppliedTag}> — non confirmé</span>
@@ -3190,6 +3199,60 @@ function ReportView({ pool, measures, applications, products, onClose }) {
             </div>
           );
         })}
+        <div style={styles.reportSectionTitle}>Consommations produits</div>
+        {(() => {
+          // Agréger toutes les consommations par produit
+          const byProduct = {};
+          applications.forEach((app) => {
+            (app.steps || []).forEach((step) => {
+              if (!step.appliedAmount || !step.productName) return;
+              if (!byProduct[step.productName]) {
+                byProduct[step.productName] = { total: 0, unit: step.doseUnit || "g", entries: [] };
+              }
+              byProduct[step.productName].total += step.appliedAmount;
+              byProduct[step.productName].entries.push({
+                date: app.appliedAt,
+                amount: step.appliedAmount,
+                unit: step.doseUnit || "g",
+              });
+            });
+          });
+          const prodNames = Object.keys(byProduct);
+          if (!prodNames.length) return <p style={styles.helpTextSmall}>Aucune consommation enregistrée.</p>;
+          return prodNames.map((name) => {
+            const data = byProduct[name];
+            const entries = [...data.entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const prod = products.find((p) => p.name === name);
+            const cUnit = prod?.containerUnit || "kg";
+            return (
+              <div key={name} style={{ marginBottom: 18 }}>
+                <div style={styles.reportSubLabel}>{name}</div>
+                <div style={{ fontSize: 12, color: "#4a6480", marginBottom: 6 }}>
+                  Total consommé : <strong>{formatDose(data.total, data.unit)}</strong>
+                  {prod?.containerAmount && (
+                    <span> · Stock restant : <strong style={{ color: (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#0a6ebd" }}>{prod.stockPercent ?? 100} %</strong></span>
+                  )}
+                </div>
+                <table style={{ ...styles.reportTable, fontSize: 11 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ ...styles.reportTableCell, textAlign: "left", color: "#6a7d90", fontWeight: 600 }}>Date</th>
+                      <th style={{ ...styles.reportTableCell, textAlign: "right", color: "#6a7d90", fontWeight: 600 }}>Quantité</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entries.map((e, i) => (
+                      <tr key={i}>
+                        <td style={{ ...styles.reportTableCell, color: "#2d4a6e" }}>{formatDate(e.date)}</td>
+                        <td style={{ ...styles.reportTableCell, textAlign: "right", fontWeight: 700, color: "#0a6ebd" }}>{formatDose(e.amount, e.unit)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          });
+        })()}
       </div>
     </div>
   );
