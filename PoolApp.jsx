@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.33";
+const APP_VERSION = "0.34";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -1077,6 +1077,7 @@ function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEdit
   const [aiComment, setAiComment] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
+  const [selectedRecs, setSelectedRecs] = useState({});
 
   async function handleAiAnalysis() {
     if (!apiKey || !latest) return;
@@ -1216,66 +1217,57 @@ Réponds directement en français, sans titre ni introduction.`;
               peut fausser le suivant s'il n'a pas eu le temps d'agir.
             </p>
           )}
+          {recs.map((r, i) => (
+            <RecoCard
+              key={i}
+              reco={r}
+              isLast={i === recs.length - 1}
+              selectable={!applicationForLatest}
+              selected={!!selectedRecs[i]}
+              onToggle={() => setSelectedRecs((prev) => ({ ...prev, [i]: !prev[i] }))}
+              manageStock={manageStock}
+              products={products}
+            />
+          ))}
+
           {(() => {
-            const [selectedRecs, setSelectedRecs] = React.useState(() => {
-              const init = {};
-              recs.forEach((_, i) => { init[i] = false; });
-              return init;
-            });
             const selectedCount = Object.values(selectedRecs).filter(Boolean).length;
-
-            return (<>
-              {recs.map((r, i) => (
-                <RecoCard
-                  key={i}
-                  reco={r}
-                  isLast={i === recs.length - 1}
-                  selectable={!applicationForLatest}
-                  selected={!!selectedRecs[i]}
-                  onToggle={() => setSelectedRecs((prev) => ({ ...prev, [i]: !prev[i] }))}
-                  manageStock={manageStock}
-                  products={products}
-                />
-              ))}
-
-              {applicationForLatest ? (
-                <div style={styles.applyConfirmedCard}>
-                  <CheckCircle2 size={16} color="#1a8fd1" />
-                  <span style={{ flex: 1 }}>
-                    Conseils {applicationForLatest.allApplied ? "appliqués" : "partiellement appliqués"}{" "}
-                    le {formatDate(applicationForLatest.appliedAt)}
-                  </span>
-                  <button style={styles.editLinkBtn} onClick={() => {
-                    // Reconstruire selectedRecs depuis les steps de l'application existante
-                    const sel = {};
-                    recs.forEach((r, i) => {
-                      sel[i] = applicationForLatest.steps?.some((s) => s.action === r.action) ?? true;
-                    });
-                    onValidateApplication(latest, recs, sel, true);
-                  }}>
-                    Ajuster
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <button
-                    style={{ ...styles.validateApplyBtn, opacity: selectedCount === 0 ? 0.5 : 1 }}
-                    disabled={selectedCount === 0}
-                    onClick={() => {
-                      if (selectedCount === 0) return;
-                      onValidateApplication(latest, recs, selectedRecs);
-                    }}
-                  >
-                    <CheckCircle2 size={16} /> Appliquer ces conseils
-                    {selectedCount > 0 && ` (${selectedCount})`}
-                    {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
-                  </button>
-                  <p style={{ ...styles.helpTextSmall, marginTop: 6, textAlign: "center" }}>
-                    Coche les conseils appliqués, puis saisis les quantités réelles.
-                  </p>
-                </div>
-              )}
-            </>);
+            return applicationForLatest ? (
+              <div style={styles.applyConfirmedCard}>
+                <CheckCircle2 size={16} color="#1a8fd1" />
+                <span style={{ flex: 1 }}>
+                  Conseils {applicationForLatest.allApplied ? "appliqués" : "partiellement appliqués"}{" "}
+                  le {formatDate(applicationForLatest.appliedAt)}
+                </span>
+                <button style={styles.editLinkBtn} onClick={() => {
+                  const sel = {};
+                  recs.forEach((r, i) => {
+                    sel[i] = applicationForLatest.steps?.some((s) => s.action === r.action) ?? true;
+                  });
+                  onValidateApplication(latest, recs, sel, true);
+                }}>
+                  Ajuster
+                </button>
+              </div>
+            ) : (
+              <div>
+                <button
+                  style={{ ...styles.validateApplyBtn, opacity: selectedCount === 0 ? 0.5 : 1 }}
+                  disabled={selectedCount === 0}
+                  onClick={() => {
+                    if (selectedCount === 0) return;
+                    onValidateApplication(latest, recs, selectedRecs);
+                  }}
+                >
+                  <CheckCircle2 size={16} /> Appliquer ces conseils
+                  {selectedCount > 0 && ` (${selectedCount})`}
+                  {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
+                </button>
+                <p style={{ ...styles.helpTextSmall, marginTop: 6, textAlign: "center" }}>
+                  Coche les conseils à appliquer puis saisis les quantités réelles.
+                </p>
+              </div>
+            );
           })()}
         </div>
       )}
