@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.30";
+const APP_VERSION = "0.31";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -1222,10 +1222,15 @@ Réponds directement en français, sans titre ni introduction.`;
               </button>
             </div>
           ) : (
-            <button style={styles.validateApplyBtn} onClick={() => onValidateApplication(latest)}>
-              <CheckCircle2 size={16} /> J'ai appliqué ces conseils
-              {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
-            </button>
+            <div>
+              <button style={styles.validateApplyBtn} onClick={() => onValidateApplication(latest)}>
+                <CheckCircle2 size={16} /> Appliquer ces conseils
+                {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
+              </button>
+              <p style={{ ...styles.helpTextSmall, marginTop: 6, textAlign: "center" }}>
+                Sélectionne les conseils appliqués et saisis les quantités réelles.
+              </p>
+            </div>
           )}
         </div>
       )}
@@ -1830,7 +1835,7 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
             </div>
           ) : (
             <button style={styles.validateApplyBtnSmall} onClick={onValidateApplication}>
-              <CheckCircle2 size={14} /> Conseils appliqués
+              <CheckCircle2 size={14} /> Appliquer ces conseils
               {!isPremium && <Lock size={12} style={{ marginLeft: 2 }} />}
             </button>
           )}
@@ -2103,14 +2108,12 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
 
 // ---------- Validation des conseils appliqués ----------
 function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave }) {
-  // Convertit une dose brute (g ou mL) en unité d'affichage (kg ou L)
   function toDisplayUnit(amount, unit) {
     if (amount == null) return { value: "", displayUnit: unit };
     if (unit === "g" && amount >= 1000) return { value: parseFloat((amount / 1000).toFixed(3)), displayUnit: "kg" };
     if (unit === "mL" && amount >= 1000) return { value: parseFloat((amount / 1000).toFixed(3)), displayUnit: "L" };
     return { value: amount, displayUnit: unit };
   }
-  // Reconvertit vers l'unité d'origine pour la sauvegarde
   function toBaseUnit(value, displayUnit, baseUnit) {
     const v = parseFloat(value);
     if (isNaN(v)) return null;
@@ -2119,6 +2122,14 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
     return v;
   }
 
+  // Étape 1 : sélection des conseils à appliquer
+  // Étape 2 : saisie des quantités pour les conseils sélectionnés
+  const [step, setStep] = useState("select");
+  const [selected, setSelected] = useState(() => {
+    const init = {};
+    recs.forEach((_, i) => { init[i] = true; });
+    return init;
+  });
   const [amounts, setAmounts] = useState(() => {
     const init = {};
     recs.forEach((r, i) => {
@@ -2129,76 +2140,132 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
     });
     return init;
   });
-  const [allApplied, setAllApplied] = useState(true);
+
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+
+  function handleConfirmSelection() {
+    if (selectedCount === 0) return;
+    setStep("quantities");
+  }
 
   function handleSave() {
-    const steps = recs.map((r, i) => {
-      const baseUnit = r.doseUnit || "g";
-      const { displayUnit } = toDisplayUnit(r.computedDoseAmount, baseUnit);
-      return {
-        action: r.action,
-        title: r.title,
-        productName: r.productName,
-        appliedAmount: toBaseUnit(amounts[i], displayUnit, baseUnit),
-        doseUnit: baseUnit,
-      };
-    });
+    const steps = recs
+      .filter((_, i) => selected[i])
+      .map((r, idx) => {
+        const i = recs.indexOf(r);
+        const baseUnit = r.doseUnit || "g";
+        const { displayUnit } = toDisplayUnit(r.computedDoseAmount, baseUnit);
+        return {
+          action: r.action,
+          title: r.title,
+          productName: r.productName,
+          appliedAmount: toBaseUnit(amounts[i], displayUnit, baseUnit),
+          doseUnit: baseUnit,
+        };
+      });
+    const allApplied = selectedCount === recs.length;
     onSave(measure.id, steps, allApplied);
   }
 
+  if (step === "select") {
+    return (
+      <ModalShell onClose={onClose} title="Appliquer ces conseils">
+        <p style={styles.helpText}>
+          Sélectionne les conseils que tu as appliqués pour la mesure du {formatDate(measure.date)}.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+          {recs.map((r, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setSelected((prev) => ({ ...prev, [i]: !prev[i] }))}
+              style={{
+                ...styles.applyStepCard,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                cursor: "pointer",
+                border: selected[i] ? "2px solid #0a6ebd" : "1.5px solid #d0e4f5",
+                background: selected[i] ? "#e8f4fd" : "#f8fafd",
+                textAlign: "left",
+              }}
+            >
+              <div style={{
+                width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                border: selected[i] ? "2px solid #0a6ebd" : "2px solid #b0c4d8",
+                background: selected[i] ? "#0a6ebd" : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {selected[i] && <CheckCircle2 size={14} color="#fff" />}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={styles.applyStepTitle}>{r.title}</div>
+                <div style={styles.applyStepProduct}>{r.productName}</div>
+                {r.doseText && <div style={{ fontSize: 12, color: "#4a6480", marginTop: 2 }}>{r.doseText}</div>}
+              </div>
+            </button>
+          ))}
+        </div>
+        <button
+          style={{ ...styles.primaryBtn, marginTop: 16, opacity: selectedCount === 0 ? 0.5 : 1 }}
+          onClick={handleConfirmSelection}
+          disabled={selectedCount === 0}
+        >
+          Confirmer ({selectedCount} conseil{selectedCount > 1 ? "s" : ""})
+        </button>
+      </ModalShell>
+    );
+  }
+
+  // Étape 2 : saisie des quantités
   return (
-    <ModalShell onClose={onClose} title="Conseils appliqués">
+    <ModalShell onClose={onClose} title="Quantités appliquées">
       <p style={styles.helpText}>
-        Confirme ce que tu as réellement appliqué pour la mesure du {formatDate(measure.date)}.
         Ajuste les quantités si besoin — ces informations serviront pour ton rapport.
       </p>
-
       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 4 }}>
-        {recs.map((r, i) => {
+        {recs.filter((_, i) => selected[i]).map((r) => {
+          const i = recs.indexOf(r);
           const baseUnit = r.doseUnit || "g";
           const { displayUnit } = toDisplayUnit(r.computedDoseAmount, baseUnit);
           return (
-          <div key={i} style={styles.applyStepCard}>
-            <div style={styles.applyStepTitle}>{r.title}</div>
-            <div style={styles.applyStepProduct}>{r.productName}</div>
-            {r.doseUnit ? (
-              <div style={styles.fieldGrid}>
-                <div>
-                  <label style={styles.fieldLabel}>Quantité appliquée</label>
-                  <input
-                    type="number"
-                    style={styles.input}
-                    value={amounts[i] ?? ""}
-                    onChange={(e) => setAmounts((prev) => ({ ...prev, [i]: e.target.value }))}
-                    placeholder={r.computedDoseAmount != null ? String(toDisplayUnit(r.computedDoseAmount, baseUnit).value) : ""}
-                    step="0.01"
-                  />
+            <div key={i} style={styles.applyStepCard}>
+              <div style={styles.applyStepTitle}>{r.title}</div>
+              <div style={styles.applyStepProduct}>{r.productName}</div>
+              {r.doseUnit ? (
+                <div style={styles.fieldGrid}>
+                  <div>
+                    <label style={styles.fieldLabel}>Quantité appliquée</label>
+                    <input
+                      type="number"
+                      style={styles.input}
+                      value={amounts[i] ?? ""}
+                      onChange={(e) => setAmounts((prev) => ({ ...prev, [i]: e.target.value }))}
+                      placeholder={r.computedDoseAmount != null ? String(toDisplayUnit(r.computedDoseAmount, baseUnit).value) : ""}
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <label style={styles.fieldLabel}>Unité</label>
+                    <div style={styles.unitTag}>{displayUnit}</div>
+                  </div>
                 </div>
-                <div>
-                  <label style={styles.fieldLabel}>Unité</label>
-                  <div style={styles.unitTag}>{displayUnit}</div>
-                </div>
-              </div>
-            ) : (
-              <p style={styles.helpTextSmall}>{r.doseText}</p>
-            )}
-          </div>
+              ) : (
+                <p style={styles.helpTextSmall}>{r.doseText}</p>
+              )}
+            </div>
           );
         })}
       </div>
-
-      <label style={styles.checkboxRow}>
-        <input
-          type="checkbox"
-          checked={allApplied}
-          onChange={(e) => setAllApplied(e.target.checked)}
-        />
-        <span>J'ai appliqué l'ensemble de ce plan de traitement</span>
-      </label>
-
-      <button style={styles.primaryBtn} onClick={handleSave}>
-        Valider
-      </button>
+      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+        <button style={{ ...styles.primaryBtn, background: "#f0f6fb", color: "#0a6ebd", border: "1px solid #d0e4f5", flex: "0 0 auto" }}
+          onClick={() => setStep("select")}>
+          ← Retour
+        </button>
+        <button style={{ ...styles.primaryBtn, flex: 1 }} onClick={handleSave}>
+          Valider
+        </button>
+      </div>
     </ModalShell>
   );
 }
