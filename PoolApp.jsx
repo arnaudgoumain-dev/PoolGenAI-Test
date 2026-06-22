@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.26";
+const APP_VERSION = "0.28";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -507,6 +507,7 @@ function PoolApp() {
       loadedPools = loadedPools.map((p) => ({
         treatmentType: "chlore",
         filtration: "sable",
+        manageStock: false,
         ...p,
       }));
       setPools(loadedPools);
@@ -830,6 +831,7 @@ function PoolApp() {
             onResetAll={resetAllProducts}
             isPremium={isPremium}
             poolName={activePool?.name}
+            manageStock={!!activePool?.manageStock}
             onWantPremium={() => setShowPaywall(true)}
           />
         )}
@@ -893,6 +895,12 @@ function PoolApp() {
             setShowPaywall(true);
           }}
           applications={poolApplications}
+          manageStock={!!activePool?.manageStock}
+          onWantManageStock={() => {
+            setShowAddProduct(false);
+            setEditingProduct(null);
+            setTab("settings");
+          }}
         />
       )}
 
@@ -2194,7 +2202,7 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
 }
 
 // ---------- Produits ----------
-function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, poolName }) {
+function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, poolName, manageStock }) {
   function handleResetAll() {
     if (products.length === 0) return;
     const ok = window.confirm(
@@ -2235,7 +2243,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                 {PRODUCT_ACTIONS.find((a) => a.value === p.action)?.label}
                 {!!p.waitHours && ` · attente ${p.waitHours}h`}
               </div>
-              {isPremium && (() => {
+              {isPremium && manageStock && (() => {
                 const pct = p.stockPercent ?? 100;
                 const low = pct <= 20;
                 const container = p.containerAmount || 1;
@@ -2283,7 +2291,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
   );
 }
 
-function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, applications }) {
+function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, applications, manageStock, onWantManageStock }) {
   const [name, setName] = useState(product?.name || "");
   const [action, setAction] = useState(product?.action || "ph-");
   const [doseAmount, setDoseAmount] = useState(product?.doseAmount ?? 30);
@@ -2460,7 +2468,15 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
         placeholder="2"
       />
 
-      {isPremium ? (<>
+      {isPremium && !manageStock && (
+        <div style={styles.stockNotManagedBox}>
+          <span>La gestion du stock n'est pas activée pour ce bassin.</span>
+          <button type="button" style={styles.stockActivateLink} onClick={onWantManageStock}>
+            Activer dans Réglages →
+          </button>
+        </div>
+      )}
+      {isPremium && manageStock ? (<>
       <label style={styles.fieldLabel}>Taille du contenant</label>
       <div style={styles.segmentedControl}>
         {["kg", "L"].map((u) => (
@@ -2741,6 +2757,21 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         Le volume est utilisé pour calculer les doses de produits.
       </p>
 
+      {isPremium && (
+        <div style={{ ...styles.sectionRow, marginTop: 14 }}>
+          <div>
+            <span style={styles.sectionLabel}>Gestion du stock</span>
+            <div style={{ fontSize: 12, color: "#6a7d90", marginTop: 2 }}>
+              Suit la consommation des produits et l'affiche dans le rapport.
+            </div>
+          </div>
+          <ToggleSwitch
+            checked={!!activePool?.manageStock}
+            onChange={(val) => onUpdatePool(activePool.id, { manageStock: val })}
+          />
+        </div>
+      )}
+
       <div style={styles.sectionRow}>
         <span style={styles.sectionLabel}>Rapport</span>
       </div>
@@ -3012,7 +3043,7 @@ function AddPoolModal({ onClose, onSave }) {
 }
 
 // ---------- Rapport ----------
-function ReportView({ pool, measures, applications, products, onClose }) {
+function ReportView({ pool, measures, applications, products, onClose, manageStock }) {
   const [showValues, setShowValues] = useState(false);
 
   const sortedMeasures = useMemo(
@@ -3144,115 +3175,59 @@ function ReportView({ pool, measures, applications, products, onClose }) {
           <p style={styles.helpTextSmall}>Aucune mesure à afficher.</p>
         )}
 
-        <div style={styles.reportSectionTitle}>Historique détaillé</div>
-        {rows.length === 0 && (
+        <div style={styles.reportSectionTitle}>Historique des mesures et consommations</div>
+        {rows.length === 0 ? (
           <p style={styles.helpTextSmall}>Aucune mesure enregistrée pour ce bassin.</p>
-        )}
-        {rows.map(({ measure, recs, application }, i) => {
-          const params = ["pH", "fCl", "tCl", "tac", "cya", "temp"].filter(
-            (p) => measure[p] !== undefined && measure[p] !== "" && measure[p] !== null
-          );
-          return (
-            <div key={measure.id} style={styles.reportRow}>
-              <div style={styles.reportRowDate}>{formatDate(measure.date)}</div>
-
-              <table style={styles.reportTable}>
-                <tbody>
-                  <tr>
-                    {params.map((p) => (
-                      <td key={p} style={styles.reportTableCell}>
-                        <div style={styles.reportTableCellLabel}>{TARGETS[p].label}</div>
-                        <div style={styles.reportTableCellValue}>
-                          {measure[p]} {TARGETS[p].unit}
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-
-              <div style={styles.reportSubLabel}>Conseils donnés</div>
-              {recs.length === 0 ? (
-                <p style={styles.reportConseilText}>Tous les paramètres étaient dans la cible.</p>
-              ) : (
-                <ul style={styles.reportConseilList}>
-                  {recs.map((r, j) => {
-                    const applied = application?.steps?.find((s) => s.action === r.action);
-                    return (
-                      <li key={j} style={styles.reportConseilItem}>
-                        <strong>{r.title}</strong> — {r.productName}
-                        {applied ? (
-                          <span style={styles.reportAppliedTag}>
-                            {" "}→ appliqué : {applied.appliedAmount == null || Number.isNaN(applied.appliedAmount)
-                              ? "—"
-                              : formatDose(applied.appliedAmount, applied.doseUnit || "g")}
-                          </span>
-                        ) : (
-                          <span style={styles.reportNotAppliedTag}> — non confirmé</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-              {i < rows.length - 1 && <div style={styles.reportDivider} />}
-            </div>
-          );
-        })}
-        <div style={styles.reportSectionTitle}>Consommations produits</div>
-        {(() => {
-          // Agréger toutes les consommations par produit
-          const byProduct = {};
-          applications.forEach((app) => {
-            (app.steps || []).forEach((step) => {
-              if (!step.appliedAmount || !step.productName) return;
-              if (!byProduct[step.productName]) {
-                byProduct[step.productName] = { total: 0, unit: step.doseUnit || "g", entries: [] };
-              }
-              byProduct[step.productName].total += step.appliedAmount;
-              byProduct[step.productName].entries.push({
-                date: app.appliedAt,
-                amount: step.appliedAmount,
-                unit: step.doseUnit || "g",
-              });
-            });
-          });
-          const prodNames = Object.keys(byProduct);
-          if (!prodNames.length) return <p style={styles.helpTextSmall}>Aucune consommation enregistrée.</p>;
-          return prodNames.map((name) => {
-            const data = byProduct[name];
-            const entries = [...data.entries].sort((a, b) => new Date(b.date) - new Date(a.date));
-            const prod = products.find((p) => p.name === name);
-            const cUnit = prod?.containerUnit || "kg";
-            return (
-              <div key={name} style={{ marginBottom: 18 }}>
-                <div style={styles.reportSubLabel}>{name}</div>
-                <div style={{ fontSize: 12, color: "#4a6480", marginBottom: 6 }}>
-                  Total consommé : <strong>{formatDose(data.total, data.unit)}</strong>
-                  {prod?.containerAmount && (
-                    <span> · Stock restant : <strong style={{ color: (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#0a6ebd" }}>{prod.stockPercent ?? 100} %</strong></span>
-                  )}
-                </div>
-                <table style={{ ...styles.reportTable, fontSize: 11 }}>
-                  <thead>
-                    <tr>
-                      <th style={{ ...styles.reportTableCell, textAlign: "left", color: "#6a7d90", fontWeight: 600 }}>Date</th>
-                      <th style={{ ...styles.reportTableCell, textAlign: "right", color: "#6a7d90", fontWeight: 600 }}>Quantité</th>
+        ) : (
+          <table style={{ ...styles.reportTable, fontSize: 11 }}>
+            <thead>
+              <tr>
+                <th style={styles.reportThCell}>Date</th>
+                <th style={styles.reportThCell}>pH</th>
+                <th style={styles.reportThCell}>Cl libre</th>
+                <th style={styles.reportThCell}>Cl total</th>
+                <th style={styles.reportThCell}>TAC</th>
+                <th style={styles.reportThCell}>CYA</th>
+                <th style={styles.reportThCell}>Temp.</th>
+                {manageStock && <th style={styles.reportThCell}>Produit appliqué</th>}
+                {manageStock && <th style={styles.reportThCell}>Quantité</th>}
+                {manageStock && <th style={styles.reportThCell}>Stock</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(({ measure, application }, i) => {
+                const applied = application?.steps?.filter((s) => s.appliedAmount) || [];
+                const rowCount = Math.max(1, applied.length);
+                return Array.from({ length: rowCount }).map((_, j) => {
+                  const step = applied[j] || null;
+                  const prod = step ? products.find((p) => p.name === step.productName) : null;
+                  return (
+                    <tr key={`${i}-${j}`} style={{ background: i % 2 === 0 ? "#f8fafd" : "#ffffff" }}>
+                      {j === 0 && (
+                        <>
+                          <td style={{ ...styles.reportTdCell, fontWeight: 600, color: "#0d2b4e" }} rowSpan={rowCount}>{formatDate(measure.date)}</td>
+                          <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.pH ?? "—"}</td>
+                          <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.fCl != null && measure.fCl !== "" ? `${measure.fCl} mg/L` : "—"}</td>
+                          <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.tCl != null && measure.tCl !== "" ? `${measure.tCl} mg/L` : "—"}</td>
+                          <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.tac != null && measure.tac !== "" ? `${measure.tac} mg/L` : "—"}</td>
+                          <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.cya != null && measure.cya !== "" ? `${measure.cya} mg/L` : "—"}</td>
+                          <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.temp != null && measure.temp !== "" ? `${measure.temp} °C` : "—"}</td>
+                        </>
+                      )}
+                      {manageStock && <td style={styles.reportTdCell}>{step ? step.productName : "—"}</td>}
+                      {manageStock && <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "#0a6ebd" }}>
+                        {step ? formatDose(step.appliedAmount, step.doseUnit || "g") : "—"}
+                      </td>}
+                      {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                        {prod ? `${prod.stockPercent ?? 100} %` : "—"}
+                      </td>}
                     </tr>
-                  </thead>
-                  <tbody>
-                    {entries.map((e, i) => (
-                      <tr key={i}>
-                        <td style={{ ...styles.reportTableCell, color: "#2d4a6e" }}>{formatDate(e.date)}</td>
-                        <td style={{ ...styles.reportTableCell, textAlign: "right", fontWeight: 700, color: "#0a6ebd" }}>{formatDose(e.amount, e.unit)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            );
-          });
-        })()}
+                  );
+                });
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
@@ -3391,6 +3366,23 @@ const styles = {
   reportRow: { marginBottom: 18 },
   reportRowDate: { fontSize: 14, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 },
   reportTable: { width: "100%", borderCollapse: "collapse", marginBottom: 10 },
+  reportThCell: {
+    padding: "6px 8px",
+    textAlign: "left",
+    fontSize: 10,
+    fontWeight: 700,
+    color: "#6a7d90",
+    textTransform: "uppercase",
+    borderBottom: "2px solid #d0e4f5",
+    whiteSpace: "nowrap",
+  },
+  reportTdCell: {
+    padding: "6px 8px",
+    fontSize: 11,
+    color: "#2d4a6e",
+    borderBottom: "1px solid #e8f0f8",
+    verticalAlign: "top",
+  },
   reportTableCell: {
     border: "1px solid #d0e4f5",
     padding: "7px 10px",
@@ -4486,6 +4478,28 @@ const styles = {
     borderRadius: 99,
     border: "1px solid",
     marginTop: 3,
+  },
+  stockNotManagedBox: {
+    padding: "12px 14px",
+    borderRadius: 10,
+    background: "#f0f6fb",
+    border: "1px solid #d0e4f5",
+    fontSize: 13,
+    color: "#2d4a6e",
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    marginBottom: 10,
+  },
+  stockActivateLink: {
+    background: "none",
+    border: "none",
+    color: "#0a6ebd",
+    fontWeight: 700,
+    fontSize: 13,
+    cursor: "pointer",
+    padding: 0,
+    textAlign: "left",
   },
   consumptionRow: {
     display: "flex",
