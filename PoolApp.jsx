@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.17";
+const APP_VERSION = "0.18";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -1314,16 +1314,24 @@ function RecoCard({ reco, isLast }) {
 
 // ---------- Logique de recommandation ----------
 function computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys) {
-  // Fallback vers le traitement chlore standard si non précisé
   const targets = effectiveTargets || getEffectiveTargets("chlore");
   const paramKeys = activeParamKeys || ["pH", "fCl", "tCl", "tac", "cya", "temp"];
 
+  // Normaliser en minuscules pour les comparaisons internes
+  const paramKeysLower = paramKeys.map((k) => k.toLowerCase());
+  const targetsLower = Object.fromEntries(
+    Object.entries(targets).map(([k, v]) => [k.toLowerCase(), v])
+  );
+  const latestLower = Object.fromEntries(
+    Object.entries(latest).map(([k, v]) => [k.toLowerCase(), v])
+  );
+
   const steps = [];
-  const has = (key) => paramKeys.includes(key);
+  const has = (key) => paramKeysLower.includes(key.toLowerCase());
 
   // TAC (en premier — influence le pH)
-  const tac = parseFloat(latest.tac);
-  if (has("tac") && !Number.isNaN(tac) && targets.tac && tac < targets.tac.min) {
+  const tac = parseFloat(latestLower.tac);
+  if (has("tac") && !Number.isNaN(tac) && targetsLower.tac && tac < targetsLower.tac.min) {
     const prod = products.find((p) => p.action === "tac+");
     steps.push({
       action: "tac+",
@@ -1342,9 +1350,9 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   }
 
   // pH
-  const phVal = parseFloat(latest.pH);
-  if (has("ph") && !Number.isNaN(phVal) && targets.ph) {
-    const phTargets = targets.ph;
+  const phVal = parseFloat(latestLower.ph);
+  if (has("ph") && !Number.isNaN(phVal) && targetsLower.ph) {
+    const phTargets = targetsLower.ph;
     const targetMid = (phTargets.min + phTargets.max) / 2;
     if (phVal > phTargets.max) {
       const diff = phVal - targetMid;
@@ -1386,12 +1394,12 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   }
 
   // Chlore libre / combiné
-  const fCl = parseFloat(latest.fCl);
-  const tCl = parseFloat(latest.tCl);
+  const fCl = parseFloat(latestLower.fcl);
+  const tCl = parseFloat(latestLower.tcl);
   const combined = !Number.isNaN(fCl) && !Number.isNaN(tCl) ? Math.max(0, tCl - fCl) : null;
 
-  if (has("fcl") && !Number.isNaN(fCl) && targets.fcl) {
-    const fclT = targets.fcl;
+  if (has("fcl") && !Number.isNaN(fCl) && targetsLower.fcl) {
+    const fclT = targetsLower.fcl;
     if (combined !== null && combined > 0.5) {
       const targetFcl = Math.max(fclT.max, combined * 3);
       const prod = products.find((p) => p.action === "chlore");
@@ -1444,9 +1452,9 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   }
 
   // Brome
-  const bromeVal = parseFloat(latest.brome);
-  if (has("brome") && !Number.isNaN(bromeVal) && targets.brome) {
-    const brT = targets.brome;
+  const bromeVal = parseFloat(latestLower.brome);
+  if (has("brome") && !Number.isNaN(bromeVal) && targetsLower.brome) {
+    const brT = targetsLower.brome;
     if (bromeVal < brT.min) {
       const prod = products.find((p) => p.action === "brome");
       const diff = ((brT.min + brT.max) / 2) - bromeVal;
@@ -1494,9 +1502,9 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   }
 
   // Sel (salinité pour électrolyseur)
-  const selVal = parseFloat(latest.sel);
-  if (has("sel") && !Number.isNaN(selVal) && targets.sel) {
-    const selT = targets.sel;
+  const selVal = parseFloat(latestLower.sel);
+  if (has("sel") && !Number.isNaN(selVal) && targetsLower.sel) {
+    const selT = targetsLower.sel;
     if (selVal < selT.min) {
       const diff = ((selT.min + selT.max) / 2) - selVal;
       const selKg = Math.round((diff * volume) / 1000); // g/L × m³ = g → /1000 pour kg
@@ -1515,8 +1523,8 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   }
 
   // CYA (pertinent seulement si le traitement l'inclut)
-  const cya = parseFloat(latest.cya);
-  if (has("cya") && !Number.isNaN(cya) && targets.cya && cya > targets.cya.max) {
+  const cya = parseFloat(latestLower.cya);
+  if (has("cya") && !Number.isNaN(cya) && targetsLower.cya && cya > targetsLower.cya.max) {
     const renewalPercent = Math.round((1 - 40 / cya) * 100);
     steps.push({
       action: "renouvellement",
