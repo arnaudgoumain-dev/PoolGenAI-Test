@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.18";
+const APP_VERSION = "0.20";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -1312,6 +1312,20 @@ function RecoCard({ reco, isLast }) {
   );
 }
 
+// Formate une dose avec conversion automatique g→kg et mL→L
+function formatDose(amount, unit) {
+  if (!amount && amount !== 0) return `? ${unit}`;
+  if ((unit === "g") && amount >= 1000) {
+    const kg = (amount / 1000);
+    return `${Number.isInteger(kg) ? kg : kg.toFixed(2).replace(/\.?0+$/, "")} kg (${amount} g)`;
+  }
+  if ((unit === "mL") && amount >= 1000) {
+    const L = (amount / 1000);
+    return `${Number.isInteger(L) ? L : L.toFixed(2).replace(/\.?0+$/, "")} L (${amount} mL)`;
+  }
+  return `${amount} ${unit}`;
+}
+
 // ---------- Logique de recommandation ----------
 function computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys) {
   const targets = effectiveTargets || getEffectiveTargets("chlore");
@@ -1340,7 +1354,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       productAvailable: !!prod,
       productPhoto: prod?.photo || null,
       doseText: prod
-        ? `Voir dosage : ${prod.doseAmount} ${prod.doseUnit} → +${prod.effectAmount} mg/L sur ${prod.effectPer} m³`
+        ? `Voir dosage : ${formatDose(prod.doseAmount, prod.doseUnit)} → +${prod.effectAmount} mg/L sur ${prod.effectPer} m³`
         : "Aucun produit TAC+ dans ta liste — ajoute-en un dans l'onglet Produits.",
       computedDoseAmount: prod?.doseAmount ?? null,
       doseUnit: prod?.doseUnit || null,
@@ -1365,7 +1379,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${targetMid.toFixed(1)}`
+          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${targetMid.toFixed(1)}`
           : "Aucun produit pH- dans ta liste — ajoute-en un dans l'onglet Produits.",
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
@@ -1383,7 +1397,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${targetMid.toFixed(1)}`
+          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${targetMid.toFixed(1)}`
           : "Aucun produit pH+ dans ta liste — ajoute-en un dans l'onglet Produits.",
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
@@ -1411,7 +1425,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${computedDose} ${prod.doseUnit} ce soir (choc renforcé)`
+          ? `≈ ${formatDose(computedDose, prod.doseUnit)} ce soir (choc renforcé)`
           : "Aucun produit chlore choc dans ta liste — ajoute-en un dans l'onglet Produits.",
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
@@ -1430,7 +1444,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${targetFcl} mg/L`
+          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${targetFcl} mg/L`
           : "Aucun produit chlore dans ta liste — ajoute-en un dans l'onglet Produits.",
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
@@ -1466,7 +1480,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${computedDose} ${prod.doseUnit} pour viser ${(brT.min + brT.max) / 2} mg/L`
+          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${(brT.min + brT.max) / 2} mg/L`
           : "Aucun produit brome dans ta liste — ajoute-en un dans l'onglet Produits.",
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
@@ -1491,7 +1505,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${computedDose} ${prod.doseUnit}`
+          ? `≈ ${formatDose(computedDose, prod.doseUnit)}`
           : "Aucun produit oxygène actif dans ta liste — ajoute-en un dans l'onglet Produits.",
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
@@ -2182,16 +2196,40 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                 {PRODUCT_ACTIONS.find((a) => a.value === p.action)?.label}
                 {!!p.waitHours && ` · attente ${p.waitHours}h`}
               </div>
-              {p.stockPercent !== undefined && p.stockPercent !== null && (
-                <div style={{
-                  ...styles.productStockBadge,
-                  color: p.stockPercent <= 20 ? "#c0392b" : "#4a6480",
-                  borderColor: p.stockPercent <= 20 ? "#f5c6c2" : "#d0e4f5",
-                  background: p.stockPercent <= 20 ? "#fdf0ef" : "#f0f6fb",
-                }}>
-                  Stock : {p.stockPercent} %
-                </div>
-              )}
+              {p.stockPercent !== undefined && p.stockPercent !== null && (() => {
+                const pct = p.stockPercent;
+                const low = pct <= 20;
+                const container = p.containerAmount || 1000;
+                const remaining = Math.round(container * pct / 100);
+                const unit = p.doseUnit || "g";
+                // Convertir en kg ou L si >= 1000
+                const displayUnit = (unit === "g" && remaining >= 1000) ? "kg"
+                  : (unit === "mL" && remaining >= 1000) ? "L" : unit;
+                const displayVal = (displayUnit === "kg" || displayUnit === "L")
+                  ? (remaining / 1000).toFixed(2).replace(/\.?0+$/, "")
+                  : remaining;
+                return (
+                  <div style={{ marginTop: 6 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                      <span style={{ fontSize: 11, color: low ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                        Stock : {pct} %
+                      </span>
+                      <span style={{ fontSize: 11, color: low ? "#c0392b" : "#6a7d90" }}>
+                        ≈ {displayVal} {displayUnit} restant{remaining > 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <div style={{ height: 5, borderRadius: 99, background: "#e8f0f8", overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%",
+                        width: `${pct}%`,
+                        borderRadius: 99,
+                        background: low ? "#c0392b" : pct <= 50 ? "#d98c2b" : "#1a8fd1",
+                        transition: "width 0.3s",
+                      }} />
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
             <ChevronRight size={16} color="#6a7d90" />
           </button>
@@ -2357,12 +2395,23 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium }) {
         </div>
         <div>
           <label style={styles.fieldLabel}>Unité</label>
-          <input
-            style={styles.input}
-            value={doseUnit}
-            onChange={(e) => setDoseUnit(e.target.value)}
-            placeholder="g, L, kg..."
-          />
+          <div style={{ ...styles.segmentedControl, marginTop: 0 }}>
+            {["g", "kg", "mL", "L"].map((u) => (
+              <button
+                key={u}
+                type="button"
+                onClick={() => setDoseUnit(u)}
+                style={{
+                  ...styles.segmentedBtn,
+                  ...(doseUnit === u ? styles.segmentedBtnActive : {}),
+                  flex: 1,
+                  padding: "8px 0",
+                }}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
         </div>
         <div>
           <label style={styles.fieldLabel}>Effet (variation)</label>
@@ -2393,14 +2442,17 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium }) {
         placeholder="2"
       />
 
-      <label style={styles.fieldLabel}>Contenant (g ou mL)</label>
+      <label style={styles.fieldLabel}>
+        Taille du contenant ({doseUnit === "kg" ? "kg" : doseUnit === "L" ? "L" : doseUnit === "mL" ? "mL" : "g"})
+      </label>
       <input
         type="number"
         style={styles.input}
         value={containerAmount}
         onChange={(e) => setContainerAmount(e.target.value)}
-        placeholder="1000"
-        min="1"
+        placeholder={doseUnit === "kg" || doseUnit === "L" ? "1" : "1000"}
+        min="0.001"
+        step={doseUnit === "kg" || doseUnit === "L" ? "0.1" : "1"}
       />
 
       <label style={styles.fieldLabel}>Stock actuel</label>
