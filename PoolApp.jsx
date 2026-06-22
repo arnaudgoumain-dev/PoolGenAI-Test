@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.7";
+const APP_VERSION = "0.8";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -2378,7 +2378,17 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
             </div>
           </div>
         </div>
-        <ToggleSwitch checked={isPremium} onChange={setIsPremium} />
+        <ToggleSwitch
+          checked={isPremium}
+          onChange={(val) => {
+            if (val) {
+              onWantPremium();
+            } else {
+              setIsPremium(false);
+              setApiKey("");
+            }
+          }}
+        />
       </div>
 
       <p style={styles.helpText}>
