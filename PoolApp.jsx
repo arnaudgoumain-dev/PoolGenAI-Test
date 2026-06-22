@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.14";
+const APP_VERSION = "0.15";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -1113,9 +1113,13 @@ Réponds directement en français, sans titre ni introduction.`;
 
   // Paramètres actifs selon le traitement, filtrés par ceux effectivement saisis
   const allPossibleParams = activeParamKeys || ["pH", "fCl", "tCl", "tac", "cya", "temp"];
-  const params = allPossibleParams.filter(
-    (p) => latest[p] !== undefined && latest[p] !== "" && latest[p] !== null
-  );
+  // Chercher la valeur dans latest de façon insensible à la casse
+  const params = allPossibleParams.filter((p) => {
+    // Chercher la clé réelle dans latest (pH peut être stocké sous "pH")
+    const key = Object.keys(latest).find((k) => k.toLowerCase() === p.toLowerCase()) || p;
+    const v = latest[key];
+    return v !== undefined && v !== "" && v !== null;
+  });
 
   return (
     <div>
@@ -1142,9 +1146,10 @@ Réponds directement en français, sans titre ni introduction.`;
       )}
 
       <div style={styles.grid}>
-        {params.map((p) => (
-          <ParamCard key={p} param={p} value={latest[p]} effectiveTargets={effectiveTargets} />
-        ))}
+        {params.map((p) => {
+          const key = Object.keys(latest).find((k) => k.toLowerCase() === p.toLowerCase()) || p;
+          return <ParamCard key={p} param={p} value={latest[key]} effectiveTargets={effectiveTargets} />;
+        })}
       </div>
 
       {blockedByLimit ? (
@@ -1912,9 +1917,10 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
     { key: "brome",label: "Brome (mg/L)",              value: brome, set: setBrome, step: "0.1",  placeholder: "3.0" },
     { key: "o2",   label: "Oxygène actif (mg/L)",      value: o2,    set: setO2,    step: "0.5",  placeholder: "20" },
   ];
-  const fields = activeParamKeys
-    ? ALL_FIELDS.filter((f) => activeParamKeys.includes(f.key.toLowerCase()))
-    : ALL_FIELDS.filter((f) => ["pH","fCl","tCl","tac","cya","temp"].includes(f.key));
+  const activeParamKeysLower = activeParamKeys ? activeParamKeys.map((k) => k.toLowerCase()) : null;
+  const fields = activeParamKeysLower
+    ? ALL_FIELDS.filter((f) => activeParamKeysLower.includes(f.key.toLowerCase()))
+    : ALL_FIELDS.filter((f) => ["ph","fcl","tcl","tac","cya","temp"].includes(f.key.toLowerCase()));
 
   return (
     <ModalShell onClose={onClose} title={isEditing ? "Modifier la mesure" : "Nouvelle mesure"}>
