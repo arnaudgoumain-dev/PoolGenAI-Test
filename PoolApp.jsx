@@ -8,13 +8,13 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.16";
+const APP_VERSION = "0.17";
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
   pH:     { min: 7.2, max: 7.4, unit: "",      label: "pH" },
   fCl:    { min: 1,   max: 3,   unit: "mg/L",  label: "Chlore libre" },
-  tCl:    { min: 0,   max: 99,  unit: "mg/L",  label: "Chlore total" },
+  tCl:    { min: 1,   max: 3,   unit: "mg/L",  label: "Chlore total" },
   tac:    { min: 80,  max: 120, unit: "mg/L",  label: "TAC" },
   cya:    { min: 30,  max: 50,  unit: "mg/L",  label: "Stabilisant (CYA)" },
   temp:   { min: 24,  max: 30,  unit: "°C",    label: "Température de l'eau" },
@@ -85,10 +85,9 @@ const FILTRATION_TYPES = [
 function getEffectiveTargets(treatmentType) {
   const tt = TREATMENT_TYPES.find((t) => t.value === treatmentType) || TREATMENT_TYPES[0];
   const effective = {};
-  const paramKeys = tt.params.map((p) => p.toLowerCase());
-  for (const key of paramKeys) {
+  for (const key of tt.params) {
     const base = TARGETS[key];
-    const override = tt.targets[key] || tt.targets[Object.keys(tt.targets).find(k => k.toLowerCase() === key)] || {};
+    const override = tt.targets[key] || {};
     if (base) effective[key] = { ...base, ...override };
   }
   return effective;
@@ -1009,7 +1008,8 @@ function TabBar({ tab, setTab }) {
     { id: "settings", label: "Réglages", icon: Settings2 },
   ];
   return (
-    <nav style={{ ...styles.tabBar, position: "relative" }}>
+    <div style={styles.tabVersion}>v{APP_VERSION}</div>
+    <nav style={styles.tabBar}>
       {tabs.map((t) => {
         const Icon = t.icon;
         const active = tab === t.id;
@@ -1029,7 +1029,6 @@ function TabBar({ tab, setTab }) {
           </button>
         );
       })}
-      <div style={styles.tabVersion}>v{APP_VERSION}</div>
     </nav>
   );
 }
@@ -3798,15 +3797,15 @@ const styles = {
     alignItems: "center",
   },
   tabVersion: {
-    position: "absolute",
-    top: "50%",
-    right: 8,
-    transform: "translateY(-50%)",
-    fontSize: 9,
+    textAlign: "center",
+    fontSize: 9.5,
     color: "#b0bec8",
-    pointerEvents: "none",
+    padding: "3px 0 1px",
+    background: "#f0f6fb",
     letterSpacing: 0.3,
-    whiteSpace: "nowrap",
+    maxWidth: 480,
+    margin: "0 auto",
+    width: "100%",
   },
   tabBtn: {
     flex: 1,
