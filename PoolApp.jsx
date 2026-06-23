@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.48";
+const APP_VERSION = "0.49";
 
 const TRANSLATIONS = {
   fr: {
@@ -4888,8 +4888,8 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                 <th style={styles.reportThCell}>{t("tac_col")}</th>
                 <th style={styles.reportThCell}>{t("cya_col")}</th>
                 <th style={styles.reportThCell}>{t("temp_col")}</th>
-                {manageStock && <th style={styles.reportThCell}>{t("product_col")}</th>}
-                {manageStock && <th style={styles.reportThCell}>{t("quantity_col")}</th>}
+                <th style={styles.reportThCell}>{t("product_col")}</th>
+                <th style={styles.reportThCell}>{t("quantity_col")}</th>
                 {manageStock && <th style={styles.reportThCell}>{t("stock_col")}</th>}
               </tr>
             </thead>
@@ -4913,10 +4913,10 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                           <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.temp != null && measure.temp !== "" ? `${measure.temp} °C` : "—"}</td>
                         </>
                       )}
-                      {manageStock && <td style={styles.reportTdCell}>{step ? step.productName : "—"}</td>}
-                      {manageStock && <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "#0a6ebd" }}>
+                      <td style={styles.reportTdCell}>{step ? step.productName : "—"}</td>
+                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "#0a6ebd" }}>
                         {step ? formatDose(step.appliedAmount, step.doseUnit || "g") : "—"}
-                      </td>}
+                      </td>
                       {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
                         {prod ? `${prod.stockPercent ?? 100} %` : "—"}
                       </td>}
