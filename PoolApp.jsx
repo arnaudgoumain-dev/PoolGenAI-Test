@@ -8,7 +8,1002 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.34";
+const APP_VERSION = "0.35";
+
+const TRANSLATIONS = {
+  fr: {
+    // Navigation
+    tab_pool: "Bassin",
+    tab_history: "Historique",
+    tab_products: "Produits",
+    tab_settings: "Réglages",
+    // Header
+    premium_badge: "Premium",
+    // Dashboard
+    last_measure: t("last_measure"),
+    modify: t("modify"),
+    new_measure: t("new_measure"),
+    treatment_plan: t("treatment_plan"),
+    all_in_range: t("all_in_range"),
+    no_measure: t("no_measure"),
+    no_measure_sub: t("no_measure_sub"),
+    add_measure: t("add_measure"),
+    daily_limit: t("daily_limit"),
+    apply_advice: t("apply_advice"),
+    apply_advice_sub: t("apply_advice_sub"),
+    advice_applied: t("advice_applied"),
+    advice_partial: t("advice_partial"),
+    adjust: t("adjust"),
+    ai_analysis: t("ai_analysis"),
+    ai_analyze_btn: t("ai_analyze_btn"),
+    ai_locked: t("ai_locked"),
+    ai_analyzing: t("ai_analyzing"),
+    ai_api_missing: t("ai_api_missing"),
+    follow_order: t("follow_order"),
+    // Status
+    in_range: "Dans la cible",
+    too_high: "Trop haut",
+    too_low: "Trop bas",
+    target: "cible",
+    // History
+    evolution: t("evolution"),
+    show_values: t("show_values"),
+    journal: t("journal"),
+    no_history: t("no_history"),
+    no_history_sub: t("no_history_sub"),
+    report: t("report"),
+    generate_report: t("generate_report"),
+    report_locked: t("report_locked"),
+    report_desc: t("report_desc"),
+    // Measure modal
+    new_measure_title: t("new_measure_title"),
+    edit_measure_title: t("edit_measure_title"),
+    date_time: t("date_time"),
+    photo_hint: "Prends en photo l'écran de ton photomètre avec les valeurs lisibles, ou place ta bandelette imbibée à côté de la légende du tube et photographie les deux ensemble.",
+    photos_label: t("photos_label"),
+    camera_btn: "Appareil photo",
+    gallery_btn: "Bibliothèque",
+    other_photo: "Autre photo",
+    other_gallery: "Autre depuis biblio",
+    photos_done: t("photos_done"),
+    yes_analyze: t("yes_analyze"),
+    add_more: t("add_more"),
+    analyze_btn: "Analyser",
+    analyzing: "Analyse en cours...",
+    analyze_locked: "Photo + analyse IA réservées à la version illimitée",
+    note_optional: t("note_optional"),
+    note_placeholder: t("note_placeholder"),
+    save_measure: "Enregistrer la mesure",
+    save_changes: "Enregistrer les modifications",
+    // Products
+    my_products: t("my_products"),
+    products_formula: "Le dosage est calculé selon : {quantité produit} pour faire varier le paramètre de {effet} sur {volume de référence} m³. Ces produits sont propres à ce bassin.",
+    products_locked: t("products_locked"),
+    stock_not_managed: t("stock_not_managed"),
+    activate_in_settings: t("activate_in_settings"),
+    delete_all_products: t("delete_all_products"),
+    stock_label: "Stock :",
+    stock_remaining: "restant",
+    // Product modal
+    edit_product: t("edit_product"),
+    new_product: t("new_product"),
+    product_photo: t("product_photo"),
+    product_name: t("product_name"),
+    effect: t("effect"),
+    quantity: t("quantity"),
+    effect_variation: t("effect_variation"),
+    for_x_m3: t("for_x_m3"),
+    wait_hours: t("wait_hours"),
+    container_size: t("container_size"),
+    current_stock: t("current_stock"),
+    new_product_btn: t("new_product_btn"),
+    manual_entry: t("manual_entry"),
+    note_precaution: t("note_precaution"),
+    save_product: t("save_product"),
+    stock_not_managed_modal: t("stock_not_managed_modal"),
+    stock_locked: t("stock_locked"),
+    last_consumptions: t("last_consumptions"),
+    // Apply modal
+    apply_title: t("apply_title"),
+    apply_subtitle: t("apply_subtitle"),
+    confirm_btn: t("confirm_btn"),
+    confirm_count: "conseil",
+    confirm_count_plural: "conseils",
+    quantities_title: t("quantities_title"),
+    quantities_subtitle: t("quantities_subtitle"),
+    quantity_applied: t("quantity_applied"),
+    unit: t("unit"),
+    back_btn: t("back_btn"),
+    validate_btn: t("validate_btn"),
+    stock_empty: t("stock_empty"),
+    add_arrow: t("add_arrow"),
+    // Settings
+    settings_title: "Réglages",
+    my_pools: t("my_pools"),
+    pool_name: t("pool_name"),
+    location: t("location"),
+    volume: t("volume"),
+    treatment_type: "Type de traitement",
+    filtration_type: "Type de filtration",
+    manage_stock_label: t("manage_stock_label"),
+    manage_stock_desc: t("manage_stock_desc"),
+    manage_stock_locked: t("manage_stock_locked"),
+    api_key_label: "Clé API Anthropic ou URL du proxy Cloudflare Worker",
+    provider_label: t("provider_label"),
+    api_key_placeholder: "sk-ant-... ou https://mon-proxy.workers.dev",
+    api_key_desc: "Ta clé est stockée localement. Pour Anthropic, saisis une clé sk-ant-... ou l'URL de ton proxy Cloudflare Worker (recommandé).",
+    premium_section: "VERSION",
+    premium_label: "Version illimitée",
+    premium_test: t("premium_test"),
+    premium_desc: "En version gratuite : 1 mesure par jour (tous bassins confondus), plusieurs bassins avec photo d'identification. En illimité : mesures sans limite, photos sur mesures et produits.",
+    delete_measures: t("delete_measures"),
+    sensitive_zone: t("sensitive_zone"),
+    add_pool: "Ajouter un bassin",
+    delete_pool: "Supprimer ce bassin",
+    language_label: "Langue",
+    // Report
+    report_title: "Rapport de suivi",
+    generated_on: t("generated_on"),
+    params_evolution: t("params_evolution"),
+    detailed_history: t("detailed_history"),
+    no_measures_report: t("no_measures_report"),
+    date_col: "DATE",
+    ph_col: "PH",
+    cl_libre_col: "CL LIBRE",
+    cl_total_col: "CL TOTAL",
+    tac_col: "TAC",
+    cya_col: "CYA",
+    temp_col: "TEMP.",
+    product_col: "Produit appliqué",
+    quantity_col: "Quantité",
+    stock_col: "Stock",
+    download_pdf: t("download_pdf"),
+    close: t("close"),
+    // Reco
+    wait_before_next: "Attendre {h}h avant le traitement suivant",
+    start_after: "À débuter au moins {h}h après l'étape précédente",
+    measure_after: "Attendre {h}h avant de mesurer à nouveau",
+    missing_product: "non disponible dans tes produits",
+    missing_product_tip: "Aucun produit {action} dans ta liste — ajoutes-en un dans l'onglet Produits.",
+    see_dosage: "Voir dosage",
+    // Paywall
+    paywall_title: t("paywall_title"),
+    paywall_desc: t("paywall_desc"),
+    paywall_btn: t("paywall_btn"),
+    paywall_close: t("paywall_close"),
+    // Pool
+    add_pool_title: "Nouveau bassin",
+    edit_pool_title: "Modifier le bassin",
+    pool_name_placeholder: "Ma piscine",
+    pool_location_placeholder: "Jardin, terrasse...",
+    pool_volume_placeholder: "72",
+    save_pool: "Enregistrer",
+    // Misc
+    loading: "Chargement...",
+    error_analyze: "Analyse impossible",
+    verify_connection: "Vérifie ta connexion et les photos.",
+    free_version: "Gratuit",
+    unlimited_version: "Illimité",
+  },
+  en: {
+    tab_pool: "Pool",
+    tab_history: "History",
+    tab_products: "Products",
+    tab_settings: "Settings",
+    premium_badge: "Premium",
+    last_measure: "LAST READING",
+    modify: "Edit",
+    new_measure: "+ New reading",
+    treatment_plan: "TREATMENT PLAN",
+    all_in_range: "All measured parameters are within target.",
+    no_measure: "No readings recorded",
+    no_measure_sub: "Add your first set of readings to see your pool status and treatment recommendations.",
+    add_measure: "Add a reading",
+    daily_limit: "Daily limit reached — go unlimited",
+    apply_advice: "Apply these recommendations",
+    apply_advice_sub: "Select the advice to apply then enter the actual quantities.",
+    advice_applied: "Recommendations applied",
+    advice_partial: "partially applied",
+    adjust: "Adjust",
+    ai_analysis: "AI ANALYSIS",
+    ai_analyze_btn: "Analyze with Claude",
+    ai_locked: "Feature reserved for the unlimited version",
+    ai_analyzing: "Analyzing…",
+    ai_api_missing: "Enter your API key in Settings to enable AI analysis.",
+    follow_order: "Follow the steps in order: each treatment changes water balance and may skew the next if not given time to work.",
+    in_range: "On target",
+    too_high: "Too high",
+    too_low: "Too low",
+    target: "target",
+    evolution: "Evolution",
+    show_values: "Show values on chart",
+    journal: "Log",
+    no_history: "No history yet",
+    no_history_sub: "Your readings will appear here over time.",
+    report: "Report",
+    generate_report: "Generate pool report",
+    report_locked: "PDF report reserved for unlimited version",
+    report_desc: "The report includes the reading history, advice given and quantities actually applied for this pool.",
+    new_measure_title: "New reading",
+    edit_measure_title: "Edit reading",
+    date_time: "Date and time",
+    photo_hint: "Take a photo of your photometer screen with readable values, or place your soaked test strip next to the tube legend and photograph both together.",
+    photos_label: "Reading photos",
+    camera_btn: "Camera",
+    gallery_btn: "Library",
+    other_photo: "Another photo",
+    other_gallery: "Another from library",
+    photos_done: "Done adding photos?",
+    yes_analyze: "Yes, analyze",
+    add_more: "Add more",
+    analyze_btn: "Analyze",
+    analyzing: "Analyzing...",
+    analyze_locked: "Photo + AI analysis reserved for unlimited version",
+    note_optional: "Note (optional)",
+    note_placeholder: "Cloudy water, strong sun, swimming planned...",
+    save_measure: "Save reading",
+    save_changes: "Save changes",
+    my_products: "MY PRODUCTS",
+    products_formula: "Dosage calculated as: {quantity} to change parameter by {effect} per {volume} m³. These products are specific to this pool.",
+    products_locked: "Feature reserved for the unlimited version",
+    stock_not_managed: "Stock management is not enabled for this pool. Enable it in Settings to track quantities and view consumption.",
+    activate_in_settings: "Enable in Settings →",
+    delete_all_products: "Delete all products for this pool",
+    stock_label: "Stock:",
+    stock_remaining: "remaining",
+    edit_product: "Edit product",
+    new_product: "New product",
+    product_photo: "Product photo (label)",
+    product_name: "Product name",
+    effect: "Effect",
+    quantity: "Quantity",
+    effect_variation: "Effect (change)",
+    for_x_m3: "Per X m³",
+    wait_hours: "Wait time before next treatment (hours)",
+    container_size: "Container size",
+    current_stock: "Current stock",
+    new_product_btn: "New product (100%)",
+    manual_entry: "Enter manually",
+    note_precaution: "Note / precaution",
+    save_product: "Save product",
+    stock_not_managed_modal: "Stock management is not enabled for this pool.",
+    stock_locked: "Stock management reserved for unlimited version",
+    last_consumptions: "Last 10 consumptions",
+    apply_title: "Apply recommendations",
+    apply_subtitle: "Select the advice you applied for the reading of",
+    confirm_btn: "Confirm",
+    confirm_count: "recommendation",
+    confirm_count_plural: "recommendations",
+    quantities_title: "Quantities applied",
+    quantities_subtitle: "Adjust quantities if needed — this information will be used in your report.",
+    quantity_applied: "Quantity applied",
+    unit: "Unit",
+    back_btn: "← Back",
+    validate_btn: "Submit",
+    stock_empty: "This product is out of stock.",
+    add_arrow: "Add →",
+    settings_title: "Settings",
+    my_pools: "My pools",
+    pool_name: "Pool name",
+    location: "Location",
+    volume: "Volume (m³)",
+    treatment_type: "Treatment type",
+    filtration_type: "Filtration type",
+    manage_stock_label: "Stock management",
+    manage_stock_desc: "Tracks product consumption and displays it in the report.",
+    manage_stock_locked: "Available in unlimited version",
+    api_key_label: "Anthropic API key or Cloudflare Worker proxy URL",
+    provider_label: "Provider",
+    api_key_placeholder: "sk-ant-... or https://my-proxy.workers.dev",
+    api_key_desc: "Your key is stored locally. For Anthropic, enter a sk-ant-... key or your Cloudflare Worker proxy URL (recommended).",
+    premium_section: "VERSION",
+    premium_label: "Unlimited version",
+    premium_test: "Test toggle — no real payment here",
+    premium_desc: "Free: 1 reading per day (all pools combined), multiple pools with photo. Unlimited: unlimited readings, photos on readings and products.",
+    delete_measures: "Delete all readings for this pool",
+    sensitive_zone: "SENSITIVE ZONE",
+    add_pool: "Add a pool",
+    delete_pool: "Delete this pool",
+    language_label: "Language",
+    report_title: "Monitoring report",
+    generated_on: "generated on",
+    params_evolution: "PARAMETER EVOLUTION",
+    detailed_history: "READING AND CONSUMPTION HISTORY",
+    no_measures_report: "No readings recorded for this pool.",
+    date_col: "DATE",
+    ph_col: "PH",
+    cl_libre_col: "FREE CL",
+    cl_total_col: "TOTAL CL",
+    tac_col: "ALK",
+    cya_col: "CYA",
+    temp_col: "TEMP.",
+    product_col: "Product applied",
+    quantity_col: "Quantity",
+    stock_col: "Stock",
+    download_pdf: "Download PDF",
+    close: "Close",
+    wait_before_next: "Wait {h}h before next treatment",
+    start_after: "Start at least {h}h after previous step",
+    measure_after: "Wait {h}h before testing again",
+    missing_product: "not available in your products",
+    missing_product_tip: "No {action} product in your list — add one in the Products tab.",
+    see_dosage: "See dosage",
+    paywall_title: "Go unlimited",
+    paywall_desc: "Unlimited readings · AI strip analysis · PDF report · Stock management",
+    paywall_btn: "Activate unlimited version",
+    paywall_close: "Later",
+    add_pool_title: "New pool",
+    edit_pool_title: "Edit pool",
+    pool_name_placeholder: "My pool",
+    pool_location_placeholder: "Garden, terrace...",
+    pool_volume_placeholder: "72",
+    save_pool: "Save",
+    loading: "Loading...",
+    error_analyze: "Analysis failed",
+    verify_connection: "Check your connection and photos.",
+    free_version: "Free",
+    unlimited_version: "Unlimited",
+  },
+  de: {
+    tab_pool: "Becken",
+    tab_history: "Verlauf",
+    tab_products: "Produkte",
+    tab_settings: "Einstellungen",
+    premium_badge: "Premium",
+    last_measure: "LETZTE MESSUNG",
+    modify: "Bearbeiten",
+    new_measure: "+ Neue Messung",
+    treatment_plan: "BEHANDLUNGSPLAN",
+    all_in_range: "Alle gemessenen Parameter sind im Zielbereich.",
+    no_measure: "Keine Messungen erfasst",
+    no_measure_sub: "Füge deine erste Messreihe hinzu, um den Zustand deines Beckens und Behandlungsempfehlungen zu sehen.",
+    add_measure: "Messung hinzufügen",
+    daily_limit: "Tageslimit erreicht — unbegrenzt nutzen",
+    apply_advice: "Empfehlungen anwenden",
+    apply_advice_sub: "Wähle die angewendeten Empfehlungen und gib die tatsächlichen Mengen ein.",
+    advice_applied: "Empfehlungen angewendet",
+    advice_partial: "teilweise angewendet",
+    adjust: "Anpassen",
+    ai_analysis: "KI-ANALYSE",
+    ai_analyze_btn: "Mit Claude analysieren",
+    ai_locked: "Funktion für unbegrenzte Version reserviert",
+    ai_analyzing: "Analyse läuft…",
+    ai_api_missing: "API-Schlüssel in Einstellungen eingeben, um KI-Analyse zu aktivieren.",
+    follow_order: "Schritte der Reihe nach befolgen: jede Behandlung verändert das Wassergleichgewicht.",
+    in_range: "Im Zielbereich",
+    too_high: "Zu hoch",
+    too_low: "Zu niedrig",
+    target: "Ziel",
+    evolution: "Verlauf",
+    show_values: "Werte im Diagramm anzeigen",
+    journal: "Protokoll",
+    no_history: "Noch kein Verlauf",
+    no_history_sub: "Deine Messungen werden hier im Laufe der Zeit angezeigt.",
+    report: "Bericht",
+    generate_report: "Beckenbericht erstellen",
+    report_locked: "PDF-Bericht nur in der unbegrenzten Version",
+    report_desc: "Der Bericht enthält den Messverlauf, gegebene Ratschläge und tatsächlich angewendete Mengen.",
+    new_measure_title: "Neue Messung",
+    edit_measure_title: "Messung bearbeiten",
+    date_time: "Datum und Uhrzeit",
+    photo_hint: "Fotografiere den Photometerbildschirm mit lesbaren Werten oder lege deinen getränkten Teststreifen neben die Tubuslegende und fotografiere beide zusammen.",
+    photos_label: "Messfotos",
+    camera_btn: "Kamera",
+    gallery_btn: "Bibliothek",
+    other_photo: "Weiteres Foto",
+    other_gallery: "Weiteres aus Bibliothek",
+    photos_done: "Alle Fotos hinzugefügt?",
+    yes_analyze: "Ja, analysieren",
+    add_more: "Weitere hinzufügen",
+    analyze_btn: "Analysieren",
+    analyzing: "Analysiere...",
+    analyze_locked: "Foto + KI-Analyse nur in unbegrenzter Version",
+    note_optional: "Notiz (optional)",
+    note_placeholder: "Trübes Wasser, starke Sonne, Schwimmen geplant...",
+    save_measure: "Messung speichern",
+    save_changes: "Änderungen speichern",
+    my_products: "MEINE PRODUKTE",
+    products_formula: "Dosierung berechnet als: {Menge} um Parameter um {Effekt} pro {Volumen} m³ zu ändern.",
+    products_locked: "Funktion für unbegrenzte Version reserviert",
+    stock_not_managed: "Lagerverwaltung für dieses Becken nicht aktiviert. In Einstellungen aktivieren.",
+    activate_in_settings: "In Einstellungen aktivieren →",
+    delete_all_products: "Alle Produkte für dieses Becken löschen",
+    stock_label: "Lager:",
+    stock_remaining: "verbleibend",
+    edit_product: "Produkt bearbeiten",
+    new_product: "Neues Produkt",
+    product_photo: "Produktfoto (Etikett)",
+    product_name: "Produktname",
+    effect: "Wirkung",
+    quantity: "Menge",
+    effect_variation: "Wirkung (Änderung)",
+    for_x_m3: "Pro X m³",
+    wait_hours: "Wartezeit vor nächster Behandlung (Stunden)",
+    container_size: "Behältergröße",
+    current_stock: "Aktueller Lagerbestand",
+    new_product_btn: "Neues Produkt (100%)",
+    manual_entry: "Manuell eingeben",
+    note_precaution: "Notiz / Vorsichtsmaßnahme",
+    save_product: "Produkt speichern",
+    stock_not_managed_modal: "Lagerverwaltung für dieses Becken nicht aktiviert.",
+    stock_locked: "Lagerverwaltung nur in unbegrenzter Version",
+    last_consumptions: "Letzte 10 Verbrauchsmengen",
+    apply_title: "Empfehlungen anwenden",
+    apply_subtitle: "Wähle die angewendeten Ratschläge für die Messung vom",
+    confirm_btn: "Bestätigen",
+    confirm_count: "Empfehlung",
+    confirm_count_plural: "Empfehlungen",
+    quantities_title: "Angewendete Mengen",
+    quantities_subtitle: "Mengen anpassen wenn nötig — diese Informationen werden für deinen Bericht verwendet.",
+    quantity_applied: "Angewendete Menge",
+    unit: "Einheit",
+    back_btn: "← Zurück",
+    validate_btn: "Bestätigen",
+    stock_empty: "Dieses Produkt ist nicht mehr auf Lager.",
+    add_arrow: "Hinzufügen →",
+    settings_title: "Einstellungen",
+    my_pools: "Meine Becken",
+    pool_name: "Beckenname",
+    location: "Standort",
+    volume: "Volumen (m³)",
+    treatment_type: "Behandlungsart",
+    filtration_type: "Filtrationsart",
+    manage_stock_label: "Lagerverwaltung",
+    manage_stock_desc: "Verfolgt den Produktverbrauch und zeigt ihn im Bericht an.",
+    manage_stock_locked: "In unbegrenzter Version verfügbar",
+    api_key_label: "Anthropic API-Schlüssel oder Cloudflare Worker Proxy-URL",
+    provider_label: "Anbieter",
+    api_key_placeholder: "sk-ant-... oder https://mein-proxy.workers.dev",
+    api_key_desc: "Dein Schlüssel wird lokal gespeichert.",
+    premium_section: "VERSION",
+    premium_label: "Unbegrenzte Version",
+    premium_test: "Testschalter — keine echte Zahlung",
+    premium_desc: "Kostenlos: 1 Messung pro Tag, mehrere Becken. Unbegrenzt: unbegrenzte Messungen, Fotos, Produkte.",
+    delete_measures: "Alle Messungen für dieses Becken löschen",
+    sensitive_zone: "KRITISCHER BEREICH",
+    add_pool: "Becken hinzufügen",
+    delete_pool: "Dieses Becken löschen",
+    language_label: "Sprache",
+    report_title: "Überwachungsbericht",
+    generated_on: "erstellt am",
+    params_evolution: "PARAMETERENTWICKLUNG",
+    detailed_history: "MESS- UND VERBRAUCHSHISTORIE",
+    no_measures_report: "Keine Messungen für dieses Becken.",
+    date_col: "DATUM",
+    ph_col: "PH",
+    cl_libre_col: "FREIES CL",
+    cl_total_col: "GESAMT CL",
+    tac_col: "KH",
+    cya_col: "CYA",
+    temp_col: "TEMP.",
+    product_col: "Angewendetes Produkt",
+    quantity_col: "Menge",
+    stock_col: "Lager",
+    download_pdf: "PDF herunterladen",
+    close: "Schließen",
+    wait_before_next: "{h}h vor nächster Behandlung warten",
+    start_after: "Mindestens {h}h nach dem vorherigen Schritt beginnen",
+    measure_after: "{h}h warten vor erneuter Messung",
+    missing_product: "nicht in deinen Produkten verfügbar",
+    missing_product_tip: "Kein {action}-Produkt in deiner Liste — füge eines im Produkte-Tab hinzu.",
+    see_dosage: "Dosierung anzeigen",
+    paywall_title: "Auf unbegrenzt wechseln",
+    paywall_desc: "Unbegrenzte Messungen · KI-Streifenanalyse · PDF-Bericht · Lagerverwaltung",
+    paywall_btn: "Unbegrenzte Version aktivieren",
+    paywall_close: "Später",
+    add_pool_title: "Neues Becken",
+    edit_pool_title: "Becken bearbeiten",
+    pool_name_placeholder: "Mein Pool",
+    pool_location_placeholder: "Garten, Terrasse...",
+    pool_volume_placeholder: "72",
+    save_pool: "Speichern",
+    loading: "Laden...",
+    error_analyze: "Analyse fehlgeschlagen",
+    verify_connection: "Verbindung und Fotos prüfen.",
+    free_version: "Kostenlos",
+    unlimited_version: "Unbegrenzt",
+  },
+  it: {
+    tab_pool: "Vasca",
+    tab_history: "Storico",
+    tab_products: "Prodotti",
+    tab_settings: "Impostazioni",
+    premium_badge: "Premium",
+    last_measure: "ULTIMA MISURAZIONE",
+    modify: "Modifica",
+    new_measure: "+ Nuova misurazione",
+    treatment_plan: "PIANO DI TRATTAMENTO",
+    all_in_range: "Tutti i parametri misurati sono nell'intervallo target.",
+    no_measure: "Nessuna misurazione registrata",
+    no_measure_sub: "Aggiungi la tua prima serie di misurazioni per vedere lo stato della tua vasca.",
+    add_measure: "Aggiungi misurazione",
+    daily_limit: "Limite giornaliero raggiunto — passa all'illimitato",
+    apply_advice: "Applica questi consigli",
+    apply_advice_sub: "Seleziona i consigli applicati e inserisci le quantità reali.",
+    advice_applied: "Consigli applicati",
+    advice_partial: "parzialmente applicati",
+    adjust: "Regola",
+    ai_analysis: "ANALISI IA",
+    ai_analyze_btn: "Analizza con Claude",
+    ai_locked: "Funzione riservata alla versione illimitata",
+    ai_analyzing: "Analisi in corso…",
+    ai_api_missing: "Inserisci la tua chiave API nelle Impostazioni per abilitare l'analisi IA.",
+    follow_order: "Segui i passaggi nell'ordine: ogni trattamento modifica l'equilibrio dell'acqua.",
+    in_range: "Nell'intervallo",
+    too_high: "Troppo alto",
+    too_low: "Troppo basso",
+    target: "obiettivo",
+    evolution: "Evoluzione",
+    show_values: "Mostra valori sul grafico",
+    journal: "Registro",
+    no_history: "Ancora nessuno storico",
+    no_history_sub: "Le tue misurazioni appariranno qui nel tempo.",
+    report: "Rapporto",
+    generate_report: "Genera rapporto della vasca",
+    report_locked: "Rapporto PDF riservato alla versione illimitata",
+    report_desc: "Il rapporto include lo storico delle misurazioni, i consigli dati e le quantità effettivamente applicate.",
+    new_measure_title: "Nuova misurazione",
+    edit_measure_title: "Modifica misurazione",
+    date_time: "Data e ora",
+    photo_hint: "Fotografa lo schermo del tuo fotometro con valori leggibili, o posiziona il tuo striscio bagnato accanto alla legenda del tubo e fotografali insieme.",
+    photos_label: "Foto della misurazione",
+    camera_btn: "Fotocamera",
+    gallery_btn: "Libreria",
+    other_photo: "Altra foto",
+    other_gallery: "Altra dalla libreria",
+    photos_done: "Hai finito di aggiungere foto?",
+    yes_analyze: "Sì, analizza",
+    add_more: "Aggiungi altre",
+    analyze_btn: "Analizza",
+    analyzing: "Analisi in corso...",
+    analyze_locked: "Foto + analisi IA riservate alla versione illimitata",
+    note_optional: "Nota (opzionale)",
+    note_placeholder: "Acqua torbida, sole forte, nuoto previsto...",
+    save_measure: "Salva misurazione",
+    save_changes: "Salva modifiche",
+    my_products: "I MIEI PRODOTTI",
+    products_formula: "Il dosaggio è calcolato come: {quantità} per variare il parametro di {effetto} per {volume} m³.",
+    products_locked: "Funzione riservata alla versione illimitata",
+    stock_not_managed: "La gestione dello stock non è attivata per questa vasca. Attivala nelle Impostazioni.",
+    activate_in_settings: "Attiva nelle Impostazioni →",
+    delete_all_products: "Elimina tutti i prodotti per questa vasca",
+    stock_label: "Stock:",
+    stock_remaining: "rimanente",
+    edit_product: "Modifica prodotto",
+    new_product: "Nuovo prodotto",
+    product_photo: "Foto prodotto (etichetta)",
+    product_name: "Nome prodotto",
+    effect: "Effetto",
+    quantity: "Quantità",
+    effect_variation: "Effetto (variazione)",
+    for_x_m3: "Per X m³",
+    wait_hours: "Tempo di attesa prima del trattamento successivo (ore)",
+    container_size: "Dimensione contenitore",
+    current_stock: "Stock attuale",
+    new_product_btn: "Prodotto nuovo (100%)",
+    manual_entry: "Inserisci manualmente",
+    note_precaution: "Nota / precauzione",
+    save_product: "Salva prodotto",
+    stock_not_managed_modal: "La gestione dello stock non è attivata per questa vasca.",
+    stock_locked: "Gestione stock riservata alla versione illimitata",
+    last_consumptions: "Ultime 10 consumazioni",
+    apply_title: "Applica questi consigli",
+    apply_subtitle: "Seleziona i consigli applicati per la misurazione del",
+    confirm_btn: "Conferma",
+    confirm_count: "consiglio",
+    confirm_count_plural: "consigli",
+    quantities_title: "Quantità applicate",
+    quantities_subtitle: "Regola le quantità se necessario — queste informazioni serviranno per il tuo rapporto.",
+    quantity_applied: "Quantità applicata",
+    unit: "Unità",
+    back_btn: "← Indietro",
+    validate_btn: "Valida",
+    stock_empty: "Stock esaurito per questo prodotto.",
+    add_arrow: "Aggiungi →",
+    settings_title: "Impostazioni",
+    my_pools: "Le mie vasche",
+    pool_name: "Nome vasca",
+    location: "Posizione",
+    volume: "Volume (m³)",
+    treatment_type: "Tipo di trattamento",
+    filtration_type: "Tipo di filtrazione",
+    manage_stock_label: "Gestione stock",
+    manage_stock_desc: "Tiene traccia del consumo dei prodotti e lo mostra nel rapporto.",
+    manage_stock_locked: "Disponibile nella versione illimitata",
+    api_key_label: "Chiave API Anthropic o URL proxy Cloudflare Worker",
+    provider_label: "Provider",
+    api_key_placeholder: "sk-ant-... o https://mio-proxy.workers.dev",
+    api_key_desc: "La tua chiave è memorizzata localmente.",
+    premium_section: "VERSIONE",
+    premium_label: "Versione illimitata",
+    premium_test: "Interruttore di test — nessun pagamento reale",
+    premium_desc: "Gratuito: 1 misurazione al giorno, più vasche. Illimitato: misurazioni illimitate, foto, prodotti.",
+    delete_measures: "Elimina tutte le misurazioni per questa vasca",
+    sensitive_zone: "ZONA SENSIBILE",
+    add_pool: "Aggiungi vasca",
+    delete_pool: "Elimina questa vasca",
+    language_label: "Lingua",
+    report_title: "Rapporto di monitoraggio",
+    generated_on: "generato il",
+    params_evolution: "EVOLUZIONE DEI PARAMETRI",
+    detailed_history: "STORICO MISURAZIONI E CONSUMI",
+    no_measures_report: "Nessuna misurazione registrata per questa vasca.",
+    date_col: "DATA",
+    ph_col: "PH",
+    cl_libre_col: "CL LIBERO",
+    cl_total_col: "CL TOTALE",
+    tac_col: "TAC",
+    cya_col: "CYA",
+    temp_col: "TEMP.",
+    product_col: "Prodotto applicato",
+    quantity_col: "Quantità",
+    stock_col: "Stock",
+    download_pdf: "Scarica PDF",
+    close: "Chiudi",
+    wait_before_next: "Attendere {h}h prima del trattamento successivo",
+    start_after: "Iniziare almeno {h}h dopo il passaggio precedente",
+    measure_after: "Attendere {h}h prima di misurare di nuovo",
+    missing_product: "non disponibile nei tuoi prodotti",
+    missing_product_tip: "Nessun prodotto {action} nella tua lista — aggiungine uno nella scheda Prodotti.",
+    see_dosage: "Vedi dosaggio",
+    paywall_title: "Passa all'illimitato",
+    paywall_desc: "Misurazioni illimitate · Analisi IA strisce · Rapporto PDF · Gestione stock",
+    paywall_btn: "Attiva versione illimitata",
+    paywall_close: "Più tardi",
+    add_pool_title: "Nuova vasca",
+    edit_pool_title: "Modifica vasca",
+    pool_name_placeholder: "La mia piscina",
+    pool_location_placeholder: "Giardino, terrazza...",
+    pool_volume_placeholder: "72",
+    save_pool: "Salva",
+    loading: "Caricamento...",
+    error_analyze: "Analisi impossibile",
+    verify_connection: "Controlla la connessione e le foto.",
+    free_version: "Gratuito",
+    unlimited_version: "Illimitato",
+  },
+  es: {
+    tab_pool: "Piscina",
+    tab_history: "Historial",
+    tab_products: "Productos",
+    tab_settings: "Ajustes",
+    premium_badge: "Premium",
+    last_measure: "ÚLTIMA MEDICIÓN",
+    modify: "Editar",
+    new_measure: "+ Nueva medición",
+    treatment_plan: "PLAN DE TRATAMIENTO",
+    all_in_range: "Todos los parámetros medidos están en el rango objetivo.",
+    no_measure: "Sin mediciones registradas",
+    no_measure_sub: "Añade tu primera serie de mediciones para ver el estado de tu piscina.",
+    add_measure: "Añadir medición",
+    daily_limit: "Límite diario alcanzado — pasar a ilimitado",
+    apply_advice: "Aplicar estos consejos",
+    apply_advice_sub: "Selecciona los consejos aplicados e introduce las cantidades reales.",
+    advice_applied: "Consejos aplicados",
+    advice_partial: "parcialmente aplicados",
+    adjust: "Ajustar",
+    ai_analysis: "ANÁLISIS IA",
+    ai_analyze_btn: "Analizar con Claude",
+    ai_locked: "Función reservada para la versión ilimitada",
+    ai_analyzing: "Analizando…",
+    ai_api_missing: "Introduce tu clave API en Ajustes para activar el análisis IA.",
+    follow_order: "Sigue los pasos en orden: cada tratamiento modifica el equilibrio del agua.",
+    in_range: "En objetivo",
+    too_high: "Demasiado alto",
+    too_low: "Demasiado bajo",
+    target: "objetivo",
+    evolution: "Evolución",
+    show_values: "Mostrar valores en el gráfico",
+    journal: "Registro",
+    no_history: "Sin historial aún",
+    no_history_sub: "Tus mediciones aparecerán aquí con el tiempo.",
+    report: "Informe",
+    generate_report: "Generar informe de la piscina",
+    report_locked: "Informe PDF reservado para versión ilimitada",
+    report_desc: "El informe incluye el historial de mediciones, consejos dados y cantidades realmente aplicadas.",
+    new_measure_title: "Nueva medición",
+    edit_measure_title: "Editar medición",
+    date_time: "Fecha y hora",
+    photo_hint: "Fotografía la pantalla de tu fotómetro con valores legibles, o coloca tu tira de prueba empapada junto a la leyenda del tubo y fotografíalos juntos.",
+    photos_label: "Fotos de la medición",
+    camera_btn: "Cámara",
+    gallery_btn: "Biblioteca",
+    other_photo: "Otra foto",
+    other_gallery: "Otra de biblioteca",
+    photos_done: "¿Has terminado de añadir fotos?",
+    yes_analyze: "Sí, analizar",
+    add_more: "Añadir más",
+    analyze_btn: "Analizar",
+    analyzing: "Analizando...",
+    analyze_locked: "Foto + análisis IA reservados para versión ilimitada",
+    note_optional: "Nota (opcional)",
+    note_placeholder: "Agua turbia, sol fuerte, natación prevista...",
+    save_measure: "Guardar medición",
+    save_changes: "Guardar cambios",
+    my_products: "MIS PRODUCTOS",
+    products_formula: "El dosaje se calcula como: {cantidad} para variar el parámetro en {efecto} por {volumen} m³.",
+    products_locked: "Función reservada para la versión ilimitada",
+    stock_not_managed: "La gestión de stock no está activada para esta piscina. Actívala en Ajustes.",
+    activate_in_settings: "Activar en Ajustes →",
+    delete_all_products: "Eliminar todos los productos de esta piscina",
+    stock_label: "Stock:",
+    stock_remaining: "restante",
+    edit_product: "Editar producto",
+    new_product: "Nuevo producto",
+    product_photo: "Foto del producto (etiqueta)",
+    product_name: "Nombre del producto",
+    effect: "Efecto",
+    quantity: "Cantidad",
+    effect_variation: "Efecto (variación)",
+    for_x_m3: "Por X m³",
+    wait_hours: "Tiempo de espera antes del siguiente tratamiento (horas)",
+    container_size: "Tamaño del envase",
+    current_stock: "Stock actual",
+    new_product_btn: "Producto nuevo (100%)",
+    manual_entry: "Introducir manualmente",
+    note_precaution: "Nota / precaución",
+    save_product: "Guardar producto",
+    stock_not_managed_modal: "La gestión de stock no está activada para esta piscina.",
+    stock_locked: "Gestión de stock reservada para versión ilimitada",
+    last_consumptions: "Últimas 10 consumiciones",
+    apply_title: "Aplicar estos consejos",
+    apply_subtitle: "Selecciona los consejos aplicados para la medición del",
+    confirm_btn: "Confirmar",
+    confirm_count: "consejo",
+    confirm_count_plural: "consejos",
+    quantities_title: "Cantidades aplicadas",
+    quantities_subtitle: "Ajusta las cantidades si es necesario — esta información se usará en tu informe.",
+    quantity_applied: "Cantidad aplicada",
+    unit: "Unidad",
+    back_btn: "← Volver",
+    validate_btn: "Validar",
+    stock_empty: "Stock agotado para este producto.",
+    add_arrow: "Añadir →",
+    settings_title: "Ajustes",
+    my_pools: "Mis piscinas",
+    pool_name: "Nombre de la piscina",
+    location: "Ubicación",
+    volume: "Volumen (m³)",
+    treatment_type: "Tipo de tratamiento",
+    filtration_type: "Tipo de filtración",
+    manage_stock_label: "Gestión de stock",
+    manage_stock_desc: "Hace seguimiento del consumo de productos y lo muestra en el informe.",
+    manage_stock_locked: "Disponible en versión ilimitada",
+    api_key_label: "Clave API Anthropic o URL proxy Cloudflare Worker",
+    provider_label: "Proveedor",
+    api_key_placeholder: "sk-ant-... o https://mi-proxy.workers.dev",
+    api_key_desc: "Tu clave se almacena localmente.",
+    premium_section: "VERSIÓN",
+    premium_label: "Versión ilimitada",
+    premium_test: "Interruptor de prueba — sin pago real",
+    premium_desc: "Gratuito: 1 medición por día, varias piscinas. Ilimitado: mediciones ilimitadas, fotos, productos.",
+    delete_measures: "Eliminar todas las mediciones de esta piscina",
+    sensitive_zone: "ZONA SENSIBLE",
+    add_pool: "Añadir piscina",
+    delete_pool: "Eliminar esta piscina",
+    language_label: "Idioma",
+    report_title: "Informe de seguimiento",
+    generated_on: "generado el",
+    params_evolution: "EVOLUCIÓN DE PARÁMETROS",
+    detailed_history: "HISTORIAL DE MEDICIONES Y CONSUMOS",
+    no_measures_report: "Sin mediciones registradas para esta piscina.",
+    date_col: "FECHA",
+    ph_col: "PH",
+    cl_libre_col: "CL LIBRE",
+    cl_total_col: "CL TOTAL",
+    tac_col: "TAC",
+    cya_col: "CYA",
+    temp_col: "TEMP.",
+    product_col: "Producto aplicado",
+    quantity_col: "Cantidad",
+    stock_col: "Stock",
+    download_pdf: "Descargar PDF",
+    close: "Cerrar",
+    wait_before_next: "Esperar {h}h antes del siguiente tratamiento",
+    start_after: "Comenzar al menos {h}h después del paso anterior",
+    measure_after: "Esperar {h}h antes de medir de nuevo",
+    missing_product: "no disponible en tus productos",
+    missing_product_tip: "Sin producto {action} en tu lista — añade uno en la pestaña Productos.",
+    see_dosage: "Ver dosaje",
+    paywall_title: "Pasar a ilimitado",
+    paywall_desc: "Mediciones ilimitadas · Análisis IA de tiras · Informe PDF · Gestión de stock",
+    paywall_btn: "Activar versión ilimitada",
+    paywall_close: "Más tarde",
+    add_pool_title: "Nueva piscina",
+    edit_pool_title: "Editar piscina",
+    pool_name_placeholder: "Mi piscina",
+    pool_location_placeholder: "Jardín, terraza...",
+    pool_volume_placeholder: "72",
+    save_pool: "Guardar",
+    loading: "Cargando...",
+    error_analyze: "Análisis imposible",
+    verify_connection: "Comprueba tu conexión y las fotos.",
+    free_version: "Gratuito",
+    unlimited_version: "Ilimitado",
+  },
+  pt: {
+    tab_pool: "Piscina",
+    tab_history: "Histórico",
+    tab_products: "Produtos",
+    tab_settings: "Configurações",
+    premium_badge: "Premium",
+    last_measure: "ÚLTIMA MEDIÇÃO",
+    modify: "Editar",
+    new_measure: "+ Nova medição",
+    treatment_plan: "PLANO DE TRATAMENTO",
+    all_in_range: "Todos os parâmetros medidos estão na faixa alvo.",
+    no_measure: "Nenhuma medição registrada",
+    no_measure_sub: "Adicione sua primeira série de medições para ver o estado da sua piscina.",
+    add_measure: "Adicionar medição",
+    daily_limit: "Limite diário atingido — passar para ilimitado",
+    apply_advice: "Aplicar estas recomendações",
+    apply_advice_sub: "Selecione os conselhos aplicados e insira as quantidades reais.",
+    advice_applied: "Recomendações aplicadas",
+    advice_partial: "parcialmente aplicadas",
+    adjust: "Ajustar",
+    ai_analysis: "ANÁLISE IA",
+    ai_analyze_btn: "Analisar com Claude",
+    ai_locked: "Funcionalidade reservada para a versão ilimitada",
+    ai_analyzing: "Analisando…",
+    ai_api_missing: "Insira sua chave API nas Configurações para ativar a análise IA.",
+    follow_order: "Siga os passos na ordem: cada tratamento modifica o equilíbrio da água.",
+    in_range: "Na faixa",
+    too_high: "Muito alto",
+    too_low: "Muito baixo",
+    target: "alvo",
+    evolution: "Evolução",
+    show_values: "Mostrar valores no gráfico",
+    journal: "Registro",
+    no_history: "Ainda sem histórico",
+    no_history_sub: "Suas medições aparecerão aqui ao longo do tempo.",
+    report: "Relatório",
+    generate_report: "Gerar relatório da piscina",
+    report_locked: "Relatório PDF reservado para versão ilimitada",
+    report_desc: "O relatório inclui o histórico de medições, conselhos dados e quantidades realmente aplicadas.",
+    new_measure_title: "Nova medição",
+    edit_measure_title: "Editar medição",
+    date_time: "Data e hora",
+    photo_hint: "Fotografe a tela do seu fotômetro com valores legíveis, ou coloque sua tira de teste embebida ao lado da legenda do tubo e fotografe ambos juntos.",
+    photos_label: "Fotos da medição",
+    camera_btn: "Câmera",
+    gallery_btn: "Biblioteca",
+    other_photo: "Outra foto",
+    other_gallery: "Outra da biblioteca",
+    photos_done: "Terminou de adicionar fotos?",
+    yes_analyze: "Sim, analisar",
+    add_more: "Adicionar mais",
+    analyze_btn: "Analisar",
+    analyzing: "Analisando...",
+    analyze_locked: "Foto + análise IA reservadas para versão ilimitada",
+    note_optional: "Nota (opcional)",
+    note_placeholder: "Água turva, sol forte, natação prevista...",
+    save_measure: "Salvar medição",
+    save_changes: "Salvar alterações",
+    my_products: "MEUS PRODUTOS",
+    products_formula: "A dosagem é calculada como: {quantidade} para variar o parâmetro em {efeito} por {volume} m³.",
+    products_locked: "Funcionalidade reservada para a versão ilimitada",
+    stock_not_managed: "A gestão de estoque não está ativada para esta piscina. Ative nas Configurações.",
+    activate_in_settings: "Ativar nas Configurações →",
+    delete_all_products: "Excluir todos os produtos desta piscina",
+    stock_label: "Estoque:",
+    stock_remaining: "restante",
+    edit_product: "Editar produto",
+    new_product: "Novo produto",
+    product_photo: "Foto do produto (rótulo)",
+    product_name: "Nome do produto",
+    effect: "Efeito",
+    quantity: "Quantidade",
+    effect_variation: "Efeito (variação)",
+    for_x_m3: "Por X m³",
+    wait_hours: "Tempo de espera antes do próximo tratamento (horas)",
+    container_size: "Tamanho do recipiente",
+    current_stock: "Estoque atual",
+    new_product_btn: "Produto novo (100%)",
+    manual_entry: "Inserir manualmente",
+    note_precaution: "Nota / precaução",
+    save_product: "Salvar produto",
+    stock_not_managed_modal: "A gestão de estoque não está ativada para esta piscina.",
+    stock_locked: "Gestão de estoque reservada para versão ilimitada",
+    last_consumptions: "Últimas 10 consumições",
+    apply_title: "Aplicar estas recomendações",
+    apply_subtitle: "Selecione os conselhos aplicados para a medição de",
+    confirm_btn: "Confirmar",
+    confirm_count: "recomendação",
+    confirm_count_plural: "recomendações",
+    quantities_title: "Quantidades aplicadas",
+    quantities_subtitle: "Ajuste as quantidades se necessário — estas informações serão usadas no seu relatório.",
+    quantity_applied: "Quantidade aplicada",
+    unit: "Unidade",
+    back_btn: "← Voltar",
+    validate_btn: "Validar",
+    stock_empty: "Estoque esgotado para este produto.",
+    add_arrow: "Adicionar →",
+    settings_title: "Configurações",
+    my_pools: "Minhas piscinas",
+    pool_name: "Nome da piscina",
+    location: "Localização",
+    volume: "Volume (m³)",
+    treatment_type: "Tipo de tratamento",
+    filtration_type: "Tipo de filtração",
+    manage_stock_label: "Gestão de estoque",
+    manage_stock_desc: "Rastreia o consumo de produtos e o exibe no relatório.",
+    manage_stock_locked: "Disponível na versão ilimitada",
+    api_key_label: "Chave API Anthropic ou URL proxy Cloudflare Worker",
+    provider_label: "Provedor",
+    api_key_placeholder: "sk-ant-... ou https://meu-proxy.workers.dev",
+    api_key_desc: "Sua chave é armazenada localmente.",
+    premium_section: "VERSÃO",
+    premium_label: "Versão ilimitada",
+    premium_test: "Interruptor de teste — sem pagamento real",
+    premium_desc: "Gratuito: 1 medição por dia, várias piscinas. Ilimitado: medições ilimitadas, fotos, produtos.",
+    delete_measures: "Excluir todas as medições desta piscina",
+    sensitive_zone: "ZONA SENSÍVEL",
+    add_pool: "Adicionar piscina",
+    delete_pool: "Excluir esta piscina",
+    language_label: "Idioma",
+    report_title: "Relatório de monitoramento",
+    generated_on: "gerado em",
+    params_evolution: "EVOLUÇÃO DOS PARÂMETROS",
+    detailed_history: "HISTÓRICO DE MEDIÇÕES E CONSUMOS",
+    no_measures_report: "Nenhuma medição registrada para esta piscina.",
+    date_col: "DATA",
+    ph_col: "PH",
+    cl_libre_col: "CL LIVRE",
+    cl_total_col: "CL TOTAL",
+    tac_col: "TAC",
+    cya_col: "CYA",
+    temp_col: "TEMP.",
+    product_col: "Produto aplicado",
+    quantity_col: "Quantidade",
+    stock_col: "Estoque",
+    download_pdf: "Baixar PDF",
+    close: "Fechar",
+    wait_before_next: "Aguardar {h}h antes do próximo tratamento",
+    start_after: "Iniciar pelo menos {h}h após o passo anterior",
+    measure_after: "Aguardar {h}h antes de medir novamente",
+    missing_product: "não disponível nos seus produtos",
+    missing_product_tip: "Nenhum produto {action} na sua lista — adicione um na aba Produtos.",
+    see_dosage: "Ver dosagem",
+    paywall_title: "Passar para ilimitado",
+    paywall_desc: "Medições ilimitadas · Análise IA de tiras · Relatório PDF · Gestão de estoque",
+    paywall_btn: "Ativar versão ilimitada",
+    paywall_close: "Mais tarde",
+    add_pool_title: "Nova piscina",
+    edit_pool_title: "Editar piscina",
+    pool_name_placeholder: "Minha piscina",
+    pool_location_placeholder: "Jardim, terraço...",
+    pool_volume_placeholder: "72",
+    save_pool: "Salvar",
+    loading: "Carregando...",
+    error_analyze: "Análise impossível",
+    verify_connection: "Verifique sua conexão e as fotos.",
+    free_version: "Gratuito",
+    unlimited_version: "Ilimitado",
+  },
+};
+
+function useT(lang) {
+  return function t(key, vars) {
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
+    let str = dict[key] || TRANSLATIONS.fr[key] || key;
+    if (vars) {
+      Object.keys(vars).forEach((k) => {
+        str = str.replace(`{${k}}`, vars[k]);
+      });
+    }
+    return str;
+  };
+}
+
+const LANGUAGE_OPTIONS = [
+  { value: "fr", label: "Français" },
+  { value: "en", label: "English" },
+  { value: "de", label: "Deutsch" },
+  { value: "it", label: "Italiano" },
+  { value: "es", label: "Español" },
+  { value: "pt", label: "Português" },
+];
+
 
 // Tous les paramètres possibles, tous traitements confondus
 const TARGETS = {
@@ -455,6 +1450,7 @@ function PoolApp() {
   const [editingMeasure, setEditingMeasure] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAddPool, setShowAddPool] = useState(false);
+  const [lang, setLang] = useState("fr");
   const [isPremium, setIsPremium] = useState(false);
   const [applications, setApplications] = useState([]);
   const [validatingMeasure, setValidatingMeasure] = useState(null);
@@ -535,6 +1531,8 @@ function PoolApp() {
       try {
         const pr = await window.storage.get(STORAGE_KEYS.premium);
         if (pr?.value) setIsPremium(JSON.parse(pr.value) === true);
+      const savedLang = await window.storage.get("app_lang");
+      if (savedLang?.value) setLang(JSON.parse(savedLang.value));
       } catch (e) {}
       try {
         const ap = await window.storage.get(STORAGE_KEYS.applications);
@@ -786,6 +1784,7 @@ function PoolApp() {
         activePoolId={activePoolId}
         onSwitchPool={setActivePoolId}
         onAddPool={handleWantAddPool}
+        lang={lang}
       />
       <main style={styles.main}>
         {tab === "dashboard" && (
@@ -794,6 +1793,7 @@ function PoolApp() {
             volume={activePool?.volume || 0}
             products={poolProducts}
             manageStock={!!activePool?.manageStock}
+            lang={lang}
             onWantPremium={() => setShowPaywall(true)}
             onAddMeasure={handleOpenAddMeasure}
             onEditMeasure={handleEditMeasure}
@@ -820,6 +1820,7 @@ function PoolApp() {
             poolName={activePool?.name}
             onGenerateReport={() => setShowReport(true)}
             onWantPremiumForReport={() => setShowPaywall(true)}
+            lang={lang}
           />
         )}
         {tab === "products" && (
@@ -840,6 +1841,7 @@ function PoolApp() {
             manageStock={!!activePool?.manageStock}
             onWantPremium={() => setShowPaywall(true)}
             onWantSettings={() => setTab("settings")}
+            lang={lang}
           />
         )}
         {tab === "settings" && (
@@ -861,11 +1863,13 @@ function PoolApp() {
             setApiKey={setApiKey}
             apiProvider={apiProvider}
             setApiProvider={setApiProvider}
+            lang={lang}
+            setLang={setLang}
           />
         )}
       </main>
 
-      <TabBar tab={tab} setTab={setTab} />
+      <TabBar tab={tab} setTab={setTab} lang={lang} />
 
       {showAddMeasure && (
         <AddMeasureModal
@@ -884,6 +1888,7 @@ function PoolApp() {
           apiKey={apiKey}
           apiProvider={apiProvider}
           activeParamKeys={activeParamKeys}
+          lang={lang}
         />
       )}
 
@@ -903,6 +1908,7 @@ function PoolApp() {
           }}
           applications={poolApplications}
           manageStock={!!activePool?.manageStock}
+          lang={lang}
           onWantManageStock={() => {
             setShowAddProduct(false);
             setEditingProduct(null);
@@ -913,6 +1919,7 @@ function PoolApp() {
 
       {showPaywall && (
         <PaywallModal
+          lang={lang}
           onClose={() => setShowPaywall(false)}
           onActivate={() => {
             setIsPremium(true);
@@ -936,6 +1943,7 @@ function PoolApp() {
           preselected={validatingSelectedRecs}
           products={poolProducts}
           manageStock={!!activePool?.manageStock}
+          lang={lang}
           onWantAddProduct={() => { setValidatingMeasure(null); setValidatingSelectedRecs(null); setTab("products"); }}
         />
       )}
@@ -955,7 +1963,8 @@ function PoolApp() {
 }
 
 // ---------- Header ----------
-function Header({ poolName, location, poolPhoto, isPremium, pools, activePoolId, onSwitchPool, onAddPool }) {
+function Header({ poolName, location, poolPhoto, isPremium, pools, activePoolId, onSwitchPool, onAddPool, lang }) {
+  const t = useT(lang);
   const [showSwitcher, setShowSwitcher] = useState(false);
 
   return (
@@ -1037,12 +2046,13 @@ function Header({ poolName, location, poolPhoto, isPremium, pools, activePoolId,
 }
 
 // ---------- Tab bar ----------
-function TabBar({ tab, setTab }) {
+function TabBar({ tab, setTab, lang }) {
+  const t = useT(lang);
   const tabs = [
-    { id: "dashboard", label: "Bassin", icon: Droplets },
-    { id: "history", label: "Historique", icon: History },
-    { id: "products", label: "Produits", icon: Beaker },
-    { id: "settings", label: "Réglages", icon: Settings2 },
+    { id: "dashboard", label: t("tab_pool"), icon: Droplets },
+    { id: "history", label: t("tab_history"), icon: History },
+    { id: "products", label: t("tab_products"), icon: Beaker },
+    { id: "settings", label: t("tab_settings"), icon: Settings2 },
   ];
   return (
     <>
@@ -1073,7 +2083,8 @@ function TabBar({ tab, setTab }) {
 }
 
 // ---------- Dashboard ----------
-function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys }) {
+function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang }) {
+  const t = useT(lang);
   const [aiComment, setAiComment] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
@@ -1184,7 +2195,7 @@ Réponds directement en français, sans titre ni introduction.`;
 
       <div style={styles.grid}>
         {params.map((p) => (
-          <ParamCard key={p} param={p} value={latest[p]} effectiveTargets={effectiveTargets} />
+          <ParamCard key={p} param={p} value={latest[p]} effectiveTargets={effectiveTargets} lang={lang} />
         ))}
       </div>
 
@@ -1315,7 +2326,8 @@ Réponds directement en français, sans titre ni introduction.`;
   );
 }
 
-function ParamCard({ param, value, effectiveTargets }) {
+function ParamCard({ param, value, effectiveTargets, lang }) {
+  const t = useT(lang || "fr");
   const allTargets = effectiveTargets || TARGETS;
   const t = allTargets[param] || TARGETS[param];
   if (!t) return null;
@@ -1666,7 +2678,8 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
 }
 
 // ---------- Historique ----------
-function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication, applications, isPremium, poolName, onGenerateReport, onWantPremiumForReport }) {
+function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication, applications, isPremium, poolName, onGenerateReport, onWantPremiumForReport, lang }) {
+  const t = useT(lang);
   const [activeParams, setActiveParams] = useState(["pH", "fCl"]);
   const [showValues, setShowValues] = useState(false);
 
@@ -1943,7 +2956,8 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
 }
 
 // ---------- Modal Ajout mesure ----------
-function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, apiKey, apiProvider, activeParamKeys }) {
+function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, apiKey, apiProvider, activeParamKeys, lang }) {
+  const t = useT(lang || "fr");
   const isEditing = !!measure;
   const [date, setDate] = useState(
     measure ? new Date(measure.date).toISOString().slice(0, 16) : todayLocalDatetime()
@@ -2105,7 +3119,7 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
               onClick={() => fileInputRef.current?.click()}
             >
               <Camera size={17} />
-              {photoBusy ? "..." : photos.length ? "Autre photo" : "Appareil photo"}
+              {photoBusy ? t("loading") : photos.length ? t("other_photo") : t("camera_btn")}
             </button>
             <button
               type="button"
@@ -2113,7 +3127,7 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
               onClick={() => galleryInputRef.current?.click()}
             >
               <ImageOff size={17} />
-              {photoBusy ? "..." : photos.length ? "Autre depuis biblio" : "Bibliothèque"}
+              {photoBusy ? t("loading") : photos.length ? t("other_gallery") : t("gallery_btn")}
             </button>
           </div>
 
@@ -2131,7 +3145,7 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
                   disabled={analyzing}
                 >
                   <Sparkles size={14} />
-                  Analyser {photos.length > 1 ? `les ${photos.length} photos` : "la photo"}
+                  {t("analyze_btn")} {photos.length > 1 ? `(${photos.length})` : ""}
                 </button>
               ) : (
                 <div style={styles.confirmAnalyzeBox}>
@@ -2188,14 +3202,15 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
       />
 
       <button style={styles.primaryBtn} onClick={handleSave}>
-        {isEditing ? "Enregistrer les modifications" : "Enregistrer la mesure"}
+        {isEditing ? t("save_changes") : t("save_measure")}
       </button>
     </ModalShell>
   );
 }
 
 // ---------- Validation des conseils appliqués ----------
-function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave, preselected, products, manageStock, onWantAddProduct }) {
+function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave, preselected, products, manageStock, onWantAddProduct, lang }) {
+  const t = useT(lang || "fr");
   function toDisplayUnit(amount, unit) {
     if (amount == null) return { value: "", displayUnit: unit };
     if (unit === "g" && amount >= 1000) return { value: parseFloat((amount / 1000).toFixed(3)), displayUnit: "kg" };
@@ -2370,7 +3385,8 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
 }
 
 // ---------- Produits ----------
-function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, onWantSettings, poolName, manageStock }) {
+function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, onWantSettings, poolName, manageStock, lang }) {
+  const t = useT(lang);
   function handleResetAll() {
     if (products.length === 0) return;
     const ok = window.confirm(
@@ -2472,7 +3488,8 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
   );
 }
 
-function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, applications, manageStock, onWantManageStock }) {
+function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, applications, manageStock, onWantManageStock, lang }) {
+  const t = useT(lang || "fr");
   const [name, setName] = useState(product?.name || "");
   const [action, setAction] = useState(product?.action || "ph-");
   const [doseAmount, setDoseAmount] = useState(product?.doseAmount ?? 30);
@@ -2764,7 +3781,8 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
 }
 
 // ---------- Réglages ----------
-function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider }) {
+function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider, lang, setLang }) {
+  const t = useT(lang);
   const activePool = pools.find((p) => p.id === activePoolId) || pools[0];
   const [showApiKey, setShowApiKey] = useState(false);
 
@@ -3050,7 +4068,8 @@ function ToggleSwitch({ checked, onChange }) {
 }
 
 // ---------- Paywall ----------
-function PaywallModal({ onClose, onActivate }) {
+function PaywallModal({ onClose, onActivate, lang }) {
+  const t = useT(lang || "fr");
   const perks = [
     "Mesures illimitées (au lieu d'1 par jour)",
     "Photo de chaque mesure (preuve, archive visuelle)",
@@ -3192,7 +4211,8 @@ function AddPoolModal({ onClose, onSave }) {
 }
 
 // ---------- Rapport ----------
-function ReportView({ pool, measures, applications, products, onClose, manageStock }) {
+function ReportView({ pool, measures, applications, products, onClose, manageStock, lang }) {
+  const t = useT(lang);
   const [showValues, setShowValues] = useState(false);
 
   const sortedMeasures = useMemo(
@@ -3331,16 +4351,16 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
           <table style={{ ...styles.reportTable, fontSize: 11 }}>
             <thead>
               <tr>
-                <th style={styles.reportThCell}>Date</th>
+                <th style={styles.reportThCell}>{t("date_col")}</th>
                 <th style={styles.reportThCell}>pH</th>
-                <th style={styles.reportThCell}>Cl libre</th>
-                <th style={styles.reportThCell}>Cl total</th>
-                <th style={styles.reportThCell}>TAC</th>
-                <th style={styles.reportThCell}>CYA</th>
-                <th style={styles.reportThCell}>Temp.</th>
-                {manageStock && <th style={styles.reportThCell}>Produit appliqué</th>}
-                {manageStock && <th style={styles.reportThCell}>Quantité</th>}
-                {manageStock && <th style={styles.reportThCell}>Stock</th>}
+                <th style={styles.reportThCell}>{t("cl_libre_col")}</th>
+                <th style={styles.reportThCell}>{t("cl_total_col")}</th>
+                <th style={styles.reportThCell}>{t("tac_col")}</th>
+                <th style={styles.reportThCell}>{t("cya_col")}</th>
+                <th style={styles.reportThCell}>{t("temp_col")}</th>
+                {manageStock && <th style={styles.reportThCell}>{t("product_col")}</th>}
+                {manageStock && <th style={styles.reportThCell}>{t("quantity_col")}</th>}
+                {manageStock && <th style={styles.reportThCell}>{t("stock_col")}</th>}
               </tr>
             </thead>
             <tbody>
