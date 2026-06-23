@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.41";
+const APP_VERSION = "0.42";
 
 const TRANSLATIONS = {
   fr: {
@@ -159,6 +159,7 @@ const TRANSLATIONS = {
     stock_col: "Stock",
     download_pdf: "Télécharger PDF",
     close: "Fermer",
+    delete: "Supprimer",
     // Reco
     wait_before_next: "Attendre {h}h avant le traitement suivant",
     start_after: "À débuter au moins {h}h après l'étape précédente",
@@ -348,6 +349,7 @@ const TRANSLATIONS = {
     stock_col: "Stock",
     download_pdf: "Download PDF",
     close: "Close",
+    delete: "Delete",
     wait_before_next: "Wait {h}h before next treatment",
     start_after: "Start at least {h}h after previous step",
     measure_after: "Wait {h}h before testing again",
@@ -533,6 +535,7 @@ const TRANSLATIONS = {
     stock_col: "Lager",
     download_pdf: "PDF herunterladen",
     close: "Schließen",
+    delete: "Löschen",
     wait_before_next: "{h}h vor nächster Behandlung warten",
     start_after: "Mindestens {h}h nach dem vorherigen Schritt beginnen",
     measure_after: "{h}h warten vor erneuter Messung",
@@ -718,6 +721,7 @@ const TRANSLATIONS = {
     stock_col: "Stock",
     download_pdf: "Scarica PDF",
     close: "Chiudi",
+    delete: "Elimina",
     wait_before_next: "Attendere {h}h prima del trattamento successivo",
     start_after: "Iniziare almeno {h}h dopo il passaggio precedente",
     measure_after: "Attendere {h}h prima di misurare di nuovo",
@@ -903,6 +907,7 @@ const TRANSLATIONS = {
     stock_col: "Stock",
     download_pdf: "Descargar PDF",
     close: "Cerrar",
+    delete: "Eliminar",
     wait_before_next: "Esperar {h}h antes del siguiente tratamiento",
     start_after: "Comenzar al menos {h}h después del paso anterior",
     measure_after: "Esperar {h}h antes de medir de nuevo",
@@ -1088,6 +1093,7 @@ const TRANSLATIONS = {
     stock_col: "Estoque",
     download_pdf: "Baixar PDF",
     close: "Fechar",
+    delete: "Excluir",
     wait_before_next: "Aguardar {h}h antes do próximo tratamento",
     start_after: "Iniciar pelo menos {h}h após o passo anterior",
     measure_after: "Aguardar {h}h antes de medir novamente",
@@ -2302,13 +2308,10 @@ Réponds directement en français, sans titre ni introduction.`;
     return (
       <div style={styles.emptyState}>
         <Droplets size={40} color="#7ab8e8" strokeWidth={1.5} />
-        <p style={styles.emptyTitle}>Aucune mesure enregistrée</p>
-        <p style={styles.emptyText}>
-          Ajoute ta première série de mesures pour voir l'état de ton bassin et les
-          traitements recommandés.
-        </p>
+        <p style={styles.emptyTitle}>{t("no_measure")}</p>
+        <p style={styles.emptyText}>{t("no_measure_sub")}</p>
         <button style={styles.primaryBtn} onClick={onAddMeasure}>
-          <Plus size={18} /> Ajouter une mesure
+          <Plus size={18} /> {t("add_measure")}
         </button>
       </div>
     );
@@ -2324,11 +2327,11 @@ Réponds directement en français, sans titre ni introduction.`;
   return (
     <div>
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Dernière mesure</span>
+        <span style={styles.sectionLabel}>{t("last_measure")}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={styles.sectionDate}>{formatDate(latest.date)}</span>
           <button style={styles.editLinkBtn} onClick={() => onEditMeasure(latest)}>
-            <Settings2 size={13} /> Modifier
+            <Settings2 size={13} /> {t("modify")}
           </button>
         </div>
       </div>
@@ -2353,32 +2356,29 @@ Réponds directement en français, sans titre ni introduction.`;
 
       {blockedByLimit ? (
         <button style={styles.addMeasureBtnLocked} onClick={onAddMeasure}>
-          <Lock size={16} /> Limite quotidienne atteinte — passer en illimité
+          <Lock size={16} /> {t("daily_limit")}
         </button>
       ) : (
         <button style={styles.addMeasureBtn} onClick={onAddMeasure}>
-          <Plus size={18} /> Nouvelle mesure
+          <Plus size={18} /> {t("new_measure")}
         </button>
       )}
 
       <div style={styles.recoHeader}>
-        <span style={styles.sectionLabel}>Plan de traitement</span>
+        <span style={styles.sectionLabel}>{t("treatment_plan")}</span>
       </div>
 
       {recs.length === 0 ? (
         <div style={styles.allGoodCard}>
           <CheckCircle2 size={22} color="#1a8fd1" />
           <span style={{ color: "#0a6ebd", fontWeight: 600, fontSize: 14 }}>
-            Tous les paramètres mesurés sont dans la cible.
+            {t("all_in_range")}
           </span>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {recs.length > 1 && (
-            <p style={styles.helpText}>
-              Suis les étapes dans l'ordre : chaque traitement modifie l'équilibre de l'eau et
-              peut fausser le suivant s'il n'a pas eu le temps d'agir.
-            </p>
+            <p style={styles.helpText}>{t("follow_order")}</p>
           )}
           {recs.map((r, i) => (
             <RecoCard
@@ -2399,7 +2399,7 @@ Réponds directement en français, sans titre ni introduction.`;
               <div style={styles.applyConfirmedCard}>
                 <CheckCircle2 size={16} color="#1a8fd1" />
                 <span style={{ flex: 1 }}>
-                  Conseils {applicationForLatest.allApplied ? "appliqués" : "partiellement appliqués"}{" "}
+                  {t("advice_applied")} {applicationForLatest.allApplied ? "" : t("advice_partial")}{" "}
                   le {formatDate(applicationForLatest.appliedAt)}
                 </span>
                 <button style={styles.editLinkBtn} onClick={() => {
@@ -2409,7 +2409,7 @@ Réponds directement en français, sans titre ni introduction.`;
                   });
                   onValidateApplication(latest, recs, sel, true);
                 }}>
-                  Ajuster
+                  {t("adjust")}
                 </button>
               </div>
             ) : (
@@ -2422,12 +2422,12 @@ Réponds directement en français, sans titre ni introduction.`;
                     onValidateApplication(latest, recs, selectedRecs);
                   }}
                 >
-                  <CheckCircle2 size={16} /> Appliquer ces conseils
+                  <CheckCircle2 size={16} /> {t("apply_advice")}
                   {selectedCount > 0 && ` (${selectedCount})`}
                   {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
                 </button>
                 <p style={{ ...styles.helpTextSmall, marginTop: 6, textAlign: "center" }}>
-                  Coche les conseils à appliquer puis saisis les quantités réelles.
+                  {t("apply_advice_sub")}
                 </p>
               </div>
             );
@@ -2437,12 +2437,12 @@ Réponds directement en français, sans titre ni introduction.`;
 
       <div style={styles.aiSection}>
         <div style={styles.aiSectionTitle}>
-          <Sparkles size={14} color="#1a8fd1" /> Analyse IA
+          <Sparkles size={14} color="#1a8fd1" /> {t("ai_analysis")}
         </div>
         {!isPremium ? (
           <button style={styles.aiLockedBtn} onClick={onWantPremium}>
             <Lock size={15} />
-            <span>Fonctionnalité réservée à la version illimitée</span>
+            <span>{t("ai_locked")}</span>
           </button>
         ) : apiKey ? (
           <>
@@ -2455,9 +2455,9 @@ Réponds directement en français, sans titre ni introduction.`;
               disabled={aiLoading || !latest}
             >
               {aiLoading ? (
-                <><Loader2 size={14} className="spin" /> Analyse en cours…</>
+                <><Loader2 size={14} className="spin" /> {t("ai_analyzing")}</>
               ) : (
-                <><Sparkles size={14} /> Analyser avec {apiProvider === "openai" ? "ChatGPT" : "Claude"}</>
+                <><Sparkles size={14} /> {t("ai_analyze_btn")}</>
               )}
             </button>
             {aiComment && (
@@ -2470,7 +2470,7 @@ Réponds directement en français, sans titre ni introduction.`;
         ) : (
           <div style={styles.aiKeyMissing}>
             <Lock size={14} color="#a0a8b0" />
-            <span>Renseigne ta clé API dans les Réglages pour activer l'analyse IA.</span>
+            <span>{t("ai_api_missing")}</span>
           </div>
         )}
       </div>
@@ -2876,10 +2876,10 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
     return (
       <div style={styles.emptyState}>
         <History size={40} color="#7ab8e8" strokeWidth={1.5} />
-        <p style={styles.emptyTitle}>Pas encore d'historique</p>
-        <p style={styles.emptyText}>Tes mesures apparaîtront ici au fil du temps.</p>
+        <p style={styles.emptyTitle}>{t("no_history")}</p>
+        <p style={styles.emptyText}>{t("no_history_sub")}</p>
         <button style={styles.primaryBtn} onClick={onAdd}>
-          <Plus size={18} /> Ajouter une mesure
+          <Plus size={18} /> {t("add_measure")}
         </button>
       </div>
     );
@@ -2889,7 +2889,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
     <div>
       {poolName && <div style={styles.poolNameTag}>{poolName}</div>}
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Évolution</span>
+        <span style={styles.sectionLabel}>{t("evolution")}</span>
       </div>
 
       <div style={styles.chipsRow}>
@@ -2903,7 +2903,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
             color: allActive ? "#ffffff" : "#2d4a6e",
           }}
         >
-          {allActive ? "Tout masquer" : "Tout afficher"}
+          {allActive ? t("show_values") : t("show_values")}
         </button>
         {chartParams.map((cp) => (
           <button
@@ -2933,7 +2933,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
           checked={showValues}
           onChange={(e) => setShowValues(e.target.checked)}
         />
-        <span>Afficher les valeurs sur le graphique</span>
+        <span>{t("show_values")}</span>
       </label>
 
       <div style={styles.chartCard}>
@@ -2987,7 +2987,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
       </div>
 
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Journal</span>
+        <span style={styles.sectionLabel}>{t("journal")}</span>
         <button style={styles.smallAddBtn} onClick={onAdd}>
           <Plus size={16} />
         </button>
@@ -3003,32 +3003,31 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
             onValidateApplication={() => onValidateApplication(m)}
             application={applications.find((a) => a.measureId === m.id)}
             isPremium={isPremium}
+            lang={lang}
           />
         ))}
       </div>
 
       <div style={{ ...styles.sectionRow, marginTop: 18 }}>
-        <span style={styles.sectionLabel}>Rapport</span>
+        <span style={styles.sectionLabel}>{t("report")}</span>
       </div>
       {isPremium ? (
         <button style={styles.validateApplyBtn} onClick={onGenerateReport}>
-          <FileText size={16} /> Générer le rapport de ce bassin
+          <FileText size={16} /> {t("generate_report")}
         </button>
       ) : (
         <button style={styles.photoLockedBtn} onClick={onWantPremiumForReport}>
           <Lock size={16} />
-          <span>Rapport PDF réservé à la version illimitée</span>
+          <span>{t("report_locked")}</span>
         </button>
       )}
-      <p style={styles.helpTextSmall}>
-        Le rapport reprend l'historique des mesures, les conseils donnés et les quantités
-        réellement appliquées pour ce bassin.
-      </p>
+      <p style={styles.helpTextSmall}>{t("report_desc")}</p>
     </div>
   );
 }
 
-function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, application, isPremium }) {
+function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, application, isPremium, lang }) {
+  const t = useT(lang || "fr");
   const [open, setOpen] = useState(false);
   const params = ["pH", "fCl", "tCl", "tac", "cya", "temp"].filter(
     (p) => measure[p] !== undefined && measure[p] !== "" && measure[p] !== null
@@ -3079,26 +3078,26 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
             <div style={styles.applyConfirmedCard}>
               <CheckCircle2 size={16} color="#1a8fd1" />
               <span style={{ flex: 1 }}>
-                Conseils {application.allApplied ? "appliqués" : "partiellement appliqués"} le{" "}
+                {t("advice_applied")} {application.allApplied ? "" : t("advice_partial")} le{" "}
                 {formatDate(application.appliedAt)}
               </span>
               <button style={styles.editLinkBtn} onClick={onValidateApplication}>
-                Ajuster
+                {t("adjust")}
               </button>
             </div>
           ) : (
             <button style={styles.validateApplyBtnSmall} onClick={onValidateApplication}>
-              <CheckCircle2 size={14} /> Appliquer ces conseils
+              <CheckCircle2 size={14} /> {t("apply_advice")}
               {!isPremium && <Lock size={12} style={{ marginLeft: 2 }} />}
             </button>
           )}
 
           <div style={{ display: "flex", gap: 8 }}>
             <button style={styles.editBtn} onClick={onEdit}>
-              <Settings2 size={14} /> Modifier
+              <Settings2 size={14} /> {t("modify")}
             </button>
             <button style={styles.deleteBtn} onClick={onDelete}>
-              <Trash2 size={14} /> Supprimer
+              <Trash2 size={14} /> {t("delete")}
             </button>
           </div>
         </div>
@@ -3960,7 +3959,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
   function onDeleteAllMeasures() {
     if (!poolMeasureCount) return;
     const ok = window.confirm(
-      `Supprimer les ${poolMeasureCount} mesure(s) de "${activePool?.name}" ? Cette action est irréversible.`
+      `${t("delete_measures")} "${activePool?.name}" ?`
     );
     if (ok) onDeleteAllMeasuresRaw();
   }
@@ -4017,7 +4016,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       )}
 
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Abonnement</span>
+        <span style={styles.sectionLabel}>{t("subscription")}</span>
       </div>
 
       <div style={styles.testPremiumCard}>
@@ -4025,10 +4024,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
           <Crown size={18} color={isPremium ? "#a8721a" : "#9aa9a5"} />
           <div>
             <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>
-              {isPremium ? "Mode illimité actif" : "Version gratuite"}
+              {isPremium ? t("unlimited_active") : t("free_mode")}
             </div>
             <div style={{ fontSize: 11.5, color: "#6a7d90" }}>
-              Interrupteur de test — pas de vrai paiement ici
+              {t("premium_test")}
             </div>
           </div>
         </div>
@@ -4050,7 +4049,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       </p>
 
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Mes bassins</span>
+        <span style={styles.sectionLabel}>{t("my_pools")}</span>
         <button style={styles.smallAddBtn} onClick={onWantAddPool}>
           <Plus size={16} />
         </button>
@@ -4087,24 +4086,24 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       </div>
 
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Bassin actif</span>
+        <span style={styles.sectionLabel}>{t("active_pool")}</span>
       </div>
 
-      <label style={styles.fieldLabel}>Nom du bassin</label>
+      <label style={styles.fieldLabel}>{t("pool_name")}</label>
       <input
         style={styles.input}
         value={activePool?.name || ""}
         onChange={(e) => onUpdatePool(activePool.id, { name: e.target.value })}
       />
 
-      <label style={styles.fieldLabel}>Localisation</label>
+      <label style={styles.fieldLabel}>{t("location")}</label>
       <input
         style={styles.input}
         value={activePool?.location || ""}
         onChange={(e) => onUpdatePool(activePool.id, { location: e.target.value })}
       />
 
-      <label style={styles.fieldLabel}>Volume du bassin (m³)</label>
+      <label style={styles.fieldLabel}>{t("pool_volume")}</label>
       <input
         type="number"
         style={styles.input}
@@ -4112,7 +4111,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         onChange={(e) => onUpdatePool(activePool.id, { volume: parseFloat(e.target.value) || 0 })}
       />
 
-      <label style={styles.fieldLabel}>Type de traitement</label>
+      <label style={styles.fieldLabel}>{t("treatment_type")}</label>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {treatmentTypes.map((tt) => (
           <button
@@ -4138,7 +4137,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         ))}
       </div>
 
-      <label style={{ ...styles.fieldLabel, marginTop: 14 }}>Type de filtration</label>
+      <label style={{ ...styles.fieldLabel, marginTop: 14 }}>{t("filtration_type")}</label>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {filtrationTypes.map((ft) => (
           <button
@@ -4162,9 +4161,9 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       {isPremium && (
         <div style={{ ...styles.sectionRow, marginTop: 14 }}>
           <div>
-            <span style={styles.sectionLabel}>Gestion du stock</span>
+            <span style={styles.sectionLabel}>{t("manage_stock_label")}</span>
             <div style={{ fontSize: 12, color: "#6a7d90", marginTop: 2 }}>
-              Suit la consommation des produits et l'affiche dans le rapport.
+              {t("manage_stock_desc")}
             </div>
           </div>
           <ToggleSwitch
@@ -4175,17 +4174,17 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       )}
 
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Clé API (analyse IA)</span>
+        <span style={styles.sectionLabel}>{t("api_section")}</span>
       </div>
 
       {!isPremium ? (
         <button style={styles.photoLockedBtn} onClick={onWantPremium}>
           <Lock size={16} />
-          <span>Analyse IA réservée à la version illimitée</span>
+          <span>{t("ai_locked_settings")}</span>
         </button>
       ) : (
         <>
-          <label style={styles.fieldLabel}>Provider</label>
+          <label style={styles.fieldLabel}>{t("provider_label")}</label>
           <div style={styles.segmentedControl}>
             {[
               { value: "anthropic", label: "Anthropic (Claude)" },
@@ -4206,9 +4205,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
           </div>
 
           <label style={styles.fieldLabel}>
-            {apiProvider === "openai"
-              ? "Clé API OpenAI"
-              : "Clé API Anthropic ou URL du proxy Cloudflare Worker"}
+            {apiProvider === "openai" ? t("api_key_openai") : t("api_key_label")}
           </label>
           <div style={styles.apiKeyRow}>
             <input
@@ -4216,7 +4213,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
               style={{ ...styles.input, flex: 1 }}
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder={apiProvider === "openai" ? "sk-..." : "sk-ant-... ou https://mon-proxy.workers.dev"}
+              placeholder={t("api_key_placeholder")}
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
@@ -4225,7 +4222,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
               type="button"
               onClick={() => setShowApiKey((v) => !v)}
               style={styles.eyeBtn}
-              title={showApiKey ? "Masquer" : "Afficher"}
+              title={showApiKey ? t("hide") : t("show")}
             >
               {showApiKey
                 ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -4243,7 +4240,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         <span style={styles.sectionLabel}>{t("sensitive_zone")}</span>
       </div>
       <button style={styles.dangerLinkBtn} onClick={onDeleteAllMeasures}>
-        <Trash2 size={14} /> Supprimer toutes les mesures de ce bassin
+        <Trash2 size={14} /> {t("delete_measures")}
       </button>
 
       <div style={styles.versionTag}>PoolApp v{APP_VERSION}</div>
