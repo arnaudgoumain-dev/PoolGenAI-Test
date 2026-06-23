@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.40";
+const APP_VERSION = "0.41";
 
 const TRANSLATIONS = {
   fr: {
@@ -3539,11 +3539,30 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
 // ---------- Produits ----------
 function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, onWantSettings, poolName, manageStock, lang }) {
   const t = useT(lang);
+
+  // Version gratuite : écran paywall uniquement
+  if (!isPremium) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", gap: 16, textAlign: "center" }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: "#f0f6fb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Lock size={26} color="#0a6ebd" />
+        </div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "#0d2b4e" }}>{t("my_products")}</div>
+        <div style={{ fontSize: 14, color: "#4a6480", lineHeight: 1.5, maxWidth: 300 }}>{t("products_locked")}</div>
+        <button
+          style={{ marginTop: 8, padding: "13px 28px", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+          onClick={onWantPremium}
+        >
+          <Crown size={15} style={{ marginRight: 7, verticalAlign: "middle" }} />
+          {t("paywall_btn")}
+        </button>
+      </div>
+    );
+  }
+
   function handleResetAll() {
     if (products.length === 0) return;
-    const ok = window.confirm(
-      `Supprimer les ${products.length} produit(s) de ce bassin ? Cette action est irréversible.`
-    );
+    const ok = window.confirm(`${products.length} ${products.length > 1 ? t("confirm_count_plural") : t("confirm_count")} ?`);
     if (ok) onResetAll();
   }
 
@@ -3551,89 +3570,85 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
     <div>
       {poolName && <div style={styles.poolNameTag}>{poolName}</div>}
       <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>Mes produits</span>
-        {(!isPremium || manageStock) && (
+        <span style={styles.sectionLabel}>{t("my_products")}</span>
+        {manageStock && (
           <button style={styles.smallAddBtn} onClick={onAddNew}>
             <Plus size={16} />
           </button>
         )}
       </div>
 
-      {isPremium && !manageStock ? (
+      {!manageStock ? (
         <div style={styles.stockNotManagedBox}>
-          <span>La gestion du stock n'est pas activée pour ce bassin. Active-la dans Réglages pour gérer les quantités et voir les consommations.</span>
-          <button type="button" style={styles.stockActivateLink} onClick={isPremium ? onWantSettings : onWantPremium}>
-            Activer dans Réglages →
+          <span>{t("stock_not_managed")}</span>
+          <button type="button" style={styles.stockActivateLink} onClick={onWantSettings}>
+            {t("activate_in_settings")}
           </button>
         </div>
       ) : (
         <>
-      <p style={styles.helpText}>
-        Le dosage est calculé selon : {"{quantité produit}"} pour faire varier le paramètre de{" "}
-        {"{effet}"} sur {"{volume de référence}"} m³. Ces produits sont propres à ce bassin.
-      </p>
+          <p style={styles.helpText}>{t("products_formula")}</p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {products.map((p) => (
-          <button key={p.id} style={styles.productRow} onClick={() => onEdit(p)}>
-            {p.photo ? (
-              <img src={p.photo} alt="" style={styles.productThumb} />
-            ) : (
-              <div style={styles.productThumbPlaceholder}>
-                <Beaker size={16} color="#7ab8e8" />
-              </div>
-            )}
-            <div style={{ flex: 1, textAlign: "left" }}>
-              <div style={styles.productName}>{p.name}</div>
-              <div style={styles.productMeta}>
-                {p.doseAmount} {p.doseUnit} → {p.effectAmount} sur {p.effectPer} m³ ·{" "}
-                {PRODUCT_ACTIONS.find((a) => a.value === p.action)?.label}
-                {!!p.waitHours && ` · attente ${p.waitHours}h`}
-              </div>
-              {isPremium && manageStock && (() => {
-                const pct = p.stockPercent ?? 100;
-                const low = pct <= 20;
-                const container = p.containerAmount || 1;
-                const cUnit = p.containerUnit || "kg";
-                const remaining = (container * pct / 100);
-                const displayVal = Number.isInteger(remaining) ? remaining : remaining.toFixed(2).replace(/\.?0+$/, "");
-                const displayUnit = cUnit;
-                return (
-                  <div style={{ marginTop: 6 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                      <span style={{ fontSize: 11, color: low ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
-                        Stock : {pct} %
-                      </span>
-                      <span style={{ fontSize: 11, color: low ? "#c0392b" : "#6a7d90" }}>
-                        ≈ {displayVal} {displayUnit} restant{remaining > 1 ? "s" : ""}
-                      </span>
-                    </div>
-                    <div style={{ height: 5, borderRadius: 99, background: "#e8f0f8", overflow: "hidden" }}>
-                      <div style={{
-                        height: "100%",
-                        width: `${pct}%`,
-                        borderRadius: 99,
-                        background: low ? "#c0392b" : pct <= 50 ? "#d98c2b" : "#1a8fd1",
-                        transition: "width 0.3s",
-                      }} />
-                    </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {products.map((p) => (
+              <button key={p.id} style={styles.productRow} onClick={() => onEdit(p)}>
+                {p.photo ? (
+                  <img src={p.photo} alt="" style={styles.productThumb} />
+                ) : (
+                  <div style={styles.productThumbPlaceholder}>
+                    <Beaker size={16} color="#7ab8e8" />
                   </div>
-                );
-              })()}
-            </div>
-            <ChevronRight size={16} color="#6a7d90" />
-          </button>
-        ))}
-        {products.length === 0 && (
-          <p style={styles.emptyText}>Aucun produit. Ajoute ton premier produit de traitement.</p>
-        )}
-      </div>
+                )}
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={styles.productName}>{p.name}</div>
+                  <div style={styles.productMeta}>
+                    {p.doseAmount} {p.doseUnit} → {p.effectAmount} / {p.effectPer} m³ ·{" "}
+                    {PRODUCT_ACTIONS.find((a) => a.value === p.action)?.label}
+                    {!!p.waitHours && ` · ${p.waitHours}h`}
+                  </div>
+                  {(() => {
+                    const pct = p.stockPercent ?? 100;
+                    const low = pct <= 20;
+                    const container = p.containerAmount || 1;
+                    const cUnit = p.containerUnit || "kg";
+                    const remaining = (container * pct / 100);
+                    const displayVal = Number.isInteger(remaining) ? remaining : remaining.toFixed(2).replace(/\.?0+$/, "");
+                    return (
+                      <div style={{ marginTop: 6 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                          <span style={{ fontSize: 11, color: low ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                            {t("stock_label")} {pct} %
+                          </span>
+                          <span style={{ fontSize: 11, color: low ? "#c0392b" : "#6a7d90" }}>
+                            ≈ {displayVal} {cUnit} {t("stock_remaining")}
+                          </span>
+                        </div>
+                        <div style={{ height: 5, borderRadius: 99, background: "#e8f0f8", overflow: "hidden" }}>
+                          <div style={{
+                            height: "100%",
+                            width: `${pct}%`,
+                            borderRadius: 99,
+                            background: low ? "#c0392b" : pct <= 50 ? "#d98c2b" : "#1a8fd1",
+                            transition: "width 0.3s",
+                          }} />
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+                <ChevronRight size={16} color="#6a7d90" />
+              </button>
+            ))}
+            {products.length === 0 && (
+              <p style={styles.emptyText}>{t("new_product")}</p>
+            )}
+          </div>
 
-      {products.length > 0 && (
-        <button style={styles.dangerLinkBtn} onClick={handleResetAll}>
-          <Trash2 size={14} /> Supprimer tous les produits de ce bassin
-        </button>
-      )}
+          {products.length > 0 && (
+            <button style={styles.dangerLinkBtn} onClick={handleResetAll}>
+              <Trash2 size={14} /> {t("delete_all_products")}
+            </button>
+          )}
         </>
       )}
     </div>
