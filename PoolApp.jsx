@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.44";
+const APP_VERSION = "0.45";
 
 const TRANSLATIONS = {
   fr: {
@@ -188,6 +188,37 @@ const TRANSLATIONS = {
     param_fcl: "Chlore libre (mg/L)",
     axis_legend_u: "ᴜ échelle unités (pH, chlore) — gauche",
     axis_legend_d: "ᴅ échelle dizaines (TAC, CYA, température) — droite",
+    reco_tac_low: "TAC trop bas ({val} mg/L)",
+    reco_ph_high: "pH trop haut ({val})",
+    reco_ph_low: "pH trop bas ({val})",
+    reco_cl_combined: "Chlore combiné élevé ({val} mg/L)",
+    reco_cl_low: "Chlore libre trop bas ({val} mg/L)",
+    reco_cl_high: "Chlore libre trop haut ({val} mg/L)",
+    reco_brome_low: "Brome trop bas ({val} mg/L)",
+    reco_o2_low: "Oxygène actif trop bas ({val} mg/L)",
+    reco_sel_low: "Salinité trop basse ({val} mg/L)",
+    reco_cya_high: "Stabilisant trop élevé ({val} mg/L)",
+    reco_target: "pour viser",
+    reco_dose_prefix: "≈",
+    reco_no_product: "Aucun produit nécessaire",
+    reco_water_renewal: "Renouvellement d'eau partiel",
+    reco_water_renewal_text: "Renouveler ≈ {pct} % du volume pour revenir vers 40 mg/L",
+    reco_cl_excess_text: "Laisser le chlore se dégrader naturellement au soleil, ne pas se baigner en attendant.",
+    reco_cl_shock_text: "ce soir (choc renforcé)",
+    reco_note_tac: "Un TAC bas rend le pH instable.",
+    reco_note_combined: "Chlore combiné = chloramines, signe d'une désinfection insuffisante. Verser le soir, filtration en continu.",
+    reco_note_sel: "Utiliser du sel spécial piscine (NaCl pur ≥ 99%). Dissoudre avant l'ajout ou verser directement près du skimmer, filtration en marche 24h.",
+    reco_note_o2: "Ne pas mélanger avec le chlore. Filtration en marche pendant 4h.",
+    reco_note_brome: "Verser loin des arrivées d'eau, filtration en marche.",
+    reco_note_cya: "Aucun produit ne fait baisser le CYA chimiquement, seule la dilution fonctionne. Éviter le chlore stabilisé tant que le CYA est haut.",
+    reco_fallback_tac: "Produit TAC+ (bicarbonate de sodium)",
+    reco_fallback_ph_minus: "pH moins",
+    reco_fallback_ph_plus: "pH plus",
+    reco_fallback_chlore: "Chlore choc non stabilisé",
+    reco_fallback_brome: "Brome (pastilles ou granulés)",
+    reco_fallback_o2: "Oxygène actif (peroxyde d'hydrogène stabilisé)",
+    reco_fallback_sel: "Sel de piscine (NaCl pur)",
+    stock_empty_badge: "stock épuisé",
     paywall_perk1: "Mesures illimitées (au lieu d'1 par jour)",
     paywall_perk2: "Photo de chaque mesure (preuve, archive visuelle)",
     paywall_perk3: "Photo de chaque produit (étiquette, dosage)",
@@ -395,6 +426,37 @@ const TRANSLATIONS = {
     param_fcl: "Free chlorine (mg/L)",
     axis_legend_u: "ᴜ unit scale (pH, chlorine) — left",
     axis_legend_d: "ᴅ tens scale (TAC, CYA, temperature) — right",
+    reco_tac_low: "TAC too low ({val} mg/L)",
+    reco_ph_high: "pH too high ({val})",
+    reco_ph_low: "pH too low ({val})",
+    reco_cl_combined: "High combined chlorine ({val} mg/L)",
+    reco_cl_low: "Free chlorine too low ({val} mg/L)",
+    reco_cl_high: "Free chlorine too high ({val} mg/L)",
+    reco_brome_low: "Bromine too low ({val} mg/L)",
+    reco_o2_low: "Active oxygen too low ({val} mg/L)",
+    reco_sel_low: "Salinity too low ({val} mg/L)",
+    reco_cya_high: "Stabiliser too high ({val} mg/L)",
+    reco_target: "to reach",
+    reco_dose_prefix: "≈",
+    reco_no_product: "No product needed",
+    reco_water_renewal: "Partial water renewal",
+    reco_water_renewal_text: "Renew ≈ {pct} % of volume to return to 40 mg/L",
+    reco_cl_excess_text: "Let chlorine degrade naturally in sunlight, avoid swimming in the meantime.",
+    reco_cl_shock_text: "tonight (shock treatment)",
+    reco_note_tac: "Low TAC makes pH unstable.",
+    reco_note_combined: "Combined chlorine = chloramines, sign of insufficient disinfection. Add in the evening, keep filtration running.",
+    reco_note_sel: "Use pool-grade salt (pure NaCl ≥ 99%). Dissolve before adding or pour directly near the skimmer, run filtration for 24h.",
+    reco_note_o2: "Do not mix with chlorine. Run filtration for 4h.",
+    reco_note_brome: "Pour away from water inlets, run filtration.",
+    reco_note_cya: "No product lowers CYA chemically, only dilution works. Avoid stabilised chlorine while CYA is high.",
+    reco_fallback_tac: "TAC+ product (sodium bicarbonate)",
+    reco_fallback_ph_minus: "pH minus",
+    reco_fallback_ph_plus: "pH plus",
+    reco_fallback_chlore: "Unstabilised shock chlorine",
+    reco_fallback_brome: "Bromine (tablets or granules)",
+    reco_fallback_o2: "Active oxygen (stabilised hydrogen peroxide)",
+    reco_fallback_sel: "Pool salt (pure NaCl)",
+    stock_empty_badge: "out of stock",
     paywall_perk1: "Unlimited readings (instead of 1 per day)",
     paywall_perk2: "Photo of each reading (proof, visual archive)",
     paywall_perk3: "Photo of each product (label, dosage)",
@@ -602,6 +664,37 @@ const TRANSLATIONS = {
     param_fcl: "Freies Chlor (mg/L)",
     axis_legend_u: "ᴜ Einheitsskala (pH, Chlor) — links",
     axis_legend_d: "ᴅ Zehnerskala (TAC, CYA, Temperatur) — rechts",
+    reco_tac_low: "KH zu niedrig ({val} mg/L)",
+    reco_ph_high: "pH zu hoch ({val})",
+    reco_ph_low: "pH zu niedrig ({val})",
+    reco_cl_combined: "Hoher gebundener Chlorgehalt ({val} mg/L)",
+    reco_cl_low: "Freies Chlor zu niedrig ({val} mg/L)",
+    reco_cl_high: "Freies Chlor zu hoch ({val} mg/L)",
+    reco_brome_low: "Brom zu niedrig ({val} mg/L)",
+    reco_o2_low: "Aktivsauerstoff zu niedrig ({val} mg/L)",
+    reco_sel_low: "Salzgehalt zu niedrig ({val} mg/L)",
+    reco_cya_high: "Stabilisator zu hoch ({val} mg/L)",
+    reco_target: "zum Erreichen von",
+    reco_dose_prefix: "≈",
+    reco_no_product: "Kein Produkt erforderlich",
+    reco_water_renewal: "Teilweiser Wasserwechsel",
+    reco_water_renewal_text: "≈ {pct} % des Volumens erneuern, um auf 40 mg/L zu kommen",
+    reco_cl_excess_text: "Chlor natürlich in der Sonne abbauen lassen, zwischenzeitlich nicht schwimmen.",
+    reco_cl_shock_text: "heute Abend (Schockbehandlung)",
+    reco_note_tac: "Niedriger KH macht den pH instabil.",
+    reco_note_combined: "Gebundenes Chlor = Chloramine, Zeichen unzureichender Desinfektion. Abends zugeben, Filtration durchlaufen lassen.",
+    reco_note_sel: "Poolsalz (reines NaCl ≥ 99%) verwenden. Vor dem Zugeben auflösen oder direkt beim Skimmer zugeben, 24h filtrieren.",
+    reco_note_o2: "Nicht mit Chlor mischen. 4h filtrieren.",
+    reco_note_brome: "Weit von Wasserzuläufen entfernt zugeben, Filtration laufen lassen.",
+    reco_note_cya: "Kein Produkt senkt CYA chemisch, nur Verdünnung wirkt. Stabilisiertes Chlor vermeiden solange CYA hoch ist.",
+    reco_fallback_tac: "KH+-Produkt (Natriumbicarbonat)",
+    reco_fallback_ph_minus: "pH-Senker",
+    reco_fallback_ph_plus: "pH-Heber",
+    reco_fallback_chlore: "Nicht stabilisiertes Schockchlor",
+    reco_fallback_brome: "Brom (Tabletten oder Granulat)",
+    reco_fallback_o2: "Aktivsauerstoff (stabilisiertes Wasserstoffperoxid)",
+    reco_fallback_sel: "Poolsalz (reines NaCl)",
+    stock_empty_badge: "nicht vorrätig",
     paywall_perk1: "Unbegrenzte Messungen (statt 1 pro Tag)",
     paywall_perk2: "Foto jeder Messung (Nachweis, visuelles Archiv)",
     paywall_perk3: "Foto jedes Produkts (Etikett, Dosierung)",
@@ -809,6 +902,37 @@ const TRANSLATIONS = {
     param_fcl: "Cloro libero (mg/L)",
     axis_legend_u: "ᴜ scala unità (pH, cloro) — sinistra",
     axis_legend_d: "ᴅ scala decine (TAC, CYA, temperatura) — destra",
+    reco_tac_low: "TAC troppo basso ({val} mg/L)",
+    reco_ph_high: "pH troppo alto ({val})",
+    reco_ph_low: "pH troppo basso ({val})",
+    reco_cl_combined: "Cloro combinato elevato ({val} mg/L)",
+    reco_cl_low: "Cloro libero troppo basso ({val} mg/L)",
+    reco_cl_high: "Cloro libero troppo alto ({val} mg/L)",
+    reco_brome_low: "Bromo troppo basso ({val} mg/L)",
+    reco_o2_low: "Ossigeno attivo troppo basso ({val} mg/L)",
+    reco_sel_low: "Salinità troppo bassa ({val} mg/L)",
+    reco_cya_high: "Stabilizzante troppo alto ({val} mg/L)",
+    reco_target: "per raggiungere",
+    reco_dose_prefix: "≈",
+    reco_no_product: "Nessun prodotto necessario",
+    reco_water_renewal: "Rinnovo parziale dell'acqua",
+    reco_water_renewal_text: "Rinnovare ≈ {pct} % del volume per tornare a 40 mg/L",
+    reco_cl_excess_text: "Lasciare che il cloro si degradi naturalmente al sole, evitare di nuotare nel frattempo.",
+    reco_cl_shock_text: "stasera (trattamento shock)",
+    reco_note_tac: "Un TAC basso rende il pH instabile.",
+    reco_note_combined: "Cloro combinato = cloramine, segno di disinfezione insufficiente. Aggiungere la sera, filtrazione in continuo.",
+    reco_note_sel: "Usare sale da piscina (NaCl puro ≥ 99%). Sciogliere prima dell'aggiunta o versare vicino allo skimmer, filtrazione 24h.",
+    reco_note_o2: "Non mescolare con il cloro. Filtrazione per 4h.",
+    reco_note_brome: "Versare lontano dagli ingressi d'acqua, filtrazione in marcia.",
+    reco_note_cya: "Nessun prodotto abbassa il CYA chimicamente, solo la diluizione funziona. Evitare cloro stabilizzato finché il CYA è alto.",
+    reco_fallback_tac: "Prodotto TAC+ (bicarbonato di sodio)",
+    reco_fallback_ph_minus: "pH meno",
+    reco_fallback_ph_plus: "pH più",
+    reco_fallback_chlore: "Cloro shock non stabilizzato",
+    reco_fallback_brome: "Bromo (pastiglie o granuli)",
+    reco_fallback_o2: "Ossigeno attivo (perossido di idrogeno stabilizzato)",
+    reco_fallback_sel: "Sale da piscina (NaCl puro)",
+    stock_empty_badge: "esaurito",
     paywall_perk1: "Misurazioni illimitate (invece di 1 al giorno)",
     paywall_perk2: "Foto di ogni misurazione (prova, archivio visivo)",
     paywall_perk3: "Foto di ogni prodotto (etichetta, dosaggio)",
@@ -1016,6 +1140,37 @@ const TRANSLATIONS = {
     param_fcl: "Cloro libre (mg/L)",
     axis_legend_u: "ᴜ escala unidades (pH, cloro) — izquierda",
     axis_legend_d: "ᴅ escala decenas (TAC, CYA, temperatura) — derecha",
+    reco_tac_low: "TAC demasiado bajo ({val} mg/L)",
+    reco_ph_high: "pH demasiado alto ({val})",
+    reco_ph_low: "pH demasiado bajo ({val})",
+    reco_cl_combined: "Cloro combinado elevado ({val} mg/L)",
+    reco_cl_low: "Cloro libre demasiado bajo ({val} mg/L)",
+    reco_cl_high: "Cloro libre demasiado alto ({val} mg/L)",
+    reco_brome_low: "Bromo demasiado bajo ({val} mg/L)",
+    reco_o2_low: "Oxígeno activo demasiado bajo ({val} mg/L)",
+    reco_sel_low: "Salinidad demasiado baja ({val} mg/L)",
+    reco_cya_high: "Estabilizador demasiado alto ({val} mg/L)",
+    reco_target: "para alcanzar",
+    reco_dose_prefix: "≈",
+    reco_no_product: "No se necesita producto",
+    reco_water_renewal: "Renovación parcial del agua",
+    reco_water_renewal_text: "Renovar ≈ {pct} % del volumen para volver a 40 mg/L",
+    reco_cl_excess_text: "Dejar que el cloro se degrade naturalmente al sol, evitar bañarse mientras tanto.",
+    reco_cl_shock_text: "esta noche (tratamiento de choque)",
+    reco_note_tac: "Un TAC bajo hace el pH inestable.",
+    reco_note_combined: "Cloro combinado = cloraminas, señal de desinfección insuficiente. Añadir por la noche, filtración continua.",
+    reco_note_sel: "Usar sal de piscina (NaCl puro ≥ 99%). Disolver antes de añadir o verter cerca del skimmer, filtración 24h.",
+    reco_note_o2: "No mezclar con cloro. Filtración durante 4h.",
+    reco_note_brome: "Verter lejos de las entradas de agua, filtración en marcha.",
+    reco_note_cya: "Ningún producto baja el CYA químicamente, solo la dilución funciona. Evitar cloro estabilizado mientras el CYA sea alto.",
+    reco_fallback_tac: "Producto TAC+ (bicarbonato de sodio)",
+    reco_fallback_ph_minus: "pH menos",
+    reco_fallback_ph_plus: "pH más",
+    reco_fallback_chlore: "Cloro shock no estabilizado",
+    reco_fallback_brome: "Bromo (pastillas o gránulos)",
+    reco_fallback_o2: "Oxígeno activo (peróxido de hidrógeno estabilizado)",
+    reco_fallback_sel: "Sal de piscina (NaCl puro)",
+    stock_empty_badge: "sin stock",
     paywall_perk1: "Mediciones ilimitadas (en lugar de 1 por día)",
     paywall_perk2: "Foto de cada medición (prueba, archivo visual)",
     paywall_perk3: "Foto de cada producto (etiqueta, dosaje)",
@@ -1223,6 +1378,37 @@ const TRANSLATIONS = {
     param_fcl: "Cloro livre (mg/L)",
     axis_legend_u: "ᴜ escala unidades (pH, cloro) — esquerda",
     axis_legend_d: "ᴅ escala dezenas (TAC, CYA, temperatura) — direita",
+    reco_tac_low: "TAC muito baixo ({val} mg/L)",
+    reco_ph_high: "pH muito alto ({val})",
+    reco_ph_low: "pH muito baixo ({val})",
+    reco_cl_combined: "Cloro combinado elevado ({val} mg/L)",
+    reco_cl_low: "Cloro livre muito baixo ({val} mg/L)",
+    reco_cl_high: "Cloro livre muito alto ({val} mg/L)",
+    reco_brome_low: "Bromo muito baixo ({val} mg/L)",
+    reco_o2_low: "Oxigênio ativo muito baixo ({val} mg/L)",
+    reco_sel_low: "Salinidade muito baixa ({val} mg/L)",
+    reco_cya_high: "Estabilizador muito alto ({val} mg/L)",
+    reco_target: "para atingir",
+    reco_dose_prefix: "≈",
+    reco_no_product: "Nenhum produto necessário",
+    reco_water_renewal: "Renovação parcial da água",
+    reco_water_renewal_text: "Renovar ≈ {pct} % do volume para voltar a 40 mg/L",
+    reco_cl_excess_text: "Deixar o cloro degradar naturalmente ao sol, evitar nadar enquanto isso.",
+    reco_cl_shock_text: "esta noite (tratamento de choque)",
+    reco_note_tac: "Um TAC baixo torna o pH instável.",
+    reco_note_combined: "Cloro combinado = cloraminas, sinal de desinfecção insuficiente. Adicionar à noite, filtração contínua.",
+    reco_note_sel: "Usar sal de piscina (NaCl puro ≥ 99%). Dissolver antes de adicionar ou verter perto do skimmer, filtração 24h.",
+    reco_note_o2: "Não misturar com cloro. Filtração por 4h.",
+    reco_note_brome: "Verter longe das entradas de água, filtração em funcionamento.",
+    reco_note_cya: "Nenhum produto baixa o CYA quimicamente, só a diluição funciona. Evitar cloro estabilizado enquanto o CYA estiver alto.",
+    reco_fallback_tac: "Produto TAC+ (bicarbonato de sódio)",
+    reco_fallback_ph_minus: "pH menos",
+    reco_fallback_ph_plus: "pH mais",
+    reco_fallback_chlore: "Cloro shock não estabilizado",
+    reco_fallback_brome: "Bromo (pastilhas ou grânulos)",
+    reco_fallback_o2: "Oxigênio ativo (peróxido de hidrogênio estabilizado)",
+    reco_fallback_sel: "Sal de piscina (NaCl puro)",
+    stock_empty_badge: "sem stock",
     paywall_perk1: "Medições ilimitadas (em vez de 1 por dia)",
     paywall_perk2: "Foto de cada medição (prova, arquivo visual)",
     paywall_perk3: "Foto de cada produto (rótulo, dosagem)",
@@ -1913,8 +2099,14 @@ function PoolApp() {
 
   const validatingMeasureRecs = useMemo(() => {
     if (!validatingMeasure) return [];
-    return computeRecommendations(validatingMeasure, activePool?.volume || 0, poolProducts, effectiveTargets, activeParamKeys);
-  }, [validatingMeasure, activePool, poolProducts, effectiveTargets, activeParamKeys]);
+    const tFn = (key, vars) => {
+      const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
+      let str = dict[key] || TRANSLATIONS.fr[key] || key;
+      if (vars) Object.keys(vars).forEach(k => { str = str.replace(`{${k}}`, vars[k]); });
+      return str;
+    };
+    return computeRecommendations(validatingMeasure, activePool?.volume || 0, poolProducts, effectiveTargets, activeParamKeys, tFn);
+  }, [validatingMeasure, activePool, poolProducts, effectiveTargets, activeParamKeys, lang]);
 
   const existingApplicationForValidating = useMemo(() => {
     if (!validatingMeasure) return null;
@@ -2426,7 +2618,7 @@ Réponds directement en français, sans titre ni introduction.`;
     }
   }
   const recs = useMemo(
-    () => (latest ? computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys) : []),
+    () => (latest ? computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys, t) : []),
     [latest, volume, products, effectiveTargets, activeParamKeys]
   );
 
@@ -2516,6 +2708,7 @@ Réponds directement en français, sans titre ni introduction.`;
               onToggle={() => setSelectedRecs((prev) => ({ ...prev, [i]: !prev[i] }))}
               manageStock={manageStock}
               products={products}
+              lang={lang}
             />
           ))}
 
@@ -2629,7 +2822,8 @@ function ParamCard({ param, value, effectiveTargets, lang }) {
   );
 }
 
-function RecoCard({ reco, isLast, selectable, selected, onToggle, manageStock, products }) {
+function RecoCard({ reco, isLast, selectable, selected, onToggle, manageStock, products, lang }) {
+  const t = useT(lang || "fr");
   return (
     <div
       style={{
@@ -2662,7 +2856,7 @@ function RecoCard({ reco, isLast, selectable, selected, onToggle, manageStock, p
       {reco.startsAfterHours > 0 && (
         <div style={styles.recoTiming}>
           <Clock size={13} color="#a8721a" />
-          À débuter au moins {reco.startsAfterHours}h après l'étape précédente
+          {t("start_after", { h: reco.startsAfterHours })}
         </div>
       )}
 
@@ -2678,12 +2872,12 @@ function RecoCard({ reco, isLast, selectable, selected, onToggle, manageStock, p
               {reco.productName}
               {reco.productAvailable === false && (
                 <span style={styles.recoMissingTag}>
-                  <AlertTriangle size={11} /> non disponible dans tes produits
+                  <AlertTriangle size={11} /> {t("missing_product")}
                 </span>
               )}
               {missingFromStock && (
                 <span style={{ ...styles.recoMissingTag, background: "#fdf0ef", color: "#c0392b", borderColor: "#f5c6c2" }}>
-                  <AlertTriangle size={11} /> stock épuisé
+                  <AlertTriangle size={11} /> {t("stock_empty_badge")}
                 </span>
               )}
             </div>
@@ -2695,7 +2889,7 @@ function RecoCard({ reco, isLast, selectable, selected, onToggle, manageStock, p
       {!!reco.waitHours && (
         <div style={styles.recoWait}>
           <Clock size={13} color="#0a6ebd" />
-          Attendre {reco.waitHours}h avant {isLast ? "de mesurer à nouveau" : "le traitement suivant"}
+          {isLast ? t("measure_after", { h: reco.waitHours }) : t("wait_before_next", { h: reco.waitHours })}
         </div>
       )}
 
@@ -2719,38 +2913,39 @@ function formatDose(amount, unit) {
 }
 
 // ---------- Logique de recommandation ----------
-function computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys) {
+function computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys, t) {
+  const _ = t || ((k, vars) => {
+    // fallback fr si pas de t fourni
+    let s = (TRANSLATIONS.fr[k] || k);
+    if (vars) Object.keys(vars).forEach(v => { s = s.replace(`{${v}}`, vars[v]); });
+    return s;
+  });
+
   const targets = effectiveTargets || getEffectiveTargets("chlore");
   const paramKeys = activeParamKeys || ["pH", "fCl", "tCl", "tac", "cya", "temp"];
-
-  // Normaliser en minuscules pour les comparaisons internes
   const paramKeysLower = paramKeys.map((k) => k.toLowerCase());
-  const targetsLower = Object.fromEntries(
-    Object.entries(targets).map(([k, v]) => [k.toLowerCase(), v])
-  );
-  const latestLower = Object.fromEntries(
-    Object.entries(latest).map(([k, v]) => [k.toLowerCase(), v])
-  );
+  const targetsLower = Object.fromEntries(Object.entries(targets).map(([k, v]) => [k.toLowerCase(), v]));
+  const latestLower = Object.fromEntries(Object.entries(latest).map(([k, v]) => [k.toLowerCase(), v]));
 
   const steps = [];
   const has = (key) => paramKeysLower.includes(key.toLowerCase());
 
-  // TAC (en premier — influence le pH)
+  // TAC
   const tac = parseFloat(latestLower.tac);
   if (has("tac") && !Number.isNaN(tac) && targetsLower.tac && tac < targetsLower.tac.min) {
     const prod = products.find((p) => p.action === "tac+");
     steps.push({
       action: "tac+",
-      title: `TAC trop bas (${tac} mg/L)`,
-      productName: prod ? prod.name : "Produit TAC+ (bicarbonate de sodium)",
+      title: _("reco_tac_low", { val: tac }),
+      productName: prod ? prod.name : _("reco_fallback_tac"),
       productAvailable: !!prod,
       productPhoto: prod?.photo || null,
       doseText: prod
-        ? `Voir dosage : ${formatDose(prod.doseAmount, prod.doseUnit)} → +${prod.effectAmount} mg/L sur ${prod.effectPer} m³`
-        : "Aucun produit TAC+ dans ta liste — ajoute-en un dans l'onglet Produits.",
+        ? `${_("reco_dose_prefix")} ${formatDose(prod.doseAmount, prod.doseUnit)} ${_("see_dosage").toLowerCase()}`
+        : _("missing_product_tip", { action: "tac+" }),
       computedDoseAmount: prod?.doseAmount ?? null,
       doseUnit: prod?.doseUnit || null,
-      note: prod?.note || "Un TAC bas rend le pH instable.",
+      note: prod?.note || _("reco_note_tac"),
       waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["tac+"],
     });
   }
@@ -2766,13 +2961,13 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "ph-",
-        title: `pH trop haut (${phVal})`,
-        productName: prod ? prod.name : "pH moins",
+        title: _("reco_ph_high", { val: phVal }),
+        productName: prod ? prod.name : _("reco_fallback_ph_minus"),
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${targetMid.toFixed(1)}`
-          : "Aucun produit pH- dans ta liste — ajoute-en un dans l'onglet Produits.",
+          ? `${_("reco_dose_prefix")} ${formatDose(computedDose, prod.doseUnit)} ${_("reco_target")} ${targetMid.toFixed(1)}`
+          : _("missing_product_tip", { action: "ph-" }),
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
         note: prod?.note,
@@ -2784,13 +2979,13 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "ph+",
-        title: `pH trop bas (${phVal})`,
-        productName: prod ? prod.name : "pH plus",
+        title: _("reco_ph_low", { val: phVal }),
+        productName: prod ? prod.name : _("reco_fallback_ph_plus"),
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${targetMid.toFixed(1)}`
-          : "Aucun produit pH+ dans ta liste — ajoute-en un dans l'onglet Produits.",
+          ? `${_("reco_dose_prefix")} ${formatDose(computedDose, prod.doseUnit)} ${_("reco_target")} ${targetMid.toFixed(1)}`
+          : _("missing_product_tip", { action: "ph+" }),
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
         note: prod?.note,
@@ -2812,16 +3007,16 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (targetFcl / prod.effectAmount)) : null;
       steps.push({
         action: "chlore",
-        title: `Chlore combiné élevé (${combined.toFixed(2)} mg/L)`,
-        productName: prod ? prod.name : "Chlore choc non stabilisé",
+        title: _("reco_cl_combined", { val: combined.toFixed(2) }),
+        productName: prod ? prod.name : _("reco_fallback_chlore"),
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${formatDose(computedDose, prod.doseUnit)} ce soir (choc renforcé)`
-          : "Aucun produit chlore choc dans ta liste — ajoute-en un dans l'onglet Produits.",
+          ? `${_("reco_dose_prefix")} ${formatDose(computedDose, prod.doseUnit)} ${_("reco_cl_shock_text")}`
+          : _("missing_product_tip", { action: "chlore" }),
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
-        note: "Chlore combiné = chloramines, signe d'une désinfection insuffisante. Verser le soir, filtration en continu.",
+        note: _("reco_note_combined"),
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["chlore"],
       });
     } else if (fCl < fclT.min) {
@@ -2831,13 +3026,13 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "chlore",
-        title: `Chlore libre trop bas (${fCl} mg/L)`,
-        productName: prod ? prod.name : "Chlore choc non stabilisé",
+        title: _("reco_cl_low", { val: fCl }),
+        productName: prod ? prod.name : _("reco_fallback_chlore"),
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${targetFcl} mg/L`
-          : "Aucun produit chlore dans ta liste — ajoute-en un dans l'onglet Produits.",
+          ? `${_("reco_dose_prefix")} ${formatDose(computedDose, prod.doseUnit)} ${_("reco_target")} ${targetFcl} mg/L`
+          : _("missing_product_tip", { action: "chlore" }),
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
         note: prod?.note,
@@ -2846,10 +3041,10 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     } else if (fCl > fclT.max) {
       steps.push({
         action: "chlore-excess",
-        title: `Chlore libre trop haut (${fCl} mg/L)`,
-        productName: "Aucun produit nécessaire",
+        title: _("reco_cl_high", { val: fCl }),
+        productName: _("reco_no_product"),
         productAvailable: true,
-        doseText: "Laisser le chlore se dégrader naturellement au soleil, ne pas se baigner en attendant.",
+        doseText: _("reco_cl_excess_text"),
         computedDoseAmount: null,
         doseUnit: null,
         waitHours: 0,
@@ -2867,16 +3062,16 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "brome",
-        title: `Brome trop bas (${bromeVal} mg/L)`,
-        productName: prod ? prod.name : "Brome (pastilles ou granulés)",
+        title: _("reco_brome_low", { val: bromeVal }),
+        productName: prod ? prod.name : _("reco_fallback_brome"),
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${formatDose(computedDose, prod.doseUnit)} pour viser ${(brT.min + brT.max) / 2} mg/L`
-          : "Aucun produit brome dans ta liste — ajoute-en un dans l'onglet Produits.",
+          ? `${_("reco_dose_prefix")} ${formatDose(computedDose, prod.doseUnit)} ${_("reco_target")} ${(brT.min + brT.max) / 2} mg/L`
+          : _("missing_product_tip", { action: "brome" }),
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
-        note: "Verser loin des arrivées d'eau, filtration en marche.",
+        note: _("reco_note_brome"),
         waitHours: prod?.waitHours ?? 6,
       });
     }
@@ -2892,60 +3087,60 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "o2",
-        title: `Oxygène actif trop bas (${o2Val} mg/L)`,
-        productName: prod ? prod.name : "Oxygène actif (peroxyde d'hydrogène stabilisé)",
+        title: _("reco_o2_low", { val: o2Val }),
+        productName: prod ? prod.name : _("reco_fallback_o2"),
         productAvailable: !!prod,
         productPhoto: prod?.photo || null,
         doseText: prod
-          ? `≈ ${formatDose(computedDose, prod.doseUnit)}`
-          : "Aucun produit oxygène actif dans ta liste — ajoute-en un dans l'onglet Produits.",
+          ? `${_("reco_dose_prefix")} ${formatDose(computedDose, prod.doseUnit)}`
+          : _("missing_product_tip", { action: "o2" }),
         computedDoseAmount: computedDose,
         doseUnit: prod?.doseUnit || null,
-        note: "Ne pas mélanger avec le chlore. Filtration en marche pendant 4h.",
+        note: _("reco_note_o2"),
         waitHours: prod?.waitHours ?? 4,
       });
     }
   }
 
-  // Sel (salinité pour électrolyseur)
+  // Sel
   const selVal = parseFloat(latestLower.sel);
   if (has("sel") && !Number.isNaN(selVal) && targetsLower.sel) {
     const selT = targetsLower.sel;
     if (selVal < selT.min) {
       const diff = ((selT.min + selT.max) / 2) - selVal;
-      const selKg = Math.round((diff * volume) / 1000); // g/L × m³ = g → /1000 pour kg
+      const selKg = Math.round((diff * volume) / 1000);
       steps.push({
         action: "sel",
-        title: `Salinité trop basse (${selVal} mg/L)`,
-        productName: "Sel de piscine (NaCl pur)",
+        title: _("reco_sel_low", { val: selVal }),
+        productName: _("reco_fallback_sel"),
         productAvailable: true,
-        doseText: `≈ ${selKg} kg pour viser ${Math.round((selT.min + selT.max) / 2)} mg/L`,
+        doseText: _("reco_water_renewal_text", { pct: selKg }).replace("{pct}", selKg) ||
+          `${_("reco_dose_prefix")} ${selKg} kg ${_("reco_target")} ${Math.round((selT.min + selT.max) / 2)} mg/L`,
         computedDoseAmount: selKg,
         doseUnit: "kg",
-        note: "Utiliser du sel spécial piscine (NaCl pur ≥ 99%). Dissoudre avant l'ajout ou verser directement près du skimmer, filtration en marche 24h.",
+        note: _("reco_note_sel"),
         waitHours: 24,
       });
     }
   }
 
-  // CYA (pertinent seulement si le traitement l'inclut)
+  // CYA
   const cya = parseFloat(latestLower.cya);
   if (has("cya") && !Number.isNaN(cya) && targetsLower.cya && cya > targetsLower.cya.max) {
     const renewalPercent = Math.round((1 - 40 / cya) * 100);
     steps.push({
       action: "renouvellement",
-      title: `Stabilisant trop élevé (${cya} mg/L)`,
-      productName: "Renouvellement d'eau partiel",
+      title: _("reco_cya_high", { val: cya }),
+      productName: _("reco_water_renewal"),
       productAvailable: true,
-      doseText: `Renouveler ≈ ${renewalPercent} % du volume pour revenir vers 40 mg/L`,
+      doseText: _("reco_water_renewal_text", { pct: renewalPercent }),
       computedDoseAmount: renewalPercent,
       doseUnit: "%",
-      note: "Aucun produit ne fait baisser le CYA chimiquement, seule la dilution fonctionne. Éviter le chlore stabilisé tant que le CYA est haut.",
+      note: _("reco_note_cya"),
       waitHours: 0,
     });
   }
 
-  // Tri et calcul des délais cumulés
   steps.sort((a, b) => (ACTION_PRIORITY[a.action] ?? 9) - (ACTION_PRIORITY[b.action] ?? 9));
   let cumulativeHours = 0;
   return steps.map((step, i) => {
@@ -4576,7 +4771,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     const repTargets = getEffectiveTargets(pool?.treatmentType || "chlore");
     const repParams = getActiveParams(pool?.treatmentType || "chlore");
     return sortedMeasures.map((m) => {
-      const recs = computeRecommendations(m, pool?.volume || 0, products, repTargets, repParams);
+      const recs = computeRecommendations(m, pool?.volume || 0, products, repTargets, repParams, t);
       const application = applications.find((a) => a.measureId === m.id) || null;
       return { measure: m, recs, application };
     });
