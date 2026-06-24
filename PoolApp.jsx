@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.53";
+const APP_VERSION = "0.54";
 
 const TRANSLATIONS = {
   fr: {
@@ -2340,6 +2340,9 @@ function PoolApp() {
     const unsub = FB.onAuth(async (user) => {
       setAuthUser(user || null);
       if (user) {
+        // Cache la connexion pour éviter de re-montrer l'écran login
+        window.storage.set("auth_skipped", "true").catch(() => {});
+        setShowLogin(false);
         try {
           const data = await FB.getUser(user.uid);
           if (data?.isPremium !== undefined) setIsPremium(data.isPremium);
@@ -2351,12 +2354,22 @@ function PoolApp() {
   }, []);
 
   // Affiche login à la première visite si Firebase configuré et non connecté
+  // On attend 2s pour laisser Firebase résoudre un éventuel redirect Google
   useEffect(() => {
     if (!loaded || !FB.ready()) return;
     if (authUser === null) {
-      window.storage.get("auth_skipped").then(v => {
-        if (!v?.value) setShowLogin(true);
-      }).catch(() => {});
+      const timer = setTimeout(() => {
+        // Re-vérifie que l'utilisateur n'est toujours pas connecté après le délai
+        if (!window._fbAuth?.currentUser) {
+          window.storage.get("auth_skipped").then(v => {
+            if (!v?.value) setShowLogin(true);
+          }).catch(() => {});
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    if (authUser) {
+      setShowLogin(false);
     }
   }, [loaded, authUser]);
 
