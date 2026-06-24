@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.55";
+const APP_VERSION = "0.56";
 
 const TRANSLATIONS = {
   fr: {
@@ -193,6 +193,13 @@ const TRANSLATIONS = {
     pool_photo_locked: "Photos du bassin réservées à la version illimitée",
     sign_in: "Connexion",
     account_section: "Mon compte",
+    confirm_password: "Confirmer le mot de passe",
+    pwd_min6: "6 caractères minimum",
+    error_pwd_mismatch: "Les mots de passe ne correspondent pas.",
+    error_email_required: "Email invalide.",
+    account_created: "Compte créé !",
+    account_created_sub: "Bienvenue sur PoolApp. Tu peux maintenant utiliser l'app.",
+    start_app: "Démarrer l'app",
     sign_out: "Se déconnecter",
     not_signed_in: "Non connecté — mode hors-ligne",
     create_account: "Créer un compte",
@@ -470,6 +477,13 @@ const TRANSLATIONS = {
     pool_photo_locked: "Pool photos reserved for unlimited version",
     sign_in: "Sign in",
     account_section: "My account",
+    confirm_password: "Confirm password",
+    pwd_min6: "6 characters minimum",
+    error_pwd_mismatch: "Passwords do not match.",
+    error_email_required: "Invalid email.",
+    account_created: "Account created!",
+    account_created_sub: "Welcome to PoolApp. You can now use the app.",
+    start_app: "Start the app",
     sign_out: "Sign out",
     not_signed_in: "Not signed in — offline mode",
     create_account: "Create account",
@@ -747,6 +761,13 @@ const TRANSLATIONS = {
     pool_photo_locked: "Beckenfotos nur in unbegrenzter Version",
     sign_in: "Anmelden",
     account_section: "Mein Konto",
+    confirm_password: "Passwort bestätigen",
+    pwd_min6: "Mindestens 6 Zeichen",
+    error_pwd_mismatch: "Passwörter stimmen nicht überein.",
+    error_email_required: "Ungültige E-Mail.",
+    account_created: "Konto erstellt!",
+    account_created_sub: "Willkommen bei PoolApp. Du kannst die App jetzt nutzen.",
+    start_app: "App starten",
     sign_out: "Abmelden",
     not_signed_in: "Nicht angemeldet — Offline-Modus",
     create_account: "Konto erstellen",
@@ -1024,6 +1045,13 @@ const TRANSLATIONS = {
     pool_photo_locked: "Foto vasca riservate alla versione illimitata",
     sign_in: "Accedi",
     account_section: "Il mio account",
+    confirm_password: "Conferma password",
+    pwd_min6: "Minimo 6 caratteri",
+    error_pwd_mismatch: "Le password non corrispondono.",
+    error_email_required: "Email non valida.",
+    account_created: "Account creato!",
+    account_created_sub: "Benvenuto su PoolApp. Puoi usare l'app ora.",
+    start_app: "Avvia l'app",
     sign_out: "Disconnetti",
     not_signed_in: "Non connesso — modalità offline",
     create_account: "Crea account",
@@ -1301,6 +1329,13 @@ const TRANSLATIONS = {
     pool_photo_locked: "Fotos de piscina reservadas para versión ilimitada",
     sign_in: "Iniciar sesión",
     account_section: "Mi cuenta",
+    confirm_password: "Confirmar contraseña",
+    pwd_min6: "Mínimo 6 caracteres",
+    error_pwd_mismatch: "Las contraseñas no coinciden.",
+    error_email_required: "Email inválido.",
+    account_created: "¡Cuenta creada!",
+    account_created_sub: "Bienvenido a PoolApp. Ya puedes usar la app.",
+    start_app: "Iniciar la app",
     sign_out: "Cerrar sesión",
     not_signed_in: "No conectado — modo offline",
     create_account: "Crear cuenta",
@@ -1578,6 +1613,13 @@ const TRANSLATIONS = {
     pool_photo_locked: "Fotos da piscina reservadas para versão ilimitada",
     sign_in: "Entrar",
     account_section: "Minha conta",
+    confirm_password: "Confirmar senha",
+    pwd_min6: "Mínimo 6 caracteres",
+    error_pwd_mismatch: "As senhas não coincidem.",
+    error_email_required: "Email inválido.",
+    account_created: "Conta criada!",
+    account_created_sub: "Bem-vindo ao PoolApp. Já podes usar a app.",
+    start_app: "Iniciar a app",
     sign_out: "Sair",
     not_signed_in: "Não conectado — modo offline",
     create_account: "Criar conta",
@@ -2184,11 +2226,12 @@ const FB = {
   },
 };
 
-function LoginScreen({ lang, onSkip }) {
+function LoginScreen({ lang, onSkip, onSuccess }) {
   const t = useT(lang || "fr");
-  const [mode, setMode] = useState("login"); // login | signup | reset
+  const [mode, setMode] = useState("login"); // login | signup | reset | done
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
+  const [pwd2, setPwd2] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
@@ -2199,9 +2242,11 @@ function LoginScreen({ lang, onSkip }) {
     setError(""); setBusy(true);
     try {
       await FB.signInGoogle();
+      // signInWithRedirect — la page va se recharger, pas de suite immédiate
     } catch (e) {
       setError(e.message);
-    } finally { setBusy(false); }
+      setBusy(false);
+    }
   }
 
   async function handleSubmit() {
@@ -2210,20 +2255,54 @@ function LoginScreen({ lang, onSkip }) {
       if (mode === "reset") {
         await FB.resetPwd(email);
         setInfo(t("reset_sent"));
-        setMode("login");
+        setTimeout(() => setMode("login"), 3000);
       } else if (mode === "signup") {
-        await FB.signUp(email, pwd);
+        if (!email.trim()) { setError(t("error_email_required")); setBusy(false); return; }
+        if (pwd.length < 6) { setError(t("weak_password")); setBusy(false); return; }
+        if (pwd !== pwd2) { setError(t("error_pwd_mismatch")); setBusy(false); return; }
+        const cred = await FB.signUp(email, pwd);
+        // Enregistre le profil dans Firestore
+        await FB.saveUser(cred.user.uid, {
+          email: cred.user.email,
+          createdAt: new Date().toISOString(),
+          isPremium: false,
+        }).catch(() => {});
+        setMode("done");
+        // onAuthStateChanged se déclenchera et appellera onSuccess via PoolApp
       } else {
         await FB.signIn(email, pwd);
+        // onAuthStateChanged se déclenchera automatiquement
       }
     } catch (e) {
-      const msg = e.code === "auth/wrong-password" ? t("wrong_password")
+      const msg = e.code === "auth/wrong-password" || e.code === "auth/invalid-credential" ? t("wrong_password")
         : e.code === "auth/user-not-found" ? t("user_not_found")
         : e.code === "auth/email-already-in-use" ? t("email_in_use")
         : e.code === "auth/weak-password" ? t("weak_password")
+        : e.code === "auth/invalid-email" ? t("error_email_required")
         : e.message;
       setError(msg);
     } finally { setBusy(false); }
+  }
+
+  // Écran de succès après inscription
+  if (mode === "done") {
+    return (
+      <div style={{ minHeight: "100vh", background: "#eaf4fb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 380, background: "#fff", borderRadius: 20, padding: 32, boxShadow: "0 4px 24px #0a6ebd18", textAlign: "center" }}>
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#e8f8ef", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <CheckCircle2 size={28} color="#1a8fd1" />
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("account_created")}</div>
+          <div style={{ fontSize: 13, color: "#6a7d90", marginBottom: 24 }}>{t("account_created_sub")}</div>
+          <button
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+            onClick={onSkip}
+          >
+            {t("start_app")}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -2246,64 +2325,84 @@ function LoginScreen({ lang, onSkip }) {
           </div>
         )}
 
-        {/* Google */}
+        {/* Google — seulement login et signup */}
         {firebaseReady && mode !== "reset" && (
-          <button
-            style={{ width: "100%", padding: "12px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#f8fafd", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, fontWeight: 600, color: "#0d2b4e", cursor: "pointer", marginBottom: 16 }}
-            onClick={handleGoogle}
-            disabled={busy}
-          >
-            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-            {t("continue_google")}
-          </button>
+          <>
+            <button
+              style={{ width: "100%", padding: "12px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#f8fafd", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, fontWeight: 600, color: "#0d2b4e", cursor: busy ? "not-allowed" : "pointer", marginBottom: 16, opacity: busy ? 0.6 : 1 }}
+              onClick={handleGoogle}
+              disabled={busy}
+            >
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+              {busy ? "..." : t("continue_google")}
+            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <div style={{ flex: 1, height: 1, background: "#e6ebe9" }} />
+              <span style={{ fontSize: 12, color: "#9aa9a5" }}>{t("or")}</span>
+              <div style={{ flex: 1, height: 1, background: "#e6ebe9" }} />
+            </div>
+          </>
         )}
 
-        {firebaseReady && mode !== "reset" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <div style={{ flex: 1, height: 1, background: "#e6ebe9" }} />
-            <span style={{ fontSize: 12, color: "#9aa9a5" }}>{t("or")}</span>
-            <div style={{ flex: 1, height: 1, background: "#e6ebe9" }} />
-          </div>
-        )}
-
-        {/* Email / pwd */}
+        {/* Formulaire email */}
         {firebaseReady && (
           <>
             <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+            <input
+              type="email" value={email} onChange={e => setEmail(e.target.value)}
               style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
-              placeholder="votre@email.com" />
+              placeholder="votre@email.com"
+              onKeyDown={e => e.key === "Enter" && mode !== "signup" && handleSubmit()}
+            />
 
             {mode !== "reset" && (
               <>
                 <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>{t("password")}</label>
-                <input type="password" value={pwd} onChange={e => setPwd(e.target.value)}
+                <input
+                  type="password" value={pwd} onChange={e => setPwd(e.target.value)}
                   style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
-                  placeholder="••••••••"
-                  onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+                  placeholder={mode === "signup" ? t("pwd_min6") : "••••••••"}
+                  onKeyDown={e => e.key === "Enter" && mode === "login" && handleSubmit()}
+                />
               </>
             )}
 
-            {error && <div style={{ fontSize: 12, color: "#c0392b", marginBottom: 8 }}>{error}</div>}
-            {info && <div style={{ fontSize: 12, color: "#1a8fd1", marginBottom: 8 }}>{info}</div>}
+            {/* Confirmation mot de passe à l'inscription */}
+            {mode === "signup" && (
+              <>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>{t("confirm_password")}</label>
+                <input
+                  type="password" value={pwd2} onChange={e => setPwd2(e.target.value)}
+                  style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: pwd2 && pwd !== pwd2 ? "1.5px solid #c0392b" : "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
+                  placeholder="••••••••"
+                  onKeyDown={e => e.key === "Enter" && handleSubmit()}
+                />
+                {pwd2 && pwd !== pwd2 && (
+                  <div style={{ fontSize: 11, color: "#c0392b", marginTop: -6, marginBottom: 8 }}>{t("error_pwd_mismatch")}</div>
+                )}
+              </>
+            )}
+
+            {error && <div style={{ fontSize: 12, color: "#c0392b", marginBottom: 8, padding: "8px 10px", background: "#fdf0ef", borderRadius: 8 }}>{error}</div>}
+            {info && <div style={{ fontSize: 12, color: "#1a8fd1", marginBottom: 8, padding: "8px 10px", background: "#e8f4fd", borderRadius: 8 }}>{info}</div>}
 
             <button
-              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: busy ? "#7ab8e8" : "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: busy ? "not-allowed" : "pointer", marginBottom: 12 }}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: busy ? "#7ab8e8" : "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: busy ? "not-allowed" : "pointer", marginBottom: 14 }}
               onClick={handleSubmit}
               disabled={busy}
             >
               {busy ? "..." : mode === "signup" ? t("create_account") : mode === "reset" ? t("send_reset") : t("sign_in")}
             </button>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
               {mode === "login" && (
                 <>
-                  <button onClick={() => { setMode("signup"); setError(""); }} style={{ background: "none", border: "none", color: "#0a6ebd", fontSize: 13, cursor: "pointer" }}>{t("no_account")}</button>
-                  <button onClick={() => { setMode("reset"); setError(""); }} style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 12, cursor: "pointer" }}>{t("forgot_password")}</button>
+                  <button onClick={() => { setMode("signup"); setError(""); setPwd(""); setPwd2(""); }} style={{ background: "none", border: "none", color: "#0a6ebd", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>{t("no_account")}</button>
+                  <button onClick={() => { setMode("reset"); setError(""); }} style={{ background: "none", border: "none", color: "#9aa9a5", fontSize: 12, cursor: "pointer" }}>{t("forgot_password")}</button>
                 </>
               )}
               {mode === "signup" && (
-                <button onClick={() => { setMode("login"); setError(""); }} style={{ background: "none", border: "none", color: "#0a6ebd", fontSize: 13, cursor: "pointer" }}>{t("already_account")}</button>
+                <button onClick={() => { setMode("login"); setError(""); setPwd(""); setPwd2(""); }} style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 13, cursor: "pointer" }}>{t("already_account")}</button>
               )}
               {mode === "reset" && (
                 <button onClick={() => { setMode("login"); setError(""); }} style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 12, cursor: "pointer" }}>{t("back_to_login")}</button>
@@ -2312,9 +2411,9 @@ function LoginScreen({ lang, onSkip }) {
           </>
         )}
 
-        {/* Skip / mode hors-ligne */}
-        <div style={{ marginTop: 20, borderTop: "1px solid #f0f4f8", paddingTop: 16, textAlign: "center" }}>
-          <button onClick={onSkip} style={{ background: "none", border: "none", color: "#9aa9a5", fontSize: 12, cursor: "pointer" }}>
+        {/* Skip */}
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid #f0f4f8", textAlign: "center" }}>
+          <button onClick={onSkip} style={{ background: "none", border: "none", color: "#b0bec5", fontSize: 12, cursor: "pointer" }}>
             {t("skip_login")}
           </button>
         </div>
@@ -2322,6 +2421,7 @@ function LoginScreen({ lang, onSkip }) {
     </div>
   );
 }
+
 
 function PoolApp() {
   const [authUser, setAuthUser] = useState(undefined); // undefined=loading, null=anonymous, object=logged in
