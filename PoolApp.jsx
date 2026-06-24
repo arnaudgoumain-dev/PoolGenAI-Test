@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.69";
+const APP_VERSION = "0.70";
 
 const TRANSLATIONS = {
   fr: {
@@ -5589,7 +5589,6 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                 tick={{ fontSize: 10, fill: "#2d4a6e" }}
                 width={30}
               />
-              <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: 11 }} />
               {chartParams.map((cp) => (
                 <Line
                   key={cp.key}
@@ -5609,6 +5608,14 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                 />
               ))}
             </LineChart>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px 16px", marginTop: 8, padding: "0 8px" }}>
+            {chartParams.map((cp) => (
+              <div key={cp.key} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#2d4a6e" }}>
+                <svg width="16" height="4"><line x1="0" y1="2" x2="16" y2="2" stroke={cp.color} strokeWidth="2"/><circle cx="8" cy="2" r="2" fill={cp.color}/></svg>
+                {cp.label}
+              </div>
+            ))}
           </div>
           );
         })() : (
