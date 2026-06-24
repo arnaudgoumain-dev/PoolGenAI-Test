@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.67";
+const APP_VERSION = "0.68";
 
 const TRANSLATIONS = {
   fr: {
@@ -5541,24 +5541,20 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
           <div style={styles.reportHeaderIcon}>
             <Droplets size={20} color="#e8f4fd" />
           </div>
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={styles.reportTitle}>{t("report_title")} — {pool?.name}</div>
             <div style={styles.reportSubtitle}>
               {pool?.location} · {pool?.volume} m³ · {t("generated_on")} {generatedAt}
             </div>
           </div>
-        </div>
-
-        {/* Photo du bassin */}
-        {pool?.photo && (
-          <div style={{ marginBottom: 20 }}>
+          {pool?.photo && (
             <img
               src={pool.photo}
-              alt={pool.name}
-              style={{ width: "100%", maxHeight: 220, objectFit: "cover", borderRadius: 12, border: "1px solid #d0e4f5" }}
+              alt={pool?.name}
+              style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", border: "1.5px solid #d0e4f5", flexShrink: 0 }}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <div style={styles.reportSectionTitle}>{t("params_evolution")}</div>
         {chartData.length > 0 ? (() => {
