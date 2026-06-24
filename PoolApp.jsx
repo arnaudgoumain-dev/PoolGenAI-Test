@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.54";
+const APP_VERSION = "0.55";
 
 const TRANSLATIONS = {
   fr: {
@@ -192,6 +192,9 @@ const TRANSLATIONS = {
     pool_photos_label: "Photos du bassin (optionnel)",
     pool_photo_locked: "Photos du bassin réservées à la version illimitée",
     sign_in: "Connexion",
+    account_section: "Mon compte",
+    sign_out: "Se déconnecter",
+    not_signed_in: "Non connecté — mode hors-ligne",
     create_account: "Créer un compte",
     reset_password: "Mot de passe oublié",
     continue_google: "Continuer avec Google",
@@ -466,6 +469,9 @@ const TRANSLATIONS = {
     pool_photos_label: "Pool photos (optional)",
     pool_photo_locked: "Pool photos reserved for unlimited version",
     sign_in: "Sign in",
+    account_section: "My account",
+    sign_out: "Sign out",
+    not_signed_in: "Not signed in — offline mode",
     create_account: "Create account",
     reset_password: "Forgot password",
     continue_google: "Continue with Google",
@@ -740,6 +746,9 @@ const TRANSLATIONS = {
     pool_photos_label: "Beckenfotos (optional)",
     pool_photo_locked: "Beckenfotos nur in unbegrenzter Version",
     sign_in: "Anmelden",
+    account_section: "Mein Konto",
+    sign_out: "Abmelden",
+    not_signed_in: "Nicht angemeldet — Offline-Modus",
     create_account: "Konto erstellen",
     reset_password: "Passwort vergessen",
     continue_google: "Mit Google fortfahren",
@@ -1014,6 +1023,9 @@ const TRANSLATIONS = {
     pool_photos_label: "Foto vasca (opzionale)",
     pool_photo_locked: "Foto vasca riservate alla versione illimitata",
     sign_in: "Accedi",
+    account_section: "Il mio account",
+    sign_out: "Disconnetti",
+    not_signed_in: "Non connesso — modalità offline",
     create_account: "Crea account",
     reset_password: "Password dimenticata",
     continue_google: "Continua con Google",
@@ -1288,6 +1300,9 @@ const TRANSLATIONS = {
     pool_photos_label: "Fotos de la piscina (opcional)",
     pool_photo_locked: "Fotos de piscina reservadas para versión ilimitada",
     sign_in: "Iniciar sesión",
+    account_section: "Mi cuenta",
+    sign_out: "Cerrar sesión",
+    not_signed_in: "No conectado — modo offline",
     create_account: "Crear cuenta",
     reset_password: "Contraseña olvidada",
     continue_google: "Continuar con Google",
@@ -1562,6 +1577,9 @@ const TRANSLATIONS = {
     pool_photos_label: "Fotos da piscina (opcional)",
     pool_photo_locked: "Fotos da piscina reservadas para versão ilimitada",
     sign_in: "Entrar",
+    account_section: "Minha conta",
+    sign_out: "Sair",
+    not_signed_in: "Não conectado — modo offline",
     create_account: "Criar conta",
     reset_password: "Senha esquecida",
     continue_google: "Continuar com Google",
@@ -2334,44 +2352,40 @@ function PoolApp() {
   const [apiProvider, setApiProvider] = useState("anthropic"); // "anthropic" | "openai"
   const [loaded, setLoaded] = useState(false);
 
+  const [authResolved, setAuthResolved] = useState(false);
+
   // --- Firebase Auth ---
   useEffect(() => {
-    if (!FB.ready()) { setAuthUser(null); return; }
+    if (!FB.ready()) { setAuthUser(null); setAuthResolved(true); return; }
+    let firstCall = true;
     const unsub = FB.onAuth(async (user) => {
       setAuthUser(user || null);
       if (user) {
-        // Cache la connexion pour éviter de re-montrer l'écran login
-        window.storage.set("auth_skipped", "true").catch(() => {});
         setShowLogin(false);
+        window.storage.set('auth_skipped', 'true').catch(() => {});
         try {
           const data = await FB.getUser(user.uid);
           if (data?.isPremium !== undefined) setIsPremium(data.isPremium);
         } catch (e) {}
         FB.saveUser(user.uid, { email: user.email, lastSeen: new Date().toISOString() }).catch(() => {});
       }
+      if (firstCall) {
+        firstCall = false;
+        setTimeout(() => setAuthResolved(true), 1500);
+      }
     });
     return () => unsub();
   }, []);
 
-  // Affiche login à la première visite si Firebase configuré et non connecté
-  // On attend 2s pour laisser Firebase résoudre un éventuel redirect Google
+  // N'affiche le login qu'apres stabilisation Firebase
   useEffect(() => {
-    if (!loaded || !FB.ready()) return;
-    if (authUser === null) {
-      const timer = setTimeout(() => {
-        // Re-vérifie que l'utilisateur n'est toujours pas connecté après le délai
-        if (!window._fbAuth?.currentUser) {
-          window.storage.get("auth_skipped").then(v => {
-            if (!v?.value) setShowLogin(true);
-          }).catch(() => {});
-        }
-      }, 2000);
-      return () => clearTimeout(timer);
+    if (!loaded || !authResolved) return;
+    if (!authUser && !window._fbAuth?.currentUser) {
+      window.storage.get('auth_skipped').then(v => {
+        if (!v?.value) setShowLogin(true);
+      }).catch(() => {});
     }
-    if (authUser) {
-      setShowLogin(false);
-    }
-  }, [loaded, authUser]);
+  }, [loaded, authResolved, authUser]);
 
   // --- Chargement initial depuis le stockage persistant ---
   useEffect(() => {
@@ -2786,6 +2800,14 @@ function PoolApp() {
             onSwitchPool={setActivePoolId}
             onWantAddPool={handleWantAddPool}
             onDeleteAllMeasures={deleteAllMeasuresForActivePool}
+            authUser={authUser}
+            onSignOut={async () => {
+              await FB.signOut().catch(() => {});
+              window.storage.set("auth_skipped", "").catch(() => {});
+              setAuthUser(null);
+              setShowLogin(true);
+            }}
+            onSignIn={() => setShowLogin(true)}
             poolMeasureCount={poolMeasures.length}
             onGenerateReport={() => setShowReport(true)}
             onWantPremiumForReport={() => setShowPaywall(true)}
@@ -4740,7 +4762,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
 }
 
 // ---------- Réglages ----------
-function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider, lang, setLang }) {
+function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider, lang, setLang, authUser, onSignOut, onSignIn }) {
   const t = useT(lang);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const [pendingLang, setPendingLang] = useState(lang);
@@ -4805,6 +4827,35 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
               {t("validate_btn")}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* --- Section Compte --- */}
+      <div style={styles.sectionRow}>
+        <span style={styles.sectionLabel}>{t("account_section")}</span>
+      </div>
+      {authUser ? (
+        <div style={{ background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#0d2b4e" }}>{authUser.displayName || authUser.email}</div>
+            {authUser.displayName && <div style={{ fontSize: 11.5, color: "#6a7d90", marginTop: 2 }}>{authUser.email}</div>}
+          </div>
+          <button
+            style={{ padding: "8px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", background: "#fff", color: "#c0392b", fontWeight: 600, fontSize: 12, cursor: "pointer" }}
+            onClick={onSignOut}
+          >
+            {t("sign_out")}
+          </button>
+        </div>
+      ) : (
+        <div style={{ background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ fontSize: 13, color: "#6a7d90" }}>{t("not_signed_in")}</div>
+          <button
+            style={{ padding: "8px 14px", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }}
+            onClick={onSignIn}
+          >
+            {t("sign_in")}
+          </button>
         </div>
       )}
 
