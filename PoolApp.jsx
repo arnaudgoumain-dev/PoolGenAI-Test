@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.57";
+const APP_VERSION = "0.58";
 
 const TRANSLATIONS = {
   fr: {
@@ -2472,21 +2472,32 @@ function PoolApp() {
   // --- Firebase Auth ---
   useEffect(() => {
     if (!FB.ready()) { setAuthUser(null); setAuthResolved(true); return; }
-    let firstCall = true;
+    const redirectPending = !!window._fbRedirectUser;
+    let resolved = false;
+
     const unsub = FB.onAuth(async (user) => {
-      setAuthUser(user || null);
       if (user) {
+        setAuthUser(user);
         setShowLogin(false);
-        window.storage.set('auth_skipped', 'true').catch(() => {});
+        window.storage.set("auth_skipped", "true").catch(() => {});
         try {
           const data = await FB.getUser(user.uid);
           if (data?.isPremium !== undefined) setIsPremium(data.isPremium);
         } catch (e) {}
         FB.saveUser(user.uid, { email: user.email, lastSeen: new Date().toISOString() }).catch(() => {});
-      }
-      if (firstCall) {
-        firstCall = false;
-        setTimeout(() => setAuthResolved(true), 1500);
+        if (!resolved) { resolved = true; setAuthResolved(true); }
+      } else {
+        if (redirectPending && !resolved) {
+          setTimeout(() => {
+            if (!window._fbAuth?.currentUser) {
+              setAuthUser(null);
+              if (!resolved) { resolved = true; setAuthResolved(true); }
+            }
+          }, 3000);
+        } else {
+          setAuthUser(null);
+          if (!resolved) setTimeout(() => { resolved = true; setAuthResolved(true); }, 500);
+        }
       }
     });
     return () => unsub();
@@ -2495,16 +2506,12 @@ function PoolApp() {
   // N'affiche le login qu'apres stabilisation Firebase
   useEffect(() => {
     if (!loaded || !authResolved) return;
-    // Vérifie authUser ET le currentUser Firebase en temps réel
     const fbUser = window._fbAuth?.currentUser;
     if (!authUser && !fbUser) {
-      window.storage.get('auth_skipped').then(v => {
-        // Dernière vérification avant d'afficher le login
-        if (!v?.value && !window._fbAuth?.currentUser) {
-          setShowLogin(true);
-        }
-      }).catch(() => setShowLogin(true));
-    } else if (authUser || fbUser) {
+      window.storage.get("auth_skipped").then(v => {
+        if (!v?.value && !window._fbAuth?.currentUser) setShowLogin(true);
+      }).catch(() => {});
+    } else {
       setShowLogin(false);
     }
   }, [loaded, authResolved, authUser]);

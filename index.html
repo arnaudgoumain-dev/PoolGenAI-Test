@@ -290,8 +290,6 @@
   window._fbAuth = auth;
   window._fbDb = db;
   window._fbGoogle = googleProvider;
-  // Utilise redirect au lieu de popup (plus fiable sur mobile / GitHub Pages)
-  window._fbSignInWithPopup = (auth, provider) => signInWithRedirect(auth, provider);
   window._fbSignIn = signInWithEmailAndPassword;
   window._fbSignUp = createUserWithEmailAndPassword;
   window._fbResetPwd = sendPasswordResetEmail;
@@ -302,12 +300,31 @@
   window._fbGetDoc = getDoc;
   window._fbOnAuth = onAuthStateChanged;
 
+  // Tente popup en premier, fallback redirect si bloqué (iOS Safari, etc.)
+  window._fbSignInWithPopup = async (auth, provider) => {
+    try {
+      return await signInWithPopup(auth, provider);
+    } catch (err) {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        // Fallback : redirect
+        return signInWithRedirect(auth, provider);
+      }
+      throw err;
+    }
+  };
+
   // Récupère le résultat du redirect Google au retour sur la page
   getRedirectResult(auth).then((result) => {
     if (result?.user) {
       console.log("Redirect Google OK :", result.user.email);
+      // Marque comme connecté immédiatement pour éviter le flash login screen
+      window._fbRedirectUser = result.user;
     }
   }).catch((err) => {
+    if (err.code !== 'auth/no-auth-event') {
+      console.warn("getRedirectResult error:", err.code, err.message);
+    }
+  });
     console.warn("getRedirectResult error:", err.code, err.message);
   });
 
