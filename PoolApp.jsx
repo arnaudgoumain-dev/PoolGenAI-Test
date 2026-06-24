@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "0.61";
+const APP_VERSION = "0.62";
 
 const TRANSLATIONS = {
   fr: {
@@ -2487,7 +2487,7 @@ function PoolApp() {
   const [showPaywall, setShowPaywall] = useState(false);
   function openPaywall(source) {
     track("paywall_shown", { source: source || "unknown" });
-    openPaywall();
+    setShowPaywall(true);
   }
   const [showAddPool, setShowAddPool] = useState(false);
   const [lang, setLang] = useState("fr");
@@ -5861,12 +5861,14 @@ const styles = {
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     background: "#f0f6fb",
-    minHeight: "100vh",
+    height: "100vh",
+    height: "100dvh",
     maxWidth: 480,
     margin: "0 auto",
     display: "flex",
     flexDirection: "column",
     color: "#0d2b4e",
+    overflow: "hidden",
   },
   header: {
     display: "flex",
@@ -6013,7 +6015,7 @@ const styles = {
     cursor: "pointer",
     flexShrink: 0,
   },
-  main: { flex: 1, padding: "16px 16px 0", paddingBottom: "calc(90px + env(safe-area-inset-bottom, 0px))", overflowY: "auto" },
+  main: { flex: 1, padding: "16px 16px 24px", overflowY: "auto" },
   sectionRow: {
     display: "flex",
     alignItems: "center",
@@ -6475,10 +6477,8 @@ const styles = {
     flexShrink: 0,
   },
   tabBar: {
-    position: "fixed",
+    position: "sticky",
     bottom: 0,
-    left: "50%",
-    transform: "translateX(-50%)",
     display: "flex",
     background: "#ffffff",
     borderTop: "1px solid #e6ebe9",
@@ -6486,8 +6486,8 @@ const styles = {
     width: "100%",
     alignItems: "center",
     zIndex: 100,
-    paddingBottom: "env(safe-area-inset-bottom, 0px)",
     boxShadow: "0 -1px 8px rgba(10,110,189,0.06)",
+    flexShrink: 0,
   },
   tabVersion: {
     textAlign: "center",
