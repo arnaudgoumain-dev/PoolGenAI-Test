@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.0";
+const APP_VERSION = "1.2";
 
 const TRANSLATIONS = {
   fr: {
@@ -52,6 +52,20 @@ const TRANSLATIONS = {
     no_history: "Pas encore d'historique",
     no_history_sub: "Tes mesures apparaîtront ici au fil du temps.",
     report: "Rapport",
+    time_col: "Horaire",
+    advised_col: "Conseillé",
+    applied_col: "Appliqué",
+    disclaimer_title: "Mentions légales & Conditions d'utilisation",
+    disclaimer_cgu: "J'accepte les conditions générales d'utilisation et la politique de confidentialité",
+    disclaimer_data: "J'accepte que mes données de traitement (mesures, produits, photos) soient collectées et potentiellement partagées avec des partenaires du secteur piscine/spa à des fins d'amélioration des analyses",
+    disclaimer_required: "L'acceptation des CGU est obligatoire pour utiliser PoolApp",
+    disclaimer_pro: "Les professionnels utilisant PoolApp pour des prestations réalisées pour le compte de tiers sont tenus de faire valider aux propriétaires des bassins traités la collecte de données par l'éditeur.",
+    revoke_data_consent: "Révoquer le consentement données",
+    revoke_data_confirm: "Ton consentement a été révoqué. Tes données ne seront plus partagées.",
+    pool_email: "Email rapport PDF",
+    pool_email_placeholder: "contact@exemple.com",
+    pool_settings_title: "Paramètres du bassin",
+    edit_pool: "Modifier le bassin",
     generate_report: "Générer le rapport de ce bassin",
     report_locked: "Rapport PDF réservé à la version illimitée",
     report_desc: "Le rapport reprend l'historique des mesures, les conseils donnés et les quantités réellement appliquées pour ce bassin.",
@@ -117,6 +131,29 @@ const TRANSLATIONS = {
     validate_btn: "Valider",
     stock_empty: "Stock épuisé pour ce produit.",
     add_arrow: "Ajouter →",
+    // Wizard traitement
+    wizard_title: "Plan de traitement",
+    wizard_step: "Étape",
+    wizard_of: "sur",
+    wizard_now: "Maintenant",
+    wizard_in: "Dans",
+    wizard_at: "à",
+    wizard_scheduled: "Prévu",
+    wizard_done: "C'est fait",
+    wizard_skip: "Passer cette étape",
+    wizard_anticipate: "Appliquer maintenant",
+    wizard_finish: "Terminer le plan",
+    wizard_reminder: "Te rappeler la prochaine étape ?",
+    wizard_reminder_yes: "Oui, me rappeler",
+    wizard_reminder_no: "Non merci",
+    wizard_next_step: "Prochaine étape",
+    wizard_start: "Démarrer le plan",
+    wizard_resume: "Reprendre le plan",
+    wizard_completed: "Plan de traitement terminé ✓",
+    wizard_partial: "Plan en cours",
+    countdown_done: "C'est l'heure !",
+    treatment_at: "Traitement appliqué à",
+    treatment_skipped: "Étape passée",
     // Settings
     settings_title: "Réglages",
     my_pools: "Mes bassins",
@@ -350,6 +387,20 @@ const TRANSLATIONS = {
     no_history: "No history yet",
     no_history_sub: "Your readings will appear here over time.",
     report: "Report",
+    time_col: "Time",
+    advised_col: "Advised",
+    applied_col: "Applied",
+    disclaimer_title: "Legal Notice & Terms of Use",
+    disclaimer_cgu: "I accept the terms of use and privacy policy",
+    disclaimer_data: "I agree that my treatment data (measurements, products, photos) may be collected and potentially shared with pool/spa industry partners for analysis improvement purposes",
+    disclaimer_required: "Accepting the Terms of Use is required to use PoolApp",
+    disclaimer_pro: "Professionals using PoolApp for services performed on behalf of third parties must obtain the pool owners' consent for data collection by the publisher.",
+    revoke_data_consent: "Revoke data consent",
+    revoke_data_confirm: "Your consent has been revoked. Your data will no longer be shared.",
+    pool_email: "PDF report email",
+    pool_email_placeholder: "contact@example.com",
+    pool_settings_title: "Pool settings",
+    edit_pool: "Edit pool",
     generate_report: "Generate pool report",
     report_locked: "PDF report reserved for unlimited version",
     report_desc: "The report includes the reading history, advice given and quantities actually applied for this pool.",
@@ -411,6 +462,29 @@ const TRANSLATIONS = {
     validate_btn: "Submit",
     stock_empty: "This product is out of stock.",
     add_arrow: "Add →",
+    // Wizard traitement
+    wizard_title: "Treatment plan",
+    wizard_step: "Step",
+    wizard_of: "of",
+    wizard_now: "Now",
+    wizard_in: "In",
+    wizard_at: "at",
+    wizard_scheduled: "Scheduled",
+    wizard_done: "Done",
+    wizard_skip: "Skip this step",
+    wizard_anticipate: "Apply now",
+    wizard_finish: "Finish plan",
+    wizard_reminder: "Remind me for next step?",
+    wizard_reminder_yes: "Yes, remind me",
+    wizard_reminder_no: "No thanks",
+    wizard_next_step: "Next step",
+    wizard_start: "Start plan",
+    wizard_resume: "Resume plan",
+    wizard_completed: "Treatment plan completed ✓",
+    wizard_partial: "Plan in progress",
+    countdown_done: "Time to treat!",
+    treatment_at: "Treatment applied at",
+    treatment_skipped: "Step skipped",
     settings_title: "Settings",
     my_pools: "My pools",
     pool_name: "Pool name",
@@ -638,6 +712,20 @@ const TRANSLATIONS = {
     no_history: "Noch kein Verlauf",
     no_history_sub: "Deine Messungen werden hier im Laufe der Zeit angezeigt.",
     report: "Bericht",
+    time_col: "Uhrzeit",
+    advised_col: "Empfohlen",
+    applied_col: "Angewendet",
+    disclaimer_title: "Rechtliche Hinweise & Nutzungsbedingungen",
+    disclaimer_cgu: "Ich akzeptiere die Nutzungsbedingungen und Datenschutzrichtlinie",
+    disclaimer_data: "Ich stimme zu, dass meine Behandlungsdaten (Messungen, Produkte, Fotos) gesammelt und möglicherweise mit Partnern der Pool/Spa-Branche geteilt werden",
+    disclaimer_required: "Die Annahme der Nutzungsbedingungen ist erforderlich",
+    disclaimer_pro: "Fachleute, die PoolApp für Dienstleistungen im Auftrag Dritter verwenden, müssen die Zustimmung der Beckeneigentümer zur Datenerhebung einholen.",
+    revoke_data_consent: "Datenzustimmung widerrufen",
+    revoke_data_confirm: "Ihre Zustimmung wurde widerrufen.",
+    pool_email: "PDF-Bericht E-Mail",
+    pool_email_placeholder: "kontakt@beispiel.de",
+    pool_settings_title: "Beckeneinstellungen",
+    edit_pool: "Becken bearbeiten",
     generate_report: "Beckenbericht erstellen",
     report_locked: "PDF-Bericht nur in der unbegrenzten Version",
     report_desc: "Der Bericht enthält den Messverlauf, gegebene Ratschläge und tatsächlich angewendete Mengen.",
@@ -699,6 +787,28 @@ const TRANSLATIONS = {
     validate_btn: "Bestätigen",
     stock_empty: "Dieses Produkt ist nicht mehr auf Lager.",
     add_arrow: "Hinzufügen →",
+    wizard_title: "Behandlungsplan",
+    wizard_step: "Schritt",
+    wizard_of: "von",
+    wizard_now: "Jetzt",
+    wizard_in: "In",
+    wizard_at: "um",
+    wizard_scheduled: "Geplant",
+    wizard_done: "Erledigt",
+    wizard_skip: "Schritt überspringen",
+    wizard_anticipate: "Jetzt anwenden",
+    wizard_finish: "Plan beenden",
+    wizard_reminder: "Nächsten Schritt erinnern?",
+    wizard_reminder_yes: "Ja, erinnern",
+    wizard_reminder_no: "Nein danke",
+    wizard_next_step: "Nächster Schritt",
+    wizard_start: "Plan starten",
+    wizard_resume: "Plan fortsetzen",
+    wizard_completed: "Behandlungsplan abgeschlossen ✓",
+    wizard_partial: "Plan läuft",
+    countdown_done: "Zeit für die Behandlung!",
+    treatment_at: "Behandlung angewendet um",
+    treatment_skipped: "Schritt übersprungen",
     settings_title: "Einstellungen",
     my_pools: "Meine Becken",
     pool_name: "Beckenname",
@@ -926,6 +1036,20 @@ const TRANSLATIONS = {
     no_history: "Ancora nessuno storico",
     no_history_sub: "Le tue misurazioni appariranno qui nel tempo.",
     report: "Rapporto",
+    time_col: "Orario",
+    advised_col: "Consigliato",
+    applied_col: "Applicato",
+    disclaimer_title: "Note legali & Condizioni d'uso",
+    disclaimer_cgu: "Accetto i termini di utilizzo e la politica sulla privacy",
+    disclaimer_data: "Acconsento alla raccolta dei miei dati di trattamento e alla possibile condivisione con partner del settore piscine/spa",
+    disclaimer_required: "L'accettazione dei termini è obbligatoria",
+    disclaimer_pro: "I professionisti che utilizzano PoolApp per conto di terzi devono ottenere il consenso dei proprietari delle vasche.",
+    revoke_data_consent: "Revoca consenso dati",
+    revoke_data_confirm: "Il tuo consenso è stato revocato.",
+    pool_email: "Email rapporto PDF",
+    pool_email_placeholder: "contatto@esempio.it",
+    pool_settings_title: "Impostazioni vasca",
+    edit_pool: "Modifica vasca",
     generate_report: "Genera rapporto della vasca",
     report_locked: "Rapporto PDF riservato alla versione illimitata",
     report_desc: "Il rapporto include lo storico delle misurazioni, i consigli dati e le quantità effettivamente applicate.",
@@ -987,6 +1111,28 @@ const TRANSLATIONS = {
     validate_btn: "Valida",
     stock_empty: "Stock esaurito per questo prodotto.",
     add_arrow: "Aggiungi →",
+    wizard_title: "Piano di trattamento",
+    wizard_step: "Passo",
+    wizard_of: "di",
+    wizard_now: "Adesso",
+    wizard_in: "Tra",
+    wizard_at: "alle",
+    wizard_scheduled: "Previsto",
+    wizard_done: "Fatto",
+    wizard_skip: "Salta questo passo",
+    wizard_anticipate: "Applica ora",
+    wizard_finish: "Termina piano",
+    wizard_reminder: "Ricordarmi il prossimo passo?",
+    wizard_reminder_yes: "Sì, ricordami",
+    wizard_reminder_no: "No grazie",
+    wizard_next_step: "Prossimo passo",
+    wizard_start: "Avvia piano",
+    wizard_resume: "Riprendi piano",
+    wizard_completed: "Piano di trattamento completato ✓",
+    wizard_partial: "Piano in corso",
+    countdown_done: "È ora di trattare!",
+    treatment_at: "Trattamento applicato alle",
+    treatment_skipped: "Passo saltato",
     settings_title: "Impostazioni",
     my_pools: "Le mie vasche",
     pool_name: "Nome vasca",
@@ -1214,6 +1360,20 @@ const TRANSLATIONS = {
     no_history: "Sin historial aún",
     no_history_sub: "Tus mediciones aparecerán aquí con el tiempo.",
     report: "Informe",
+    time_col: "Hora",
+    advised_col: "Aconsejado",
+    applied_col: "Aplicado",
+    disclaimer_title: "Aviso legal & Condiciones de uso",
+    disclaimer_cgu: "Acepto los términos de uso y la política de privacidad",
+    disclaimer_data: "Acepto que mis datos de tratamiento sean recopilados y compartidos con socios del sector piscinas/spa",
+    disclaimer_required: "La aceptación de los términos es obligatoria",
+    disclaimer_pro: "Los profesionales que usen PoolApp para servicios a terceros deben obtener el consentimiento de los propietarios de las piscinas.",
+    revoke_data_consent: "Revocar consentimiento de datos",
+    revoke_data_confirm: "Tu consentimiento ha sido revocado.",
+    pool_email: "Email informe PDF",
+    pool_email_placeholder: "contacto@ejemplo.es",
+    pool_settings_title: "Configuración de la piscina",
+    edit_pool: "Editar piscina",
     generate_report: "Generar informe de la piscina",
     report_locked: "Informe PDF reservado para versión ilimitada",
     report_desc: "El informe incluye el historial de mediciones, consejos dados y cantidades realmente aplicadas.",
@@ -1275,6 +1435,28 @@ const TRANSLATIONS = {
     validate_btn: "Validar",
     stock_empty: "Stock agotado para este producto.",
     add_arrow: "Añadir →",
+    wizard_title: "Plan de tratamiento",
+    wizard_step: "Paso",
+    wizard_of: "de",
+    wizard_now: "Ahora",
+    wizard_in: "En",
+    wizard_at: "a las",
+    wizard_scheduled: "Programado",
+    wizard_done: "Hecho",
+    wizard_skip: "Saltar este paso",
+    wizard_anticipate: "Aplicar ahora",
+    wizard_finish: "Terminar plan",
+    wizard_reminder: "¿Recordarme el siguiente paso?",
+    wizard_reminder_yes: "Sí, recordarme",
+    wizard_reminder_no: "No gracias",
+    wizard_next_step: "Siguiente paso",
+    wizard_start: "Iniciar plan",
+    wizard_resume: "Reanudar plan",
+    wizard_completed: "Plan de tratamiento completado ✓",
+    wizard_partial: "Plan en curso",
+    countdown_done: "¡Es hora de tratar!",
+    treatment_at: "Tratamiento aplicado a las",
+    treatment_skipped: "Paso omitido",
     settings_title: "Ajustes",
     my_pools: "Mis piscinas",
     pool_name: "Nombre de la piscina",
@@ -1502,6 +1684,20 @@ const TRANSLATIONS = {
     no_history: "Ainda sem histórico",
     no_history_sub: "Suas medições aparecerão aqui ao longo do tempo.",
     report: "Relatório",
+    time_col: "Horário",
+    advised_col: "Aconselhado",
+    applied_col: "Aplicado",
+    disclaimer_title: "Aviso legal & Termos de uso",
+    disclaimer_cgu: "Aceito os termos de uso e a política de privacidade",
+    disclaimer_data: "Concordo que meus dados de tratamento sejam coletados e compartilhados com parceiros do setor de piscinas/spa",
+    disclaimer_required: "A aceitação dos termos é obrigatória",
+    disclaimer_pro: "Os profissionais que usam o PoolApp para serviços prestados a terceiros devem obter o consentimento dos proprietários das piscinas.",
+    revoke_data_consent: "Revogar consentimento de dados",
+    revoke_data_confirm: "Seu consentimento foi revogado.",
+    pool_email: "Email relatório PDF",
+    pool_email_placeholder: "contato@exemplo.com.br",
+    pool_settings_title: "Configurações da piscina",
+    edit_pool: "Editar piscina",
     generate_report: "Gerar relatório da piscina",
     report_locked: "Relatório PDF reservado para versão ilimitada",
     report_desc: "O relatório inclui o histórico de medições, conselhos dados e quantidades realmente aplicadas.",
@@ -1563,6 +1759,28 @@ const TRANSLATIONS = {
     validate_btn: "Validar",
     stock_empty: "Estoque esgotado para este produto.",
     add_arrow: "Adicionar →",
+    wizard_title: "Plano de tratamento",
+    wizard_step: "Passo",
+    wizard_of: "de",
+    wizard_now: "Agora",
+    wizard_in: "Em",
+    wizard_at: "às",
+    wizard_scheduled: "Previsto",
+    wizard_done: "Feito",
+    wizard_skip: "Pular este passo",
+    wizard_anticipate: "Aplicar agora",
+    wizard_finish: "Terminar plano",
+    wizard_reminder: "Lembrar do próximo passo?",
+    wizard_reminder_yes: "Sim, lembrar",
+    wizard_reminder_no: "Não, obrigado",
+    wizard_next_step: "Próximo passo",
+    wizard_start: "Iniciar plano",
+    wizard_resume: "Retomar plano",
+    wizard_completed: "Plano de tratamento concluído ✓",
+    wizard_partial: "Plano em andamento",
+    countdown_done: "Hora do tratamento!",
+    treatment_at: "Tratamento aplicado às",
+    treatment_skipped: "Passo ignorado",
     settings_title: "Configurações",
     my_pools: "Minhas piscinas",
     pool_name: "Nome da piscina",
@@ -1971,6 +2189,9 @@ const STORAGE_KEYS = {
   applications: "pool:applications",
   apiKey: "pool:apiKey",
   apiProvider: "pool:apiProvider",
+  activePlan: "pool:activePlan",
+  gdprConsent: "pool:gdprConsent",
+  dataConsent: "pool:dataConsent",
 };
 
 // ---------- Helpers ----------
@@ -2263,15 +2484,17 @@ function track(event, params) {
   try { window._fbLog && window._fbLog(event, params); } catch (e) {}
 }
 
-function LoginScreen({ lang, onSkip }) {
-  const t = useT(lang || "fr");
-  const [mode, setMode] = useState("login"); // login | signup | reset | done
+function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
+  const t = useT(lang || detectedLang || "fr");
+  const [mode, setMode] = useState("login"); // login | signup | reset | done | disclaimer
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [pwd2, setPwd2] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
+  const [cguAccepted, setCguAccepted] = useState(false);
+  const [dataAccepted, setDataAccepted] = useState(false);
 
   const firebaseReady = FB.ready();
 
@@ -2297,6 +2520,7 @@ function LoginScreen({ lang, onSkip }) {
         if (!email.trim()) { setError(t("error_email_required")); setBusy(false); return; }
         if (pwd.length < 6) { setError(t("weak_password")); setBusy(false); return; }
         if (pwd !== pwd2) { setError(t("error_pwd_mismatch")); setBusy(false); return; }
+        if (!cguAccepted) { setError(t("disclaimer_required")); setBusy(false); return; }
         const cred = await FB.signUp(email, pwd);
         track("sign_up", { method: "email" });
         // Envoie l'email de vérification
@@ -2306,7 +2530,12 @@ function LoginScreen({ lang, onSkip }) {
           email: cred.user.email,
           createdAt: new Date().toISOString(),
           isPremium: false,
+          gdprConsent: true,
+          gdprConsentDate: new Date().toISOString(),
+          dataConsent: dataAccepted,
+          dataConsentDate: dataAccepted ? new Date().toISOString() : null,
         }).catch(() => {});
+        if (onConsentChange) onConsentChange({ gdpr: true, data: dataAccepted });
         setMode("done");
         // onAuthStateChanged se déclenchera et appellera onSuccess via PoolApp
       } else {
@@ -2322,6 +2551,101 @@ function LoginScreen({ lang, onSkip }) {
         : e.message;
       setError(msg);
     } finally { setBusy(false); }
+  }
+
+  // Écran disclaimer
+  if (mode === "disclaimer") {
+    const tDisc = t; // t est déjà défini via useT au dessus
+    const disclaimerText = {
+      fr: `AVIS DE NON-RESPONSABILITÉ — POOLAPP
+Éditeur : Arnaud Goumain — Version ${APP_VERSION}
+
+1. NATURE DE L'APPLICATION
+PoolApp est un outil d'aide à la gestion de la chimie de piscine à usage personnel. Les recommandations générées sont automatiques et ne constituent pas un avis professionnel.
+
+2. LIMITATION DE RESPONSABILITÉ
+L'éditeur décline toute responsabilité pour tout dommage résultant de l'application de traitements chimiques, erreur de dosage, réaction chimique ou dysfonctionnement de l'application.
+
+3. RESPONSABILITÉ DE L'UTILISATEUR
+L'utilisateur est seul responsable de la vérification des dosages, du respect des notices d'utilisation des produits, des réglementations locales et de la sécurité des personnes.
+
+4. PRODUITS CHIMIQUES
+Les produits de traitement peuvent être dangereux. L'utilisateur doit lire les fiches de données de sécurité (FDS) et respecter les précautions prescrites.
+
+5. COLLECTE DE DONNÉES
+PoolApp collecte les données de traitement (mesures, produits utilisés, photos) afin d'affiner les analyses et recommandations. Ces données peuvent être exploitées et revendues par l'éditeur à des organisations du secteur du traitement de l'eau (piscines, spas, équipements et produits de traitement). Le consentement à la collecte est optionnel et révocable à tout moment depuis les Réglages.
+
+6. DONNÉES IA
+Les analyses photo par intelligence artificielle sont indicatives. L'utilisateur doit vérifier les valeurs par des méthodes certifiées avant tout traitement.
+
+7. USAGE RÉSERVÉ
+L'utilisation de PoolApp est réservée aux traitements d'eau de bassins de type piscine ou spa. Tout autre usage est exclu.
+
+8. PROFESSIONNELS
+Les professionnels utilisant PoolApp pour des prestations réalisées pour le compte de tiers sont tenus de faire valider aux propriétaires desdits bassins la collecte par l'éditeur des données de traitement.
+
+9. ABSENCE DE GARANTIE
+L'application est fournie "en l'état", sans garantie d'exactitude, de fiabilité ou d'adéquation à un usage particulier.
+
+En créant un compte, l'utilisateur reconnaît avoir pris connaissance du présent avis et en accepte les termes.`,
+      en: `DISCLAIMER — POOLAPP
+Publisher: Arnaud Goumain — Version ${APP_VERSION}
+
+1. NATURE OF THE APPLICATION
+PoolApp is a personal pool chemistry management tool. Generated recommendations are automatic and do not constitute professional advice.
+
+2. LIMITATION OF LIABILITY
+The publisher disclaims all liability for any damage resulting from chemical treatments, dosage errors, chemical reactions or application malfunctions.
+
+3. USER RESPONSIBILITY
+The user is solely responsible for verifying dosages, following product instructions, complying with local regulations and ensuring the safety of persons.
+
+4. CHEMICAL PRODUCTS
+Treatment products may be hazardous. The user must read safety data sheets (SDS) and follow prescribed precautions.
+
+5. DATA COLLECTION
+PoolApp collects treatment data (measurements, products, photos) to improve analysis and recommendations. This data may be used and sold by the publisher to pool/spa industry organizations. Consent is optional and revocable at any time from Settings.
+
+6. AI DATA
+Photo analysis by AI is indicative. Users must verify values by certified methods before any treatment.
+
+7. PERMITTED USE
+PoolApp is intended exclusively for pool and spa water treatment. Any other use is excluded.
+
+8. PROFESSIONALS
+Professionals using PoolApp for services on behalf of third parties must obtain the pool owners' consent for data collection by the publisher.
+
+9. NO WARRANTY
+The application is provided "as is" without warranty of accuracy, reliability or fitness for a particular purpose.
+
+By creating an account, the user acknowledges having read and accepted these terms.`,
+    };
+    const text = disclaimerText[detectedLang || lang] || disclaimerText.en;
+    return (
+      <div style={{ minHeight: "100vh", background: "#eaf4fb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <div style={{ width: "100%", maxWidth: 480, background: "#fff", borderRadius: 20, padding: 24, boxShadow: "0 4px 24px #0a6ebd18", maxHeight: "90dvh", display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: "#0d2b4e" }}>{tDisc("disclaimer_title")}</div>
+            <button onClick={() => setMode("signup")} style={{ background: "none", border: "none", cursor: "pointer", color: "#6a7d90" }}><X size={20} /></button>
+          </div>
+          <div style={{ flex: 1, overflowY: "auto", fontSize: 12, color: "#2d4a6e", lineHeight: 1.7, whiteSpace: "pre-wrap", background: "#f5f8fc", borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
+            {text}
+          </div>
+          <button
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+            onClick={() => { setCguAccepted(true); setMode("signup"); }}
+          >
+            {tDisc("disclaimer_cgu")}
+          </button>
+          <button
+            onClick={() => setMode("signup")}
+            style={{ background: "none", border: "none", color: "#9ab0c4", fontSize: 12, cursor: "pointer", marginTop: 10, textAlign: "center" }}
+          >
+            {tDisc("back_to_login")}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Écran de succès après inscription
@@ -2426,6 +2750,43 @@ function LoginScreen({ lang, onSkip }) {
               </>
             )}
 
+            {/* Cases consentement — uniquement en mode signup */}
+            {mode === "signup" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14, padding: "12px 14px", background: "#f5f8fc", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+                {/* CGU — obligatoire */}
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={cguAccepted}
+                    onChange={e => setCguAccepted(e.target.checked)}
+                    style={{ marginTop: 2, accentColor: "#0a6ebd", width: 16, height: 16, flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 12, color: "#0d2b4e", lineHeight: 1.5 }}>
+                    <strong>{t("disclaimer_cgu")}</strong>
+                    {" "}<span
+                      style={{ color: "#0a6ebd", textDecoration: "underline", cursor: "pointer" }}
+                      onClick={e => { e.preventDefault(); setMode("disclaimer"); }}
+                    >{t("disclaimer_title")}</span>
+                  </span>
+                </label>
+                {/* Données — optionnel */}
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={dataAccepted}
+                    onChange={e => setDataAccepted(e.target.checked)}
+                    style={{ marginTop: 2, accentColor: "#0a6ebd", width: 16, height: 16, flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 12, color: "#4a6480", lineHeight: 1.5 }}>
+                    {t("disclaimer_data")}
+                  </span>
+                </label>
+                <div style={{ fontSize: 10, color: "#9ab0c4", fontStyle: "italic" }}>
+                  {t("disclaimer_pro")}
+                </div>
+              </div>
+            )}
+
             {error && <div style={{ fontSize: 12, color: "#c0392b", marginBottom: 8, padding: "8px 10px", background: "#fdf0ef", borderRadius: 8 }}>{error}</div>}
             {info && <div style={{ fontSize: 12, color: "#1a8fd1", marginBottom: 8, padding: "8px 10px", background: "#e8f4fd", borderRadius: 8 }}>{info}</div>}
 
@@ -2494,6 +2855,15 @@ function PoolApp() {
   const [isPremium, setIsPremium] = useState(false);
   const [applications, setApplications] = useState([]);
   const [validatingMeasure, setValidatingMeasure] = useState(null);
+  const [activePlan, setActivePlan] = useState(null); // { measureId, steps: [{...rec, appliedAt, skipped, scheduledAt}], currentStepIdx }
+  const [showWizard, setShowWizard] = useState(false);
+  const [gdprConsent, setGdprConsent] = useState(false);
+  const [dataConsent, setDataConsent] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const detectedLang = (() => {
+    const nav = (navigator.language || navigator.userLanguage || "fr").toLowerCase().slice(0, 2);
+    return ["fr","en","de","it","es","pt"].includes(nav) ? nav : "fr";
+  })();
   const [validatingSelectedRecs, setValidatingSelectedRecs] = useState(null);
   const [showReport, setShowReport] = useState(false);
   const [apiKey, setApiKey] = useState("");
@@ -2620,6 +2990,12 @@ function PoolApp() {
       }
 
       try {
+        const pl2 = await window.storage.get(STORAGE_KEYS.activePlan);
+        if (pl2?.value) { try { setActivePlan(JSON.parse(pl2.value)); } catch(e){} }
+        const gc = await window.storage.get(STORAGE_KEYS.gdprConsent);
+        if (gc?.value === "true") setGdprConsent(true);
+        const dc = await window.storage.get(STORAGE_KEYS.dataConsent);
+        if (dc?.value === "true") setDataConsent(true);
         const pr = await window.storage.get(STORAGE_KEYS.premium);
         if (pr?.value) setIsPremium(JSON.parse(pr.value) === true);
       } catch (e) {}
@@ -2680,6 +3056,21 @@ function PoolApp() {
 
   useEffect(() => {
     if (!loaded) return;
+    window.storage.set(STORAGE_KEYS.activePlan, JSON.stringify(activePlan)).catch(() => {});
+  }, [activePlan, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    window.storage.set(STORAGE_KEYS.gdprConsent, String(gdprConsent)).catch(() => {});
+  }, [gdprConsent, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    window.storage.set(STORAGE_KEYS.dataConsent, String(dataConsent)).catch(() => {});
+  }, [dataConsent, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
     window.storage.set(STORAGE_KEYS.apiKey, JSON.stringify(apiKey)).catch(() => {});
   }, [apiKey, loaded]);
 
@@ -2725,14 +3116,15 @@ function PoolApp() {
   const latest = sortedMeasures[0] || null;
   const blockedByLimit = !isPremium && hasMeasureToday(measures);
 
+  const tFn = (key, vars) => {
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
+    let str = dict[key] || TRANSLATIONS.fr[key] || key;
+    if (vars) Object.keys(vars).forEach(k => { str = str.replace(`{${k}}`, vars[k]); });
+    return str;
+  };
+
   const validatingMeasureRecs = useMemo(() => {
     if (!validatingMeasure) return [];
-    const tFn = (key, vars) => {
-      const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
-      let str = dict[key] || TRANSLATIONS.fr[key] || key;
-      if (vars) Object.keys(vars).forEach(k => { str = str.replace(`{${k}}`, vars[k]); });
-      return str;
-    };
     return computeRecommendations(validatingMeasure, activePool?.volume || 0, poolProducts, effectiveTargets, activeParamKeys, tFn);
   }, [validatingMeasure, activePool, poolProducts, effectiveTargets, activeParamKeys, lang]);
 
@@ -2763,8 +3155,7 @@ function PoolApp() {
 
   function saveApplication(measureId, steps, allApplied) {
     track("treatment_applied", { steps_count: steps.length, all_applied: allApplied });
-    // Déduire le stock consommé pour chaque produit utilisé, qu'il soit appliqué partiellement ou totalement
-    const stepsWithAmount = steps.filter((s) => s.appliedAmount);
+    const stepsWithAmount = steps.filter((s) => s.appliedAmount && !s.skipped);
     if (stepsWithAmount.length > 0) {
       setProducts((prev) => prev.map((prod) => {
         const step = stepsWithAmount.find((s) => s.productName === prod.name);
@@ -2788,11 +3179,93 @@ function PoolApp() {
           measureId,
           appliedAt: new Date().toISOString(),
           allApplied: !!allApplied,
-          steps,
+          steps, // chaque step a son propre appliedAt et skipped
         },
       ];
     });
     setValidatingMeasure(null);
+  }
+
+  // Démarre le wizard pour une mesure donnée
+  function startPlan(measureId, recs) {
+    const now = new Date();
+    let cumulatedMs = 0;
+    const steps = recs.map((r, i) => {
+      const scheduledAt = new Date(now.getTime() + cumulatedMs).toISOString();
+      cumulatedMs += (r.waitHours || 0) * 3600 * 1000;
+      return {
+        ...r,
+        stepIndex: i,
+        scheduledAt,
+        appliedAt: null,
+        skipped: false,
+        appliedAmount: r.computedDoseAmount,
+      };
+    });
+    setActivePlan({ measureId, steps, currentStepIdx: 0 });
+  }
+
+  // Valide une étape du wizard — version sans appel de setter dans setter
+  function applyWizardStep(stepIdx, amount) {
+    if (!activePlan) return;
+    const now = new Date().toISOString();
+    const newSteps = activePlan.steps.map((s, i) => {
+      if (i !== stepIdx) return s;
+      return { ...s, appliedAt: now, appliedAmount: amount, skipped: false };
+    });
+    // Recalculer les scheduledAt des étapes suivantes
+    let lastApplied = new Date(now);
+    const recalcSteps = newSteps.map((s, i) => {
+      if (i < stepIdx) return s;
+      if (i === stepIdx) { lastApplied = new Date(now); return s; }
+      const scheduled = new Date(lastApplied.getTime() + (newSteps[i-1]?.waitHours || 0) * 3600 * 1000);
+      lastApplied = scheduled;
+      return { ...s, scheduledAt: scheduled.toISOString() };
+    });
+    // Trouver la prochaine étape non traitée
+    let nextIdx = stepIdx + 1;
+    while (nextIdx < recalcSteps.length && (recalcSteps[nextIdx].appliedAt || recalcSteps[nextIdx].skipped)) nextIdx++;
+    const allDone = nextIdx >= recalcSteps.length;
+    const finalSteps = recalcSteps.map(s => ({
+      action: s.action, title: s.title, productName: s.productName,
+      appliedAmount: s.appliedAmount, doseUnit: s.doseUnit,
+      appliedAt: s.appliedAt, skipped: s.skipped, scheduledAt: s.scheduledAt,
+    }));
+    if (allDone) {
+      const applied = finalSteps.filter(s => !s.skipped && s.appliedAt);
+      saveApplication(activePlan.measureId, finalSteps, applied.length === finalSteps.length);
+      setActivePlan(null);
+      setShowWizard(false);
+    } else {
+      setActivePlan({ ...activePlan, steps: recalcSteps, currentStepIdx: nextIdx });
+    }
+  }
+
+  // Passe une étape
+  function skipWizardStep(stepIdx) {
+    if (!activePlan) return;
+    const newSteps = activePlan.steps.map((s, i) =>
+      i === stepIdx ? { ...s, skipped: true, appliedAt: new Date().toISOString() } : s
+    );
+    let nextIdx = stepIdx + 1;
+    while (nextIdx < newSteps.length && (newSteps[nextIdx].appliedAt || newSteps[nextIdx].skipped)) nextIdx++;
+    const finalSteps = newSteps.map(s => ({
+      action: s.action, title: s.title, productName: s.productName,
+      appliedAmount: s.appliedAmount, doseUnit: s.doseUnit,
+      appliedAt: s.appliedAt, skipped: s.skipped, scheduledAt: s.scheduledAt,
+    }));
+    if (nextIdx >= newSteps.length) {
+      saveApplication(activePlan.measureId, finalSteps, false);
+      setActivePlan(null);
+      setShowWizard(false);
+    } else {
+      setActivePlan({ ...activePlan, steps: newSteps, currentStepIdx: nextIdx });
+    }
+  }
+
+  // Abandonne le wizard sans sauvegarder
+  function cancelPlan() {
+    setActivePlan(null);
   }
 
   function saveProduct(p) {
@@ -2839,9 +3312,15 @@ function PoolApp() {
       openPaywall();
       return;
     }
-    setValidatingMeasure(m);
-    if (selectedRecsOverride) setValidatingSelectedRecs({ selected: selectedRecsOverride, adjustMode: !!adjustMode });
-    else setValidatingSelectedRecs(null);
+    // Si plan déjà en cours pour cette mesure, reprendre
+    if (activePlan && activePlan.measureId === m.id) {
+      setShowWizard(true);
+      return;
+    }
+    // Sinon démarrer un nouveau plan
+    const recs = recsOverride || computeRecommendations(m, activePool?.volume || 0, poolProducts, effectiveTargets, activeParamKeys, tFn);
+    startPlan(m.id, recs);
+    setShowWizard(true);
   }
 
   function addPool(pool) {
@@ -2925,6 +3404,8 @@ function PoolApp() {
             recentMeasures={sortedMeasures}
             effectiveTargets={effectiveTargets}
             activeParamKeys={activeParamKeys}
+            activePlan={activePlan}
+            onResumePlan={() => setShowWizard(true)}
           />
         )}
         {tab === "history" && (
@@ -3012,6 +3493,13 @@ function PoolApp() {
             setApiProvider={setApiProvider}
             lang={lang}
             setLang={setLang}
+            dataConsent={dataConsent}
+            onRevokeDataConsent={() => {
+              setDataConsent(false);
+              if (authUser?.uid) {
+                FB.saveUser(authUser.uid, { dataConsent: false, dataConsentDate: null }).catch(() => {});
+              }
+            }}
           />
         )}
       </main>
@@ -3080,19 +3568,26 @@ function PoolApp() {
       {showAddPool && (
         <AddPoolModal onClose={() => setShowAddPool(false)} onSave={addPool} lang={lang} />
       )}
+      {editingPool && (
+        <AddPoolModal
+          onClose={() => setEditingPool(null)}
+          onSave={(updated) => { updatePool(updated); setEditingPool(null); }}
+          lang={lang}
+          existingPool={editingPool}
+        />
+      )}
 
-      {validatingMeasure && isPremium && (
-        <ValidateApplicationModal
-          measure={validatingMeasure}
-          recs={validatingMeasureRecs}
-          existingApplication={existingApplicationForValidating}
-          onClose={() => { setValidatingMeasure(null); setValidatingSelectedRecs(null); }}
-          onSave={saveApplication}
-          preselected={validatingSelectedRecs}
+      {showWizard && activePlan && isPremium && (
+        <TreatmentWizard
+          plan={activePlan}
           products={poolProducts}
           manageStock={!!activePool?.manageStock}
           lang={lang}
-          onWantAddProduct={() => { setValidatingMeasure(null); setValidatingSelectedRecs(null); setTab("products"); }}
+          onApplyStep={(idx, amount) => { applyWizardStep(idx, amount, false); }}
+          onSkipStep={(idx) => { skipWizardStep(idx); }}
+          onClose={() => { setShowWizard(false); }}
+          onCancel={() => { cancelPlan(); setShowWizard(false); }}
+          onWantAddProduct={() => { setShowWizard(false); setTab("products"); }}
         />
       )}
 
@@ -3235,7 +3730,7 @@ function TabBar({ tab, setTab, lang }) {
 }
 
 // ---------- Dashboard ----------
-function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang }) {
+function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang, activePlan, onResumePlan }) {
   const t = useT(lang);
   const [aiComment, setAiComment] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -3389,40 +3884,31 @@ Réponds directement en français, sans titre ni introduction.`;
           ))}
 
           {(() => {
-            const selectedCount = Object.values(selectedRecs).filter(Boolean).length;
-            return applicationForLatest ? (
-              <div style={styles.applyConfirmedCard}>
-                <CheckCircle2 size={16} color="#1a8fd1" />
-                <span style={{ flex: 1 }}>
-                  {t("advice_applied")} {applicationForLatest.allApplied ? "" : t("advice_partial")}{" "}
-                  le {formatDate(applicationForLatest.appliedAt)}
-                </span>
-                <button style={styles.editLinkBtn} onClick={() => {
-                  const sel = {};
-                  recs.forEach((r, i) => {
-                    sel[i] = applicationForLatest.steps?.some((s) => s.action === r.action) ?? true;
-                  });
-                  onValidateApplication(latest, recs, sel, true);
-                }}>
-                  {t("adjust")}
-                </button>
-              </div>
-            ) : (
+            const planForLatest = activePlan && latest && activePlan.measureId === latest.id ? activePlan : null;
+            if (applicationForLatest && !planForLatest) {
+              return (
+                <div style={styles.applyConfirmedCard}>
+                  <CheckCircle2 size={16} color="#1a8fd1" />
+                  <span style={{ flex: 1 }}>
+                    {applicationForLatest.allApplied ? t("wizard_completed") : t("wizard_partial")}
+                  </span>
+                </div>
+              );
+            }
+            if (planForLatest) {
+              return <PlanStatusCard plan={planForLatest} onResume={onResumePlan} lang={lang} />;
+            }
+            return (
               <div>
                 <button
-                  style={{ ...styles.validateApplyBtn, opacity: selectedCount === 0 ? 0.5 : 1 }}
-                  disabled={selectedCount === 0}
-                  onClick={() => {
-                    if (selectedCount === 0) return;
-                    onValidateApplication(latest, recs, selectedRecs);
-                  }}
+                  style={styles.validateApplyBtn}
+                  onClick={() => onValidateApplication(latest, recs)}
                 >
-                  <CheckCircle2 size={16} /> {t("apply_advice")}
-                  {selectedCount > 0 && ` (${selectedCount})`}
+                  <CheckCircle2 size={16} /> {t("wizard_start")}
                   {!isPremium && <Lock size={14} style={{ marginLeft: 4 }} />}
                 </button>
                 <p style={{ ...styles.helpTextSmall, marginTop: 6, textAlign: "center" }}>
-                  {t("apply_advice_sub")}
+                  {t("follow_order")}
                 </p>
               </div>
             );
@@ -4105,19 +4591,41 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
           {measure.note && <div style={styles.measureNote}>{measure.note}</div>}
 
           {application ? (
-            <div style={styles.applyConfirmedCard}>
-              <CheckCircle2 size={16} color="#1a8fd1" />
-              <span style={{ flex: 1 }}>
-                {t("advice_applied")} {application.allApplied ? "" : t("advice_partial")} le{" "}
-                {formatDate(application.appliedAt)}
-              </span>
-              <button style={styles.editLinkBtn} onClick={onValidateApplication}>
-                {t("adjust")}
-              </button>
+            <div style={{ marginTop: 8 }}>
+              {(application.steps || []).map((s, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 0",
+                  borderBottom: i < application.steps.length - 1 ? "1px solid #eaf4fb" : "none",
+                }}>
+                  <div style={{ marginTop: 2 }}>
+                    {s.skipped
+                      ? <span style={{ fontSize: 11, color: "#9ab0c4" }}>⊘</span>
+                      : <CheckCircle2 size={14} color="#1a8fd1" />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: s.skipped ? "#9ab0c4" : "#0d2b4e" }}>
+                      {s.productName || s.title}
+                      {s.appliedAmount && !s.skipped && (
+                        <span style={{ fontWeight: 400, color: "#4a6480", marginLeft: 6 }}>
+                          — {s.appliedAmount >= 1000 ? `${(s.appliedAmount/1000).toFixed(2)} ${s.doseUnit === "g" ? "kg" : "L"}` : `${s.appliedAmount} ${s.doseUnit || "g"}`}
+                        </span>
+                      )}
+                    </div>
+                    {s.appliedAt && (
+                      <div style={{ fontSize: 11, color: s.skipped ? "#b0c4d4" : "#4a8fd1", marginTop: 1 }}>
+                        {s.skipped ? t("treatment_skipped") : t("treatment_at")} {new Date(s.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 4 }}>
+                {application.allApplied ? t("wizard_completed") : t("wizard_partial")}
+              </div>
             </div>
           ) : (
             <button style={styles.validateApplyBtnSmall} onClick={onValidateApplication}>
-              <CheckCircle2 size={14} /> {t("apply_advice")}
+              <CheckCircle2 size={14} /> {t("wizard_start")}
               {!isPremium && <Lock size={12} style={{ marginLeft: 2 }} />}
             </button>
           )}
@@ -4443,6 +4951,291 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
 }
 
 // ---------- Validation des conseils appliqués ----------
+
+// ---------- PlanStatusCard : countdown du plan en cours ----------
+function PlanStatusCard({ plan, onResume, lang }) {
+  const t = useT(lang);
+  const [now, setNow] = React.useState(Date.now());
+
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  if (!plan) return null;
+  const currentStep = plan.currentStepIdx >= 0 ? plan.steps[plan.currentStepIdx] : null;
+  const doneSteps = plan.steps.filter((s) => s.appliedAt && !s.skipped).length;
+  const totalSteps = plan.steps.length;
+
+  function formatCountdown(ms) {
+    if (ms <= 0) return t("countdown_done");
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    if (h > 0) return `${h}h ${m.toString().padStart(2,"0")}min`;
+    if (m > 0) return `${m}min ${s.toString().padStart(2,"0")}s`;
+    return `${s}s`;
+  }
+
+  const scheduled = currentStep?.scheduledAt ? new Date(currentStep.scheduledAt).getTime() : null;
+  const remaining = scheduled ? scheduled - now : null;
+  const isReady = remaining !== null && remaining <= 0;
+
+  return (
+    <div style={{
+      background: isReady ? "#e8f8f0" : "#eaf4fb",
+      border: `1.5px solid ${isReady ? "#1a8fd1" : "#b0d8f0"}`,
+      borderRadius: 12, padding: "12px 14px", marginTop: 8,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#0d2b4e" }}>
+          {t("wizard_partial")} — {doneSteps}/{totalSteps}
+        </span>
+        <button
+          style={{ background: "#0a6ebd", color: "#fff", border: "none", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+          onClick={onResume}
+        >
+          {t("wizard_resume")}
+        </button>
+      </div>
+      {currentStep && (
+        <div style={{ fontSize: 13, color: "#0d2b4e" }}>
+          <span style={{ fontWeight: 600 }}>{t("wizard_next_step")} : {currentStep.productName || currentStep.title}</span>
+          <div style={{ fontSize: 12, color: isReady ? "#1a8fd1" : "#4a6480", marginTop: 2, fontWeight: isReady ? 700 : 400 }}>
+            {remaining !== null
+              ? isReady
+                ? t("countdown_done")
+                : `${t("wizard_in")} ${formatCountdown(remaining)} — ${t("wizard_at")} ${new Date(currentStep.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+              : t("wizard_now")}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- TreatmentWizard : wizard pas-à-pas ----------
+function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSkipStep, onClose, onCancel, onWantAddProduct }) {
+  const t = useT(lang);
+  const [now, setNow] = React.useState(Date.now());
+  const [editAmount, setEditAmount] = React.useState(null);
+
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  useEffect(() => {
+    if (plan && plan.currentStepIdx >= 0) {
+      const step = plan.steps[plan.currentStepIdx];
+      if (step) {
+        const { value } = toDisplayUnit(step.computedDoseAmount || step.appliedAmount, step.doseUnit || "g");
+        setEditAmount(value != null ? String(value) : "");
+      }
+    }
+  }, [plan?.currentStepIdx]);
+
+  function toDisplayUnit(amount, unit) {
+    // Toujours afficher en kg ou L (jamais g ou mL)
+    if (unit === "g") {
+      const v = amount != null ? parseFloat((amount / 1000).toFixed(3)) : "";
+      return { value: v, displayUnit: "kg" };
+    }
+    if (unit === "mL") {
+      const v = amount != null ? parseFloat((amount / 1000).toFixed(3)) : "";
+      return { value: v, displayUnit: "L" };
+    }
+    return { value: amount ?? "", displayUnit: unit };
+  }
+
+  function toBaseUnit(value, displayUnit, baseUnit) {
+    const v = parseFloat(value);
+    if (isNaN(v)) return null;
+    // displayUnit est toujours kg ou L (jamais g ou mL)
+    if (baseUnit === "g") return v * 1000; // kg → g
+    if (baseUnit === "mL") return v * 1000; // L → mL
+    return v;
+  }
+
+  function formatCountdown(ms) {
+    if (ms <= 0) return t("countdown_done");
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    if (h > 0) return `${h}h ${m.toString().padStart(2,"0")}min`;
+    if (m > 0) return `${m}min ${s.toString().padStart(2,"0")}s`;
+    return `${s}s`;
+  }
+
+  if (!plan || plan.currentStepIdx < 0) return null;
+  const currentIdx = plan.currentStepIdx;
+  const step = plan.steps[currentIdx];
+  if (!step) return null;
+
+  const totalSteps = plan.steps.length;
+  const doneCount = plan.steps.filter((s) => s.appliedAt || s.skipped).length;
+  const baseUnit = step.doseUnit || "g";
+  const { displayUnit } = toDisplayUnit(step.computedDoseAmount || step.appliedAmount, baseUnit);
+  const scheduled = step.scheduledAt ? new Date(step.scheduledAt).getTime() : null;
+  const remaining = scheduled ? scheduled - now : null;
+  const isReady = remaining === null || remaining <= 0;
+  const prod = products?.find((p) => p.name === step.productName);
+  const stockEmpty = manageStock && prod && (prod.stockPercent ?? 100) <= 0;
+
+  function handleApply() {
+    const amount = toBaseUnit(editAmount, displayUnit, baseUnit);
+    onApplyStep(currentIdx, amount);
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 400,
+      background: "rgba(10,30,60,0.55)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+    }}>
+      <div style={{
+        background: "#fff", borderRadius: "20px 20px 0 0",
+        width: "100%", maxWidth: 480,
+        padding: "20px 18px 32px", boxSizing: "border-box",
+        maxHeight: "92dvh", overflowY: "auto",
+      }}>
+        {/* En-tête */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <span style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>
+            {t("wizard_step")} {currentIdx + 1} {t("wizard_of")} {totalSteps}
+          </span>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#6a7d90", padding: 4 }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Barre de progression */}
+        <div style={{ display: "flex", gap: 4, marginBottom: 18 }}>
+          {plan.steps.map((s, i) => (
+            <div key={i} style={{
+              flex: 1, height: 4, borderRadius: 4,
+              background: s.appliedAt && !s.skipped ? "#1a8fd1"
+                : s.skipped ? "#d0e4f5"
+                : i === currentIdx ? "#0a6ebd"
+                : "#e0ecf5",
+            }} />
+          ))}
+        </div>
+
+        {/* Titre étape */}
+        <div style={{ fontSize: 18, fontWeight: 800, color: "#0d2b4e", marginBottom: 4 }}>
+          {step.productName || step.title}
+        </div>
+        {step.title && step.productName && step.title !== step.productName && (
+          <div style={{ fontSize: 13, color: "#4a6480", marginBottom: 8 }}>{step.title}</div>
+        )}
+
+        {/* Countdown / horaire */}
+        {!isReady && remaining !== null && (
+          <div style={{
+            background: "#eaf4fb", borderRadius: 10, padding: "10px 14px",
+            marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between",
+          }}>
+            <div>
+              <div style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>{t("wizard_scheduled")}</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "#0a6ebd", fontVariantNumeric: "tabular-nums" }}>
+                {formatCountdown(remaining)}
+              </div>
+            </div>
+            <div style={{ textAlign: "right", fontSize: 12, color: "#4a6480" }}>
+              {t("wizard_at")} {new Date(step.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </div>
+          </div>
+        )}
+        {isReady && (
+          <div style={{
+            background: "#e8f8f0", borderRadius: 10, padding: "8px 14px",
+            marginBottom: 14, fontSize: 13, fontWeight: 700, color: "#1a8fd1",
+          }}>
+            ✓ {t("countdown_done")}
+          </div>
+        )}
+
+        {/* Note produit */}
+        {step.note && (
+          <div style={{ background: "#fff8e8", border: "1px solid #f5e6c0", borderRadius: 8, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: "#8a6a20" }}>
+            {step.note}
+          </div>
+        )}
+
+        {/* Stock vide */}
+        {stockEmpty && (
+          <div style={{ background: "#fdf0ef", border: "1px solid #f5c6c2", borderRadius: 8, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: "#c0392b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span><AlertTriangle size={12} style={{ marginRight: 4 }} />{t("stock_empty")}</span>
+            <button type="button" onClick={onWantAddProduct} style={{ background: "none", border: "none", color: "#c0392b", fontWeight: 700, fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>
+              {t("add_arrow")}
+            </button>
+          </div>
+        )}
+
+        {/* Quantité */}
+        {baseUnit && (
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
+              {t("quantity_applied")}
+            </label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                type="number"
+                value={editAmount ?? ""}
+                onChange={(e) => setEditAmount(e.target.value)}
+                style={{ flex: 1, fontSize: 22, fontWeight: 700, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", textAlign: "center", outline: "none" }}
+                step="0.01"
+              />
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#4a6480", minWidth: 32 }}>{displayUnit}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Boutons */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <button
+            style={{ display:"flex",alignItems:"center",justifyContent:"center",gap:8,width:"100%",padding:"14px 0",borderRadius:12,border:"none",background:"#0a6ebd",color:"#fff",fontWeight:700,fontSize:16,cursor:"pointer" }}
+            onClick={handleApply}
+          >
+            <CheckCircle2 size={18} /> {t("wizard_done")}
+          </button>
+          {!isReady && (
+            <button
+              style={{ display:"flex",alignItems:"center",justifyContent:"center",gap:8,width:"100%",padding:"12px 0",borderRadius:12,border:"1px solid #b0d8f0",background:"#eaf4fb",color:"#0a6ebd",fontWeight:700,fontSize:14,cursor:"pointer" }}
+              onClick={handleApply}
+            >
+              {t("wizard_anticipate")}
+            </button>
+          )}
+          <button
+            style={{ background: "none", border: "none", color: "#9ab0c4", fontSize: 13, cursor: "pointer", padding: "8px 0" }}
+            onClick={() => onSkipStep(currentIdx)}
+          >
+            {t("wizard_skip")}
+          </button>
+        </div>
+
+        {/* Aperçu des étapes suivantes */}
+        {plan.steps.slice(currentIdx + 1).some((s) => !s.skipped && !s.appliedAt) && (
+          <div style={{ marginTop: 16, borderTop: "1px solid #eaf4fb", paddingTop: 12 }}>
+            <div style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600, marginBottom: 8 }}>ÉTAPES SUIVANTES</div>
+            {plan.steps.slice(currentIdx + 1).filter((s) => !s.skipped && !s.appliedAt).map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: "1px solid #f0f6fb" }}>
+                <Clock size={13} color="#b0c8e0" />
+                <span style={{ fontSize: 12, color: "#4a6480", flex: 1 }}>{s.productName || s.title}</span>
+                <span style={{ fontSize: 11, color: "#6a7d90" }}>
+                  {s.scheduledAt ? new Date(s.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ValidateApplicationModal({ measure, recs, existingApplication, onClose, onSave, preselected, products, manageStock, onWantAddProduct, lang }) {
   const t = useT(lang || "fr");
   function toDisplayUnit(amount, unit) {
@@ -4956,7 +5749,8 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
 }
 
 // ---------- Réglages ----------
-function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount }) {
+function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount, dataConsent, onRevokeDataConsent }) {
+  const [editingPool, setEditingPool] = useState(null);
   const t = useT(lang);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const [pendingLang, setPendingLang] = useState(lang);
@@ -5122,9 +5916,15 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
               )}
               <div style={{ flex: 1, textAlign: "left" }}>
                 <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{p.name}</div>
-                <div style={{ fontSize: 11.5, color: "#6a7d90" }}>{p.location} · {p.volume} m³ · {treatmentTypes.find((tt) => tt.value === p.treatmentType)?.label || t("treatment_chlore")}</div>
+                <div style={{ fontSize: 11.5, color: "#6a7d90" }}>{p.location} · {p.volume} m³</div>
               </div>
               {p.id === activePoolId && <CheckCircle2 size={16} color="#1a8fd1" />}
+            </button>
+            <button
+              style={{ background: "none", border: "none", color: "#0a6ebd", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "0 8px", flexShrink: 0 }}
+              onClick={() => onEditPool(p)}
+            >
+              <Settings2 size={14} />
             </button>
             {pools.length > 1 && (
               <button style={styles.poolListDeleteBtn} onClick={() => onDeletePool(p.id)}>
@@ -5286,6 +6086,21 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         </>
       )}
 
+      {/* Révocation consentement données */}
+      {dataConsent && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={styles.sectionRow}>
+            <span style={styles.sectionLabel}>{t("disclaimer_title")}</span>
+          </div>
+          <button
+            style={{ width: "100%", padding: "11px 0", borderRadius: 10, border: "1.5px solid #f5c6c2", background: "#fdf0ef", color: "#c0392b", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
+            onClick={() => { if (window.confirm(t("revoke_data_confirm"))) onRevokeDataConsent(); }}
+          >
+            {t("revoke_data_consent")}
+          </button>
+        </div>
+      )}
+
       <div style={styles.sectionRow}>
         <span style={styles.sectionLabel}>{t("sensitive_zone")}</span>
       </div>
@@ -5369,12 +6184,17 @@ function PaywallModal({ onClose, onActivate, lang }) {
 }
 
 // ---------- Ajout d'un bassin ----------
-function AddPoolModal({ onClose, onSave, lang }) {
+function AddPoolModal({ onClose, onSave, lang, existingPool }) {
   const t = useT(lang || "fr");
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [volume, setVolume] = useState(50);
-  const [photo, setPhoto] = useState(null);
+  const isEdit = !!existingPool;
+  const [name, setName] = useState(existingPool?.name || "");
+  const [location, setLocation] = useState(existingPool?.location || "");
+  const [volume, setVolume] = useState(existingPool?.volume || 50);
+  const [treatmentType, setTreatmentType] = useState(existingPool?.treatmentType || "chlore");
+  const [filtration, setFiltration] = useState(existingPool?.filtration || "sable");
+  const [manageStock, setManageStock] = useState(existingPool?.manageStock || false);
+  const [reportEmail, setReportEmail] = useState(existingPool?.reportEmail || "");
+  const [photo, setPhoto] = useState(existingPool?.photo || null);
   const [photoBusy, setPhotoBusy] = useState(false);
   const fileInputRef = useRef(null);
   const galleryInputRef = useRef(null);
@@ -5386,20 +6206,42 @@ function AddPoolModal({ onClose, onSave, lang }) {
     try {
       const dataUrl = await fileToDataUrl(file);
       setPhoto(dataUrl);
-    } catch (err) {
-      // silencieux
-    } finally {
-      setPhotoBusy(false);
-    }
+    } catch (err) {}
+    finally { setPhotoBusy(false); }
   }
 
   function handleSave() {
     if (!name.trim()) return;
-    onSave({ name: name.trim(), location: location.trim(), volume: parseFloat(volume) || 0, photo });
+    onSave({
+      ...(existingPool || {}),
+      name: name.trim(),
+      location: location.trim(),
+      volume: parseFloat(volume) || 0,
+      treatmentType,
+      filtration,
+      manageStock,
+      reportEmail: reportEmail.trim(),
+      photo,
+    });
   }
 
+  const treatmentOptions = [
+    { value: "chlore", label: t("treatment_chlore") },
+    { value: "sel", label: t("treatment_sel") },
+    { value: "brome", label: t("treatment_brome") },
+    { value: "o2", label: t("treatment_o2") },
+    { value: "autre", label: t("treatment_autre") },
+  ];
+  const filtrationOptions = [
+    { value: "sable", label: t("filter_sand") },
+    { value: "cartouche", label: t("filter_cartridge") },
+    { value: "diatomees", label: t("filter_de") },
+    { value: "aucune", label: t("filter_none") },
+  ];
+
   return (
-    <ModalShell onClose={onClose} title={t("add_pool_title")}>
+    <ModalShell onClose={onClose} title={isEdit ? t("edit_pool") : t("add_pool_title")}>
+      {/* Photo */}
       <label style={styles.fieldLabel}>{t("pool_photo")}</label>
       <div>
         {photo ? (
@@ -5411,21 +6253,11 @@ function AddPoolModal({ onClose, onSave, lang }) {
           </div>
         ) : (
           <div style={styles.photoCaptureBtnRow}>
-            <button
-              type="button"
-              style={styles.photoCaptureBtnHalf}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Camera size={17} />
-              {photoBusy ? "..." : t("camera_btn")}
+            <button type="button" style={styles.photoCaptureBtnHalf} onClick={() => fileInputRef.current?.click()}>
+              <Camera size={17} />{photoBusy ? "..." : t("camera_btn")}
             </button>
-            <button
-              type="button"
-              style={styles.photoCaptureBtnHalf}
-              onClick={() => galleryInputRef.current?.click()}
-            >
-              <ImageOff size={17} />
-              {photoBusy ? "..." : t("gallery_btn")}
+            <button type="button" style={styles.photoCaptureBtnHalf} onClick={() => galleryInputRef.current?.click()}>
+              <ImageOff size={17} />{photoBusy ? "..." : t("gallery_btn")}
             </button>
           </div>
         )}
@@ -5433,32 +6265,48 @@ function AddPoolModal({ onClose, onSave, lang }) {
         <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={styles.hiddenFileInput} />
       </div>
 
+      {/* Nom */}
       <label style={styles.fieldLabel}>{t("pool_name")}</label>
-      <input
-        style={styles.input}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder={t("pool_name_placeholder")}
-      />
+      <input style={styles.input} value={name} onChange={e => setName(e.target.value)} placeholder={t("pool_name_placeholder")} />
 
+      {/* Localisation */}
       <label style={styles.fieldLabel}>{t("location")}</label>
-      <input
-        style={styles.input}
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        placeholder={t("pool_location_placeholder")}
-      />
+      <input style={styles.input} value={location} onChange={e => setLocation(e.target.value)} placeholder={t("pool_location_placeholder")} />
 
+      {/* Volume */}
       <label style={styles.fieldLabel}>{t("volume")}</label>
+      <input type="number" style={styles.input} value={volume} onChange={e => setVolume(e.target.value)} />
+
+      {/* Type de traitement */}
+      <label style={styles.fieldLabel}>{t("treatment_type")}</label>
+      <select style={styles.input} value={treatmentType} onChange={e => setTreatmentType(e.target.value)}>
+        {treatmentOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+
+      {/* Filtration */}
+      <label style={styles.fieldLabel}>{t("filtration")}</label>
+      <select style={styles.input} value={filtration} onChange={e => setFiltration(e.target.value)}>
+        {filtrationOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+
+      {/* Gestion stock */}
+      <label style={{ ...styles.fieldLabel, display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+        <input type="checkbox" checked={manageStock} onChange={e => setManageStock(e.target.checked)} style={{ width: 18, height: 18, accentColor: "#0a6ebd" }} />
+        {t("manage_stock")}
+      </label>
+
+      {/* Email rapport PDF */}
+      <label style={styles.fieldLabel}>{t("pool_email")}</label>
       <input
-        type="number"
+        type="email"
         style={styles.input}
-        value={volume}
-        onChange={(e) => setVolume(e.target.value)}
+        value={reportEmail}
+        onChange={e => setReportEmail(e.target.value)}
+        placeholder={t("pool_email_placeholder")}
       />
 
       <button style={styles.primaryBtn} onClick={handleSave}>
-        {t("create_pool")}
+        {isEdit ? t("save") : t("create_pool")}
       </button>
     </ModalShell>
   );
@@ -5639,13 +6487,15 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                 <th style={styles.reportThCell}>{t("cya_col")}</th>
                 <th style={styles.reportThCell}>{t("temp_col")}</th>
                 <th style={styles.reportThCell}>{t("product_col")}</th>
-                <th style={styles.reportThCell}>{t("quantity_col")}</th>
+                <th style={styles.reportThCell}>{t("advised_col")}</th>
+                <th style={styles.reportThCell}>{t("applied_col")}</th>
+                <th style={styles.reportThCell}>{t("time_col")}</th>
                 {manageStock && <th style={styles.reportThCell}>{t("stock_col")}</th>}
               </tr>
             </thead>
             <tbody>
               {rows.map(({ measure, application }, i) => {
-                const applied = application?.steps?.filter((s) => s.appliedAmount) || [];
+                const applied = application?.steps || [];
                 const rowCount = Math.max(1, applied.length);
                 return Array.from({ length: rowCount }).map((_, j) => {
                   const step = applied[j] || null;
@@ -5663,9 +6513,17 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                           <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.temp != null && measure.temp !== "" ? `${measure.temp} °C` : "—"}</td>
                         </>
                       )}
-                      <td style={styles.reportTdCell}>{step ? step.productName : "—"}</td>
-                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "#0a6ebd" }}>
-                        {step ? formatDose(step.appliedAmount, step.doseUnit || "g") : "—"}
+                      <td style={styles.reportTdCell}>
+                        {step ? (step.skipped ? <span style={{ color: "#9ab0c4" }}>⊘ {step.productName}</span> : step.productName) : "—"}
+                      </td>
+                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
+                        {step && !step.skipped ? formatDose(step.computedDoseAmount ?? step.appliedAmount, step.doseUnit || "g") : "—"}
+                      </td>
+                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: step?.skipped ? "#9ab0c4" : "#0a6ebd" }}>
+                        {step && !step.skipped ? formatDose(step.appliedAmount, step.doseUnit || "g") : "—"}
+                      </td>
+                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
+                        {step?.appliedAt ? new Date(step.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}
                       </td>
                       {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
                         {prod ? `${prod.stockPercent ?? 100} %` : "—"}
