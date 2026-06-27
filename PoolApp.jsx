@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.7.2";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -3332,7 +3332,7 @@ function PoolApp() {
   })();
   const [validatingSelectedRecs, setValidatingSelectedRecs] = useState(null);
   const [showReport, setShowReport] = useState(false);
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState("https://poolgenai-proxy.support-poolgenai.workers.dev");
   const [apiProvider, setApiProvider] = useState("anthropic"); // "anthropic" | "openai"
   const [aiEnabled, setAiEnabled] = useState(false);
   const [loaded, setLoaded] = useState(false);
