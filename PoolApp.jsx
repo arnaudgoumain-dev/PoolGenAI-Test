@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.7.4";
+const APP_VERSION = "1.7.5";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -2862,8 +2862,10 @@ Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, sans markdown, s
 {"pH": nombre ou null, "fCl": nombre ou null, "tCl": nombre ou null, "ccl": nombre ou null, "tac": nombre ou null, "cya": nombre ou null, "hard": nombre ou null, "phos": nombre ou null, "copper": nombre ou null, "iron": nombre ou null, "temp": nombre ou null, "brome": nombre ou null, "o2": nombre ou null, "sel": nombre ou null, "confidence": "haute" ou "moyenne" ou "basse", "note": "une phrase en français sur la lisibilité et la méthode utilisée"}
 
 Règles strictes :
+- Pour un PHOTOMÈTRE : retourne les valeurs numériques exactes affichées à l'écran
+- Pour une BANDELETTE : retourne une ESTIMATION de la valeur basée sur la comparaison des couleurs avec l'échelle du tube — une valeur approchée est préférable à null
 - Les valeurs doivent être des nombres (pas des chaînes)
-- null si le paramètre n'est pas visible ou pas lisible
+- null uniquement si le paramètre est vraiment impossible à lire ou absent de la bandelette
 - JSON pur, rien d'autre`;
 
   const text = await callAIWithImage({ apiKey, apiProvider, prompt, imageDataUrl: dataUrl });
