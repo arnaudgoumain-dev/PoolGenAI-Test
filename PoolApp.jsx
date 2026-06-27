@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.7.2";
+const APP_VERSION = "1.7.3";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -271,6 +271,8 @@ const TRANSLATIONS = {
     save_pool: "Enregistrer",
     // Misc
     loading: "Chargement...",
+    ai_no_values: "Aucune valeur lisible sur cette photo. Vérifie la qualité et l'orientation de l'image.",
+    ai_no_values: "No readable values on this photo. Check the image quality and orientation.",
     error_analyze: "Analyse impossible",
     verify_connection: "Vérifie ta connexion et les photos.",
     free_version: "Gratuit",
@@ -652,7 +654,8 @@ const TRANSLATIONS = {
     add_pool_title: "New pool",
     edit_pool_title: "Edit pool",
     pool_name_placeholder: "My pool",
-    pool_location_placeholder: "Garden, terrace...",
+    pool_location_placeholder: "Garden, te    ai_no_values: "Keine lesbaren Werte auf diesem Foto. Überprüfe Qualität und Ausrichtung des Bildes.",
+rrace...",
     pool_volume_placeholder: "72",
     save_pool: "Save",
     loading: "Loading...",
@@ -1034,7 +1037,8 @@ const TRANSLATIONS = {
     paywall_btn: "Unbegrenzte Version aktivieren",
     paywall_close: "Später",
     add_pool_title: "Neues Becken",
-    edit_pool_title: "Becken bearbeiten",
+    edit_pool_title: "    ai_no_values: "Nessun valore leggibile su questa foto. Controlla la qualità e l'orientamento dell'immagine.",
+Becken bearbeiten",
     pool_name_placeholder: "Mein Pool",
     pool_location_placeholder: "Garten, Terrasse...",
     pool_volume_placeholder: "72",
@@ -1415,7 +1419,8 @@ const TRANSLATIONS = {
     see_dosage: "Vedi dosaggio",
     paywall_title: "Passa all'illimitato",
     paywall_desc: "Misurazioni illimitate · Analisi IA strisce · Rapporto PDF · Gestione stock",
-    paywall_btn: "Attiva versione illimitata",
+    paywall_btn: "Attiva ver    ai_no_values: "Ningún valor legible en esta foto. Verifica la calidad y orientación de la imagen.",
+sione illimitata",
     paywall_close: "Più tardi",
     add_pool_title: "Nuova vasca",
     edit_pool_title: "Modifica vasca",
@@ -1798,7 +1803,8 @@ const TRANSLATIONS = {
     missing_product_tip: "Sin producto {action} en tu lista — añade uno en la pestaña Productos.",
     see_dosage: "Ver dosaje",
     paywall_title: "Pasar a ilimitado",
-    paywall_desc: "Mediciones ilimitadas · Análisis IA de tiras · Informe PDF · Gestión de stock",
+    paywall_desc    ai_no_values: "Nenhum valor legível nesta foto. Verifique a qualidade e orientação da imagem.",
+: "Mediciones ilimitadas · Análisis IA de tiras · Informe PDF · Gestión de stock",
     paywall_btn: "Activar versión ilimitada",
     paywall_close: "Más tarde",
     add_pool_title: "Nueva piscina",
@@ -3482,7 +3488,17 @@ function PoolApp() {
       } catch (e) {}
       try {
         const ak = await window.storage.get(STORAGE_KEYS.apiKey);
-        if (ak?.value) setApiKey(JSON.parse(ak.value));
+        if (ak?.value) {
+          const storedKey = JSON.parse(ak.value);
+          // Migration automatique ancienne URL → nouvelle
+          if (storedKey && storedKey.includes("poolapp-proxy.arnaud-goumain")) {
+            const newUrl = "https://poolgenai-proxy.support-poolgenai.workers.dev";
+            setApiKey(newUrl);
+            window.storage.set(STORAGE_KEYS.apiKey, JSON.stringify(newUrl)).catch(() => {});
+          } else {
+            setApiKey(storedKey);
+          }
+        }
         const aie = await window.storage.get(STORAGE_KEYS.aiEnabled);
         if (aie?.value === "true") setAiEnabled(true);
       } catch (e) {}
@@ -5404,9 +5420,17 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
       if (merged.brome  !== undefined) setBrome(String(merged.brome));
       if (merged.o2     !== undefined) setO2(String(merged.o2));
       if (merged.sel    !== undefined) setSel(String(merged.sel));
-      setAnalyzeNote(
-        `${photos.length} photo(s) — ${notes.join(" / ") || t("verify_connection")}`
-      );
+
+      // Vérifier si au moins une valeur numérique a été extraite
+      const numericKeys = ["pH","fCl","tCl","ccl","tac","cya","hard","phos","copper","iron","temp","brome","o2","sel"];
+      const hasValues = numericKeys.some(k => merged[k] !== undefined && merged[k] !== null);
+      if (!hasValues) {
+        setAnalyzeError(t("ai_no_values"));
+      } else {
+        setAnalyzeNote(
+          `${photos.length} photo(s) — ${notes.join(" / ") || t("verify_connection")}`
+        );
+      }
     } catch (err) {
       setAnalyzeError(t("error_analyze") + " : " + (err?.message || t("verify_connection")));
     } finally {
