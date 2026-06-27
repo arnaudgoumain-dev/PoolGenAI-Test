@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.7.7";
+const APP_VERSION = "1.8.1";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -271,7 +271,11 @@ const TRANSLATIONS = {
     save_pool: "Enregistrer",
     // Misc
     loading: "Chargement...",
+    ai_timer_hint: "L'analyse peut prendre jusqu'à 30 secondes.",
+    ai_reliability: "Fiabilité de l'analyse",
     ai_no_values: "Aucune valeur lisible sur cette photo. Vérifie la qualité et l'orientation de l'image.",
+    ai_timer_hint: "Analysis may take up to 30 seconds.",
+    ai_reliability: "Analysis reliability",
     ai_no_values: "No readable values on this photo. Check the image quality and orientation.",
     error_analyze: "Analyse impossible",
     verify_connection: "Vérifie ta connexion et les photos.",
@@ -654,6 +658,8 @@ const TRANSLATIONS = {
     add_pool_title: "New pool",
     edit_pool_title: "Edit pool",
     pool_name_placeholder: "My pool",
+    ai_timer_hint: "Die Analyse kann bis zu 30 Sekunden dauern.",
+    ai_reliability: "Zuverlässigkeit der Analyse",
     ai_no_values: "Keine lesbaren Werte auf diesem Foto. Überprüfe Qualität und Ausrichtung des Bildes.",
     pool_location_placeholder: "Garden, terrace...",
     pool_volume_placeholder: "72",
@@ -1037,6 +1043,8 @@ const TRANSLATIONS = {
     paywall_btn: "Unbegrenzte Version aktivieren",
     paywall_close: "Später",
     add_pool_title: "Neues Becken",
+    ai_timer_hint: "L'analisi può richiedere fino a 30 secondi.",
+    ai_reliability: "Affidabilità dell'analisi",
     ai_no_values: "Nessun valore leggibile su questa foto. Controlla la qualità e l'orientamento dell'immagine.",
     edit_pool_title: "Becken bearbeiten",
     pool_name_placeholder: "Mein Pool",
@@ -1419,6 +1427,8 @@ const TRANSLATIONS = {
     see_dosage: "Vedi dosaggio",
     paywall_title: "Passa all'illimitato",
     paywall_desc: "Misurazioni illimitate · Analisi IA strisce · Rapporto PDF · Gestione stock",
+    ai_timer_hint: "El análisis puede tardar hasta 30 segundos.",
+    ai_reliability: "Fiabilidad del análisis",
     ai_no_values: "Ningún valor legible en esta foto. Verifica la calidad y orientación de la imagen.",
     paywall_btn: "Attiva versione illimitata",
     paywall_close: "Più tardi",
@@ -1803,6 +1813,8 @@ const TRANSLATIONS = {
     missing_product_tip: "Sin producto {action} en tu lista — añade uno en la pestaña Productos.",
     see_dosage: "Ver dosaje",
     paywall_title: "Pasar a ilimitado",
+    ai_timer_hint: "A análise pode levar até 30 segundos.",
+    ai_reliability: "Confiabilidade da análise",
     ai_no_values: "Nenhum valor legível nesta foto. Verifique a qualidade e orientação da imagem.",
     paywall_desc: "Mediciones ilimitadas · Análisis IA de tiras · Informe PDF · Gestión de stock",
     paywall_btn: "Activar versión ilimitada",
@@ -2859,7 +2871,7 @@ Correspondances des abréviations courantes :
 - O2 / Active O2 → o2
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, sans markdown, sans commentaires :
-{"pH": nombre ou null, "fCl": nombre ou null, "tCl": nombre ou null, "ccl": nombre ou null, "tac": nombre ou null, "cya": nombre ou null, "hard": nombre ou null, "phos": nombre ou null, "copper": nombre ou null, "iron": nombre ou null, "temp": nombre ou null, "brome": nombre ou null, "o2": nombre ou null, "sel": nombre ou null, "confidence": "haute" ou "moyenne" ou "basse", "note": "une phrase en français sur la lisibilité et la méthode utilisée"}
+{"pH": nombre ou null, "fCl": nombre ou null, "tCl": nombre ou null, "ccl": nombre ou null, "tac": nombre ou null, "cya": nombre ou null, "hard": nombre ou null, "phos": nombre ou null, "copper": nombre ou null, "iron": nombre ou null, "temp": nombre ou null, "brome": nombre ou null, "o2": nombre ou null, "sel": nombre ou null, "confidence": "haute" ou "moyenne" ou "basse", "reliability": entier de 1 à 5 (1=très peu fiable, 5=très fiable), "reliability_reason": "une phrase en français expliquant la note de fiabilité (qualité image, lisibilité échelle, etc.)", "note": "une phrase en français sur la lisibilité et la méthode utilisée"}
 
 Règles strictes :
 - Pour un PHOTOMÈTRE : retourne les valeurs numériques exactes affichées à l'écran
@@ -3497,17 +3509,10 @@ function PoolApp() {
       } catch (e) {}
       try {
         const ak = await window.storage.get(STORAGE_KEYS.apiKey);
-        if (ak?.value) {
-          const storedKey = JSON.parse(ak.value);
-          // Migration automatique ancienne URL → nouvelle
-          if (storedKey && storedKey.includes("poolapp-proxy.arnaud-goumain")) {
-            const newUrl = "https://poolgenai-proxy.support-poolgenai.workers.dev";
-            setApiKey(newUrl);
-            window.storage.set(STORAGE_KEYS.apiKey, JSON.stringify(newUrl)).catch(() => {});
-          } else {
-            setApiKey(storedKey);
-          }
-        }
+        // Toujours forcer l'URL proxy officielle — ignore toute valeur stockée en IndexedDB
+        const FORCED_PROXY = "https://poolgenai-proxy.support-poolgenai.workers.dev";
+        setApiKey(FORCED_PROXY);
+        window.storage.set(STORAGE_KEYS.apiKey, JSON.stringify(FORCED_PROXY)).catch(() => {});
         const aie = await window.storage.get(STORAGE_KEYS.aiEnabled);
         if (aie?.value === "true") setAiEnabled(true);
       } catch (e) {}
@@ -5356,6 +5361,9 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState(null);
   const [analyzeNote, setAnalyzeNote] = useState(null);
+  const [analyzeTimer, setAnalyzeTimer] = useState(null); // secondes écoulées | null
+  const [analyzeReliability, setAnalyzeReliability] = useState(null); // { score: 1-5, reason: string }
+  const analyzeTimerRef = React.useRef(null);
   const [confirmAnalyze, setConfirmAnalyze] = useState(false);
   const fileInputRef = useRef(null);
   const galleryInputRef = useRef(null);
@@ -5402,6 +5410,14 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
     setAnalyzing(true);
     setAnalyzeError(null);
     setAnalyzeNote(null);
+    setAnalyzeReliability(null);
+    // Démarrer le timer
+    setAnalyzeTimer(0);
+    let elapsed = 0;
+    analyzeTimerRef.current = setInterval(() => {
+      elapsed += 1;
+      setAnalyzeTimer(elapsed);
+    }, 1000);
     try {
       // Analyse chaque photo et consolide les résultats en prenant la valeur la plus fiable par paramètre
       const allResults = [];
@@ -5444,6 +5460,17 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
       if (merged.o2     !== undefined) setO2(String(merged.o2));
       if (merged.sel    !== undefined) setSel(String(merged.sel));
 
+      // Calculer la note de fiabilité consolidée (moyenne des notes de chaque photo)
+      const reliabilityScores = allResults.filter(r => r.reliability != null).map(r => Number(r.reliability));
+      const avgReliability = reliabilityScores.length
+        ? Math.round(reliabilityScores.reduce((a, b) => a + b, 0) / reliabilityScores.length)
+        : null;
+      // Prendre la raison de la photo avec la meilleure fiabilité
+      const bestResult = allResults.reduce((best, r) => (!best || (r.reliability > (best.reliability || 0))) ? r : best, null);
+      if (avgReliability !== null) {
+        setAnalyzeReliability({ score: avgReliability, reason: bestResult?.reliability_reason || "" });
+      }
+
       // Vérifier si au moins une valeur numérique a été extraite
       const hasValues = numericKeys.some(k => merged[k] !== undefined && merged[k] !== null);
       if (!hasValues) {
@@ -5456,6 +5483,11 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
     } catch (err) {
       setAnalyzeError(t("error_analyze") + " : " + (err?.message || t("verify_connection")));
     } finally {
+      // Arrêter le timer mais garder la valeur affichée
+      if (analyzeTimerRef.current) {
+        clearInterval(analyzeTimerRef.current);
+        analyzeTimerRef.current = null;
+      }
       setAnalyzing(false);
     }
   }
@@ -5601,8 +5633,44 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
             </div>
           )}
 
+          {/* Hint 30 secondes + compteur */}
+          {!analyzing && analyzeTimer === null && (
+            <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 6, textAlign: "center", fontStyle: "italic" }}>
+              {t("ai_timer_hint")}
+            </div>
+          )}
+          {analyzing && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, fontSize: 13, color: "#0a6ebd", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+              <Loader2 size={14} className="spin" />
+              {analyzeTimer}s
+            </div>
+          )}
+          {!analyzing && analyzeTimer !== null && (
+            <div style={{ fontSize: 12, color: "#6a7d90", marginTop: 6, textAlign: "center" }}>
+              ⏱ {analyzeTimer}s
+            </div>
+          )}
+
           {analyzeNote && <div style={{ ...styles.analyzeNoteOk, marginTop: 8 }}>{analyzeNote}</div>}
           {analyzeError && <div style={{ ...styles.analyzeNoteError, marginTop: 8 }}>{analyzeError}</div>}
+
+          {/* Note de fiabilité étoiles */}
+          {analyzeReliability && (
+            <div style={{ marginTop: 10, padding: "10px 12px", background: "#f5f8fc", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#0d2b4e" }}>{t("ai_reliability")} :</span>
+                <span style={{ fontSize: 16, letterSpacing: 2 }}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <span key={i} style={{ color: i < analyzeReliability.score ? "#f5a623" : "#d0d8e0" }}>★</span>
+                  ))}
+                </span>
+                <span style={{ fontSize: 11, color: "#6a7d90" }}>{analyzeReliability.score}/5</span>
+              </div>
+              {analyzeReliability.reason && (
+                <div style={{ fontSize: 11, color: "#4a6480", lineHeight: 1.5 }}>{analyzeReliability.reason}</div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <button style={styles.photoLockedBtn} onClick={onWantPremium}>
@@ -5892,8 +5960,8 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
 
         {/* Note produit */}
         {step.note && (
-          <div style={{ background: "#fff8e8", border: "1px solid #f5e6c0", borderRadius: 8, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: "#8a6a20" }}>
-            {step.note}
+          <div style={{ background: "#fff8e8", border: "1.5px solid #e6a817", borderRadius: 8, padding: "10px 14px", marginBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#7a5800", lineHeight: 1.4 }}>{step.note}</div>
           </div>
         )}
 
@@ -7197,9 +7265,22 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         </button>
         {pool?.reportEmail && (
           <button
+            className="no-print"
             style={{ ...styles.reportCloseBtn, background: "#0a6ebd", color: "#fff", border: "none", fontSize: 12, padding: "6px 12px" }}
             onClick={() => {
-              window.open(`mailto:${pool.reportEmail}?subject=${encodeURIComponent("Rapport PoolGenAI — " + (pool.name || ""))}&body=${encodeURIComponent("Veuillez trouver ci-joint le rapport de suivi de votre piscine généré par PoolApp.")}`);
+              const poolName = pool.name || "Ma piscine";
+              const subject = encodeURIComponent(`Rapport PoolGenAI — ${poolName}`);
+              const body = encodeURIComponent(`Bonjour,
+
+Veuillez trouver ci-dessous les instructions pour obtenir le rapport PDF de la piscine "${poolName}" :
+
+1. Ouvrez l'application PoolGenAI
+2. Onglet Historique → Générer le rapport
+3. Cliquez sur "Imprimer / Enregistrer en PDF"
+
+Cordialement,
+PoolGenAI`);
+              window.open(`mailto:${pool.reportEmail}?subject=${subject}&body=${body}`);
             }}
           >
             ✉ {pool.reportEmail}
