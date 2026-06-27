@@ -8,7 +8,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.8.1";
+const APP_VERSION = "1.8.2";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -6737,12 +6737,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       </div>
 
       {isPremium && (
-        <div style={{ ...styles.sectionRow, marginTop: 14 }}>
-          <div>
-            <span style={styles.sectionLabel}>{t("manage_stock_label")}</span>
-            <div style={{ fontSize: 12, color: "#6a7d90", marginTop: 2 }}>
-              {t("manage_stock_desc")}
-            </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 8, marginTop: 8 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#0d2b4e" }}>{t("manage_stock_label")}</div>
+            <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 2 }}>{t("manage_stock_desc")}</div>
           </div>
           <ToggleSwitch
             checked={!!activePool?.manageStock}
