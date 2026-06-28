@@ -4,11 +4,12 @@ const {
 } = Recharts;
 const {
   Plus, Trash2, Droplets, X, ChevronRight, ChevronDown, Settings2, AlertTriangle, CheckCircle2,
-  History, Beaker, Camera, Lock, Crown, ImageOff, Sparkles, Loader2, Clock, FileText, Download
+  History, Beaker, Camera, Lock, Crown, ImageOff, Sparkles, Loader2, Clock, FileText, Download,
+  Eye, EyeOff, Share2
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.10.2";
+const APP_VERSION = "1.11.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -7105,10 +7106,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
                 onClick={() => setShowAiPwd(v => !v)}
                 style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#6a7d90", display: "flex", alignItems: "center", padding: 2 }}
               >
-                {showAiPwd
-                  ? <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/></svg>
-                  : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                }
+                {showAiPwd ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             {aiPasswordError && (
@@ -7497,173 +7495,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState(null);
 
-  async function generateAndSharePdf() {
-    setPdfLoading(true);
-    setPdfError(null);
-    try {
-      if (!window.jspdf) throw new Error("jsPDF non chargé");
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const mL = 12, mR = 12, mT = 14, mB = 14;
-      const contentW = pageW - mL - mR;
-      let y = mT;
-
-      const localeMap = { fr: "fr-FR", en: "en-GB", de: "de-DE", it: "it-IT", es: "es-ES", pt: "pt-PT" };
-      const genAt = new Date().toLocaleString(localeMap[lang] || "fr-FR", { dateStyle: "long", timeStyle: "short" });
-      const poolName = pool?.name || "piscine";
-
-      // ── En-tête ──
-      pdf.setFillColor(10, 74, 138);
-      pdf.roundedRect(mL, y, contentW, 18, 3, 3, "F");
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(13);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(`${t("report_title")} — ${poolName}`, mL + 4, y + 7);
-      pdf.setFontSize(8);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`${pool?.location || ""} · ${pool?.volume || ""} m³ · ${t("generated_on")} ${genAt}`, mL + 4, y + 13);
-      pdf.setTextColor(0, 0, 0);
-      y += 24;
-
-      // ── Section titre ──
-      function sectionTitle(label) {
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "bold");
-        pdf.setTextColor(10, 110, 189);
-        pdf.text(label.toUpperCase(), mL, y);
-        pdf.setDrawColor(10, 110, 189);
-        pdf.setLineWidth(0.3);
-        pdf.line(mL, y + 1.5, mL + contentW, y + 1.5);
-        pdf.setTextColor(0, 0, 0);
-        y += 6;
-      }
-
-      function checkPage(needed) {
-        if (y + needed > pageH - mB) { pdf.addPage(); y = mT; }
-      }
-
-      // ── Tableau historique ──
-      sectionTitle(t("detailed_history"));
-
-      const cols = [
-        { key: "date",   label: t("date_col"),      w: 22 },
-        { key: "pH",     label: "pH",                w: 10 },
-        { key: "fCl",    label: t("cl_libre_col"),   w: 14 },
-        { key: "tCl",    label: t("cl_total_col"),   w: 14 },
-        { key: "ccl",    label: "CCL",               w: 12 },
-        { key: "tac",    label: t("tac_col"),        w: 12 },
-        { key: "cya",    label: t("cya_col"),        w: 12 },
-        { key: "temp",   label: t("temp_col"),       w: 12 },
-        { key: "prod",   label: t("product_col"),    w: 34 },
-        { key: "qty",    label: t("applied_col"),    w: 14 },
-      ];
-
-      const totalW = cols.reduce((s, c) => s + c.w, 0);
-      const scale = contentW / totalW;
-      const scaledCols = cols.map(c => ({ ...c, w: c.w * scale }));
-      const rowH = 6;
-      const headerH = 7;
-
-      // Header ligne
-      checkPage(headerH + rowH);
-      pdf.setFillColor(230, 240, 250);
-      pdf.rect(mL, y, contentW, headerH, "F");
-      pdf.setFontSize(6.5);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(13, 43, 78);
-      let x = mL;
-      scaledCols.forEach(col => {
-        pdf.text(col.label, x + 1, y + 4.5, { maxWidth: col.w - 2 });
-        x += col.w;
-      });
-      y += headerH;
-
-      // Lignes données
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(6.5);
-      const sortedM = [...measures].sort((a, b) => new Date(a.date) - new Date(b.date));
-      sortedM.forEach((m, i) => {
-        checkPage(rowH);
-        if (i % 2 === 0) {
-          pdf.setFillColor(248, 250, 253);
-          pdf.rect(mL, y, contentW, rowH, "F");
-        }
-        pdf.setTextColor(30, 30, 30);
-        const app = applications.find(a => a.measureId === m.id);
-        const steps = app?.steps?.filter(s => !s.skipped) || [];
-        const prodText = steps.map(s => s.productName).join(", ") || "—";
-        const qtyText = steps.map(s => formatDose(s.appliedAmount, s.doseUnit || "g")).join(", ") || "—";
-        const d = new Date(m.date);
-        const dateStr = `${d.getDate().toString().padStart(2,"0")}/${(d.getMonth()+1).toString().padStart(2,"0")} ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
-        const vals = {
-          date: dateStr,
-          pH:   m.pH != null && m.pH !== "" ? String(m.pH) : "—",
-          fCl:  m.fCl != null && m.fCl !== "" ? `${m.fCl}` : "—",
-          tCl:  m.tCl != null && m.tCl !== "" ? `${m.tCl}` : "—",
-          ccl:  m.ccl != null && m.ccl !== "" ? `${m.ccl}` : "—",
-          tac:  m.tac != null && m.tac !== "" ? `${m.tac}` : "—",
-          cya:  m.cya != null && m.cya !== "" ? `${m.cya}` : "—",
-          temp: m.temp != null && m.temp !== "" ? `${m.temp}°` : "—",
-          prod: prodText,
-          qty:  qtyText,
-        };
-        x = mL;
-        scaledCols.forEach(col => {
-          pdf.text(String(vals[col.key] ?? "—"), x + 1, y + 4, { maxWidth: col.w - 2 });
-          x += col.w;
-        });
-        // Bordure basse
-        pdf.setDrawColor(220, 228, 238);
-        pdf.setLineWidth(0.1);
-        pdf.line(mL, y + rowH, mL + contentW, y + rowH);
-        y += rowH;
-      });
-
-      y += 6;
-
-      // ── Footer ──
-      const pageCount = pdf.internal.getNumberOfPages();
-      for (let p = 1; p <= pageCount; p++) {
-        pdf.setPage(p);
-        pdf.setFontSize(7);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text(`PoolGenAI v${APP_VERSION} · ${poolName}`, mL, pageH - 6);
-        pdf.text(`${p} / ${pageCount}`, pageW - mR, pageH - 6, { align: "right" });
-      }
-
-      const fileName = `rapport-poolgenai-${poolName.toLowerCase().replace(/[^a-z0-9]/g, "-")}.pdf`;
-      const pdfBlob = pdf.output("blob");
-      const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
-
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-        await navigator.share({
-          title: t("report_email_subject").replace("{pool}", poolName),
-          files: [pdfFile],
-        });
-      } else {
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      }
-    } catch (e) {
-      if (e.name !== "AbortError") {
-        console.error("PDF error", e);
-        setPdfError(e.message || "Erreur génération PDF");
-      }
-    } finally {
-      setPdfLoading(false);
-    }
-  }
-
-  // Inject print CSS so the chart goes full width and toolbar is hidden
+  // Inject print CSS (kept for browser print fallback)
   useEffect(() => {
     const id = "poolgenai-print-css";
     if (document.getElementById(id)) return;
@@ -7703,17 +7535,14 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
   );
 
   const chartParams = [
-    { key: "pH", color: "#1a8fd1", label: "pH", axis: "left" },
-    { key: "fCl", color: "#2b7fd9", label: t("param_fcl").replace(" (mg/L)", ""), axis: "left" },
-    { key: "tCl", color: "#8a6fd1", label: t("param_tcl").replace(" (mg/L)", ""), axis: "left" },
-    { key: "tac", color: "#d98c2b", label: t("tac_col"), axis: "right" },
-    { key: "cya", color: "#c4502f", label: t("cya_col"), axis: "right" },
-    { key: "temp", color: "#e0578a", label: t("temp_col"), axis: "right" },
+    { key: "pH",  color: "#1a8fd1", label: "pH",                                      axis: "left"  },
+    { key: "fCl", color: "#2b7fd9", label: t("param_fcl").replace(" (mg/L)", ""),     axis: "left"  },
+    { key: "tCl", color: "#8a6fd1", label: t("param_tcl").replace(" (mg/L)", ""),     axis: "left"  },
+    { key: "tac", color: "#d98c2b", label: t("tac_col"),                              axis: "right" },
+    { key: "cya", color: "#c4502f", label: t("cya_col"),                              axis: "right" },
+    { key: "temp",color: "#e0578a", label: t("temp_col"),                             axis: "right" },
   ];
 
-  // Pour chaque mesure : recalcule le plan de traitement qui avait été
-  // donné (avec les produits actuels) et retrouve l'application validée
-  // correspondante si elle existe.
   const rows = useMemo(() => {
     const repTargets = getEffectiveTargets(pool?.treatmentType || "chlore");
     const repParams = getActiveParams(pool?.treatmentType || "chlore");
@@ -7730,6 +7559,254 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     timeStyle: "short",
   });
 
+  // ── Génération PDF programmatique ──────────────────────────────────────
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return [r, g, b];
+  }
+
+  async function generatePdfBlob() {
+    if (!window.jspdf) throw new Error("jsPDF non chargé");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const mL = 10, mR = 10, mT = 12, mB = 12;
+    const cW = pageW - mL - mR;
+    let y = mT;
+
+    const poolName = pool?.name || "piscine";
+    const genAt = new Date().toLocaleString(localeMap[lang] || "fr-FR", { dateStyle: "long", timeStyle: "short" });
+
+    // ── En-tête bleu ──
+    pdf.setFillColor(10, 74, 138);
+    pdf.roundedRect(mL, y, cW, 16, 2, 2, "F");
+    pdf.setTextColor(255,255,255);
+    pdf.setFontSize(11); pdf.setFont("helvetica","bold");
+    pdf.text(`${t("report_title")} — ${poolName}`, mL+3, y+6);
+    pdf.setFontSize(7.5); pdf.setFont("helvetica","normal");
+    pdf.text(`${pool?.location||""} · ${pool?.volume||""} m³ · ${t("generated_on")} ${genAt}`, mL+3, y+12);
+    pdf.setTextColor(0,0,0);
+    y += 20;
+
+    function checkPage(need) {
+      if (y + need > pageH - mB) { pdf.addPage(); y = mT; }
+    }
+
+    function sectionTitle(label) {
+      checkPage(8);
+      pdf.setFontSize(8); pdf.setFont("helvetica","bold");
+      pdf.setTextColor(10,110,189);
+      pdf.text(label.toUpperCase(), mL, y);
+      pdf.setDrawColor(10,110,189); pdf.setLineWidth(0.25);
+      pdf.line(mL, y+1.2, mL+cW, y+1.2);
+      pdf.setTextColor(0,0,0);
+      y += 5.5;
+    }
+
+    // ── Graphique simplifié ──
+    if (chartData.length >= 2) {
+      sectionTitle(t("params_evolution"));
+      const gH = 45, gW = cW;
+      const gX = mL, gY = y;
+
+      // Fond graphique
+      pdf.setFillColor(250,252,251);
+      pdf.rect(gX, gY, gW, gH, "F");
+      pdf.setDrawColor(200,210,220); pdf.setLineWidth(0.15);
+      pdf.rect(gX, gY, gW, gH);
+
+      // Grille horizontale (5 lignes)
+      pdf.setDrawColor(220,228,234); pdf.setLineWidth(0.1);
+      for (let i = 1; i <= 4; i++) {
+        const gy = gY + (gH / 5) * i;
+        pdf.line(gX, gy, gX + gW, gy);
+      }
+
+      const timestamps = chartData.map(d => d.timestamp);
+      const tMin = Math.min(...timestamps), tMax = Math.max(...timestamps);
+      const tRange = tMax - tMin || 1;
+
+      // Dessiner chaque paramètre
+      chartParams.forEach(cp => {
+        const pts = chartData.map((d, i) => {
+          const v = d[cp.key];
+          return v == null ? null : { x: i, t: d.timestamp, v };
+        }).filter(Boolean);
+        if (pts.length < 1) return;
+
+        // Normalise selon axe (left: 0-8, right: 0-100)
+        const vMax = cp.axis === "left" ? 10 : 110;
+        const [r,g,b] = hexToRgb(cp.color);
+        pdf.setDrawColor(r,g,b); pdf.setLineWidth(0.5);
+
+        let prev = null;
+        pts.forEach(pt => {
+          const px = gX + ((pt.t - tMin) / tRange) * gW;
+          const py = gY + gH - (pt.v / vMax) * gH;
+          const clampedPy = Math.max(gY, Math.min(gY+gH, py));
+          if (prev) pdf.line(prev.px, prev.py, px, clampedPy);
+          // Point
+          pdf.setFillColor(r,g,b);
+          pdf.circle(px, clampedPy, 0.8, "F");
+          prev = { px, py: clampedPy };
+        });
+      });
+
+      // Légende
+      y = gY + gH + 2;
+      let lx = mL;
+      pdf.setFontSize(6.5); pdf.setFont("helvetica","normal");
+      chartParams.forEach(cp => {
+        const hasData = chartData.some(d => d[cp.key] != null);
+        if (!hasData) return;
+        const [r,g,b] = hexToRgb(cp.color);
+        pdf.setFillColor(r,g,b);
+        pdf.rect(lx, y+0.5, 6, 1.5, "F");
+        pdf.setTextColor(30,30,30);
+        pdf.text(cp.label, lx+7, y+1.8);
+        lx += 7 + pdf.getTextWidth(cp.label) + 4;
+        if (lx > mL + cW - 20) { lx = mL; y += 4; }
+      });
+      pdf.setTextColor(0,0,0);
+      y += 7;
+    }
+
+    // ── Tableau complet ──
+    sectionTitle(t("detailed_history"));
+
+    // Toutes les colonnes de paramètres + produit
+    const allCols = [
+      { key: "date",   label: t("date_col"),       w: 18 },
+      { key: "pH",     label: "pH",                w: 8  },
+      { key: "fCl",    label: "FCL",               w: 9  },
+      { key: "tCl",    label: "TCL",               w: 9  },
+      { key: "ccl",    label: "CCL",               w: 9  },
+      { key: "tac",    label: "TAC",               w: 9  },
+      { key: "cya",    label: "CYA",               w: 9  },
+      { key: "hard",   label: "TH",                w: 9  },
+      { key: "phos",   label: "Phos",              w: 9  },
+      { key: "copper", label: "Cu",                w: 8  },
+      { key: "iron",   label: "Fe",                w: 8  },
+      { key: "temp",   label: "°C",                w: 8  },
+      { key: "prod",   label: t("product_col"),    w: 28 },
+      { key: "qty",    label: t("applied_col"),    w: 13 },
+    ];
+
+    const totalRawW = allCols.reduce((s,c)=>s+c.w, 0);
+    const sc = cW / totalRawW;
+    const cols = allCols.map(c => ({ ...c, w: c.w * sc }));
+    const rowH = 5.5, hdrH = 6.5;
+
+    // Header
+    checkPage(hdrH + rowH);
+    pdf.setFillColor(220,235,250);
+    pdf.rect(mL, y, cW, hdrH, "F");
+    pdf.setFontSize(6); pdf.setFont("helvetica","bold"); pdf.setTextColor(13,43,78);
+    let x = mL;
+    cols.forEach(c => {
+      pdf.text(c.label, x+0.8, y+4.2, { maxWidth: c.w-1.2 });
+      x += c.w;
+    });
+    pdf.setDrawColor(180,200,220); pdf.setLineWidth(0.2);
+    pdf.line(mL, y+hdrH, mL+cW, y+hdrH);
+    y += hdrH;
+
+    // Lignes données
+    pdf.setFont("helvetica","normal"); pdf.setFontSize(6);
+    sortedMeasures.forEach((m, i) => {
+      checkPage(rowH);
+      if (i % 2 === 0) { pdf.setFillColor(247,250,254); pdf.rect(mL, y, cW, rowH, "F"); }
+      const app = applications.find(a => a.measureId === m.id);
+      const steps = app?.steps?.filter(s => !s.skipped) || [];
+      const prodText = steps.map(s => s.productName).join(", ") || "—";
+      const qtyText  = steps.map(s => formatDose(s.appliedAmount, s.doseUnit||"g")).join(", ") || "—";
+      const d = new Date(m.date);
+      const dateStr = `${d.getDate().toString().padStart(2,"0")}/${(d.getMonth()+1).toString().padStart(2,"0")} ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+
+      const vals = {
+        date:   dateStr,
+        pH:     m.pH   != null && m.pH   !== "" ? String(m.pH)   : "—",
+        fCl:    m.fCl  != null && m.fCl  !== "" ? String(m.fCl)  : "—",
+        tCl:    m.tCl  != null && m.tCl  !== "" ? String(m.tCl)  : "—",
+        ccl:    m.ccl  != null && m.ccl  !== "" ? String(m.ccl)  : "—",
+        tac:    m.tac  != null && m.tac  !== "" ? String(m.tac)  : "—",
+        cya:    m.cya  != null && m.cya  !== "" ? String(m.cya)  : "—",
+        hard:   m.hard != null && m.hard !== "" ? String(m.hard) : "—",
+        phos:   m.phos != null && m.phos !== "" ? String(m.phos) : "—",
+        copper: m.copper != null && m.copper !== "" ? String(m.copper) : "—",
+        iron:   m.iron != null && m.iron !== "" ? String(m.iron) : "—",
+        temp:   m.temp != null && m.temp !== "" ? String(m.temp) : "—",
+        prod: prodText,
+        qty:  qtyText,
+      };
+
+      pdf.setTextColor(30,30,30);
+      x = mL;
+      cols.forEach(c => {
+        pdf.text(String(vals[c.key]??'—'), x+0.8, y+3.8, { maxWidth: c.w-1.5 });
+        x += c.w;
+      });
+      pdf.setDrawColor(225,232,242); pdf.setLineWidth(0.1);
+      pdf.line(mL, y+rowH, mL+cW, y+rowH);
+      y += rowH;
+    });
+
+    // Footer toutes pages
+    const pageCount = pdf.internal.getNumberOfPages();
+    for (let p = 1; p <= pageCount; p++) {
+      pdf.setPage(p);
+      pdf.setFontSize(6.5); pdf.setFont("helvetica","normal"); pdf.setTextColor(160,160,160);
+      pdf.text(`PoolGenAI v${APP_VERSION} · ${poolName}`, mL, pageH-5);
+      pdf.text(`${p} / ${pageCount}`, pageW-mR, pageH-5, { align: "right" });
+    }
+
+    return pdf.output("blob");
+  }
+
+  async function handleSharePdf() {
+    setPdfLoading(true); setPdfError(null);
+    try {
+      const poolName = pool?.name || "piscine";
+      const fileName = `rapport-poolgenai-${poolName.toLowerCase().replace(/[^a-z0-9]/g,"-")}.pdf`;
+      const pdfBlob = await generatePdfBlob();
+      const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({ title: `Rapport PoolGenAI — ${poolName}`, files: [pdfFile] });
+      } else {
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement("a");
+        a.href = url; a.download = fileName;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }
+    } catch(e) {
+      if (e.name !== "AbortError") { console.error("PDF share error", e); setPdfError(e.message||"Erreur PDF"); }
+    } finally { setPdfLoading(false); }
+  }
+
+  async function handleDownloadPdf() {
+    setPdfLoading(true); setPdfError(null);
+    try {
+      const poolName = pool?.name || "piscine";
+      const fileName = `rapport-poolgenai-${poolName.toLowerCase().replace(/[^a-z0-9]/g,"-")}.pdf`;
+      const pdfBlob = await generatePdfBlob();
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement("a");
+      a.href = url; a.download = fileName;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch(e) {
+      console.error("PDF download error", e); setPdfError(e.message||"Erreur PDF");
+    } finally { setPdfLoading(false); }
+  }
+
   return (
     <div style={styles.reportOverlay} className="report-print-root">
       <div style={styles.reportToolbar} className="no-print">
@@ -7737,27 +7814,25 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
           <X size={18} /> {t("close")}
         </button>
         <label style={styles.reportToolbarCheckbox}>
-          <input
-            type="checkbox"
-            checked={showValues}
-            onChange={(e) => setShowValues(e.target.checked)}
-          />
+          <input type="checkbox" checked={showValues} onChange={(e) => setShowValues(e.target.checked)} />
           <span>{t("show_values")}</span>
         </label>
-        <button style={styles.reportPrintBtn} onClick={() => window.print()}>
-          <Download size={16} /> {t("report_print_btn")}
+        <button
+          style={{ ...styles.reportPrintBtn, opacity: pdfLoading ? 0.7 : 1 }}
+          onClick={handleDownloadPdf}
+          disabled={pdfLoading}
+        >
+          {pdfLoading ? <Loader2 size={16} className="spin" /> : <Download size={16} />}
+          {t("report_print_btn")}
         </button>
         <button
           className="no-print"
           style={{ ...styles.reportPrintBtn, background: pdfLoading ? "#6a7d90" : "#0d7a3e", opacity: pdfLoading ? 0.7 : 1 }}
-          onClick={generateAndSharePdf}
+          onClick={handleSharePdf}
           disabled={pdfLoading}
         >
-          {pdfLoading
-            ? <Loader2 size={16} className="spin" />
-            : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          }
-          {pdfLoading ? t("ai_analyzing") : t("share_report")}
+          {pdfLoading ? <Loader2 size={16} className="spin" /> : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>}
+          {t("share_report")}
         </button>
         {pdfError && (
           <div className="no-print" style={{ fontSize: 11, color: "#c0392b", padding: "4px 8px", background: "#fdf0ef", borderRadius: 6 }}>
