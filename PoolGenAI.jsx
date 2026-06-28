@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.9.2";
+const APP_VERSION = "1.9.3";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4541,6 +4541,7 @@ Réponds directement en français, sans titre ni introduction.`;
         <button style={styles.primaryBtn} onClick={onAddMeasure}>
           <Plus size={18} /> {t("add_measure")}
         </button>
+        <div style={styles.versionTag}>PoolGenAI v{APP_VERSION}</div>
       </div>
     );
   }
@@ -5213,6 +5214,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication,
         <History size={40} color="#7ab8e8" strokeWidth={1.5} />
         <p style={styles.emptyTitle}>{t("no_history")}</p>
         <p style={styles.emptyText}>{t("no_history_sub")}</p>
+        <div style={styles.versionTag}>PoolGenAI v{APP_VERSION}</div>
       </div>
     );
   }
