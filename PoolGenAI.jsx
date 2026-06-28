@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.9.3";
+const APP_VERSION = "1.9.4";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -6985,11 +6985,11 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
                 onKeyDown={e => {
                   if (e.key === "Enter") {
                     if (aiPasswordInput === AI_PASSWORD) {
-                      setAiEnabled(true);
                       setShowAiPasswordModal(false);
                       setAiPasswordInput("");
                       setShowAiPwd(false);
-                      setTimeout(() => setShowAiConfig(true), 100);
+                      setAiEnabled(true);
+                      setShowAiConfig(true);
                     } else {
                       setAiPasswordError(true);
                     }
@@ -7021,11 +7021,11 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
                 style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
                 onClick={() => {
                   if (aiPasswordInput === AI_PASSWORD) {
-                    setAiEnabled(true);
                     setShowAiPasswordModal(false);
                     setAiPasswordInput("");
                     setShowAiPwd(false);
-                    setTimeout(() => setShowAiConfig(true), 100);
+                    setAiEnabled(true);
+                    setShowAiConfig(true);
                   } else {
                     setAiPasswordError(true);
                   }
