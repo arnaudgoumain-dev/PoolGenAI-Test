@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.11.2";
+const APP_VERSION = "1.11.3";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4213,7 +4213,7 @@ function PoolApp() {
           onActivate={() => {
             track("upgrade_activated");
             setIsPremium(true);
-            setApiKey("https://poolapp-proxy.arnaud-goumain.workers.dev");
+            setApiKey("https://poolgenai-proxy.support-poolgenai.workers.dev");
             setShowPaywall(false);
           }}
         />
