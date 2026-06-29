@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.13.4";
+const APP_VERSION = "1.13.5";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -7937,8 +7937,14 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
 
     sortedMeasures.forEach((m, i) => {
       const app   = applications.find(a => a.measureId === m.id);
-      const steps = app?.steps?.filter(s => !s.skipped) || [];
-      const rowCount = Math.max(1, steps.length);
+      const appliedSteps = app?.steps?.filter(s => !s.skipped) || [];
+      const repTargets = getEffectiveTargets(pool?.treatmentType || "chlore");
+      const repParams  = getActiveParams(pool?.treatmentType || "chlore");
+      const mRecs = computeRecommendations(m, pool?.volume || 0, products, repTargets, repParams, t);
+
+      const useSteps = appliedSteps.length > 0;
+      const items = useSteps ? appliedSteps : mRecs;
+      const rowCount = Math.max(1, items.length);
       const blockH = rowH * rowCount;
 
       checkPage(blockH);
@@ -7971,11 +7977,15 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         x += c.w;
       });
 
-      // Une ligne par step
-      const stepsToRender = steps.length > 0 ? steps : [null];
-      stepsToRender.forEach((step, j) => {
+      // Une ligne par item (step ou rec)
+      const itemsToRender = items.length > 0 ? items : [null];
+      itemsToRender.forEach((item, j) => {
         const rowY = y + j * rowH;
+        const isStep = useSteps;
+        const step = isStep ? item : null;
+        const rec  = !isStep ? item : null;
         const prod = step ? products.find(p => p.name === step.productName) : null;
+
         const stockVal = (() => {
           if (!manageStock || !prod) return "—";
           const qty = Math.round((prod.stockPercent ?? 100) / 100 * (prod.containerAmount ?? 1) * 10) / 10;
@@ -7983,8 +7993,9 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         })();
 
         const prodVals = {
-          prod:    step ? step.productName : "—",
-          advised: step && step.computedDoseAmount != null ? formatDose(step.computedDoseAmount, step.doseUnit||"g") : "—",
+          prod:    step ? step.productName : rec ? rec.productName : "—",
+          advised: step ? (step.computedDoseAmount != null ? formatDose(step.computedDoseAmount, step.doseUnit||"g") : "—")
+                        : rec ? formatDose(rec.computedDoseAmount, rec.doseUnit||"g") : "—",
           qty:     step ? formatDose(step.appliedAmount, step.doseUnit||"g") : "—",
           stock:   stockVal,
         };
@@ -7995,8 +8006,8 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
           x += c.w;
         });
 
-        // Ligne de séparation entre steps (fine)
-        if (j < stepsToRender.length - 1) {
+        // Ligne de séparation entre items (fine)
+        if (j < itemsToRender.length - 1) {
           pdf.setDrawColor(210,220,235); pdf.setLineWidth(0.08);
           pdf.line(prodStartX, rowY+rowH, mL+cW, rowY+rowH);
         }
@@ -8247,11 +8258,14 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
               </tr>
             </thead>
             <tbody>
-              {rows.flatMap(({ measure, application }, i) => {
-                const applied = application?.steps || [];
-                const rowCount = Math.max(1, applied.length);
+              {rows.flatMap(({ measure, recs, application }, i) => {
+                const applied = application?.steps?.filter(s => !s.skipped) || [];
+                // Si plan appliqué → utiliser les steps ; sinon → utiliser les recs calculées
+                const useSteps = applied.length > 0;
+                const rowCount = useSteps ? Math.max(1, applied.length) : Math.max(1, recs.length);
                 return Array.from({ length: rowCount }).map((_, j) => {
-                  const step = applied[j] || null;
+                  const step = useSteps ? (applied[j] || null) : null;
+                  const rec  = !useSteps ? (recs[j] || null) : null;
                   const prod = step ? products.find((p) => p.name === step.productName) : null;
                   return (
                     <tr key={`${i}-${j}`} style={{ background: i % 2 === 0 ? "#f8fafd" : "#ffffff" }}>
@@ -8271,15 +8285,23 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                           <td style={styles.reportTdCell} rowSpan={rowCount}>{measure.temp != null && measure.temp !== "" ? `${measure.temp} °C` : "—"}</td>
                         </>
                       )}
+                      {/* Produit */}
                       <td style={styles.reportTdCell}>
-                        {step ? (step.skipped ? <span style={{ color: "#9ab0c4" }}>⊘ {step.productName}</span> : step.productName) : "—"}
+                        {step ? (step.skipped ? <span style={{ color: "#9ab0c4" }}>⊘ {step.productName}</span> : step.productName)
+                          : rec ? <span style={{ color: "#6a7d90", fontStyle: "italic" }}>{rec.productName}</span>
+                          : "—"}
                       </td>
+                      {/* Conseillé */}
                       <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
-                        {step && !step.skipped ? formatDose(step.computedDoseAmount ?? step.appliedAmount, step.doseUnit || "g") : "—"}
+                        {step && !step.skipped ? formatDose(step.computedDoseAmount ?? step.appliedAmount, step.doseUnit || "g")
+                          : rec ? formatDose(rec.computedDoseAmount, rec.doseUnit || "g")
+                          : "—"}
                       </td>
+                      {/* Appliqué */}
                       <td style={{ ...styles.reportTdCell, fontWeight: 700, color: step?.skipped ? "#9ab0c4" : "#0a6ebd" }}>
                         {step && !step.skipped ? formatDose(step.appliedAmount, step.doseUnit || "g") : "—"}
                       </td>
+                      {/* Horaire */}
                       <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
                         {step?.appliedAt ? new Date(step.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}
                       </td>
