@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.14.0";
+const APP_VERSION = "1.14.1";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -129,7 +129,12 @@ const TRANSLATIONS = {
     diag_analyzing: "Analyse en cours...",
     diag_confidence: "Indice de confiance",
     diag_off_topic: "Cette question ne concerne pas le traitement de l'eau de bassin. Je ne peux répondre qu'aux questions liées à la chimie de l'eau, aux produits de traitement et aux équipements de piscine.",
-        diag_error: "Analyse impossible",
+            diag_error: "Analyse impossible",
+    import_pdf_btn: "Importer un rapport PDF",
+    import_pdf_prefill_title: "Mesure importée depuis PDF",
+    import_pdf_analyzing: "Lecture du fichier par l'IA...",
+    import_pdf_error: "Impossible de lire ce fichier",
+    import_pdf_no_values: "Aucune valeur trouvée dans ce fichier",
     legend_title: "Légende des paramètres et valeurs cibles",
     ccl_fcl_tcl_error: "Erreur : FCL + CCL ne peut pas dépasser TCL. Vérifie les valeurs saisies.",
     param_ph_long: "Potentiel Hydrogène", param_fcl_long: "Chlore libre", param_tcl_long: "Chlore total",
@@ -556,7 +561,12 @@ const TRANSLATIONS = {
     diag_analyzing: "Analysing...",
     diag_confidence: "Confidence level",
     diag_off_topic: "This question is not related to pool water treatment. I can only answer questions about water chemistry, treatment products and pool equipment.",
-        diag_error: "Analysis failed",
+            diag_error: "Analysis failed",
+    import_pdf_btn: "Import PDF report",
+    import_pdf_prefill_title: "Reading imported from PDF",
+    import_pdf_analyzing: "AI is reading the file...",
+    import_pdf_error: "Unable to read this file",
+    import_pdf_no_values: "No values found in this file",
     legend_title: "Parameters legend and target values",
     ccl_fcl_tcl_error: "Error: FCL + CCL cannot exceed TCL. Check the entered values.",
     param_ph_long: "Hydrogen Potential", param_fcl_long: "Free chlorine", param_tcl_long: "Total chlorine",
@@ -973,7 +983,12 @@ const TRANSLATIONS = {
     diag_analyzing: "Analyse läuft...",
     diag_confidence: "Vertrauensindex",
     diag_off_topic: "Diese Frage betrifft nicht die Wasserbehandlung. Ich beantworte nur Fragen zur Wasserchemie, Behandlungsprodukten und Poolausrüstung.",
-        diag_error: "Analyse fehlgeschlagen",
+            diag_error: "Analyse fehlgeschlagen",
+    import_pdf_btn: "PDF-Bericht importieren",
+    import_pdf_prefill_title: "Messung aus PDF importiert",
+    import_pdf_analyzing: "KI liest die Datei...",
+    import_pdf_error: "Diese Datei kann nicht gelesen werden",
+    import_pdf_no_values: "Keine Werte in dieser Datei gefunden",
     legend_title: "Parameterlegende und Zielwerte",
     ccl_fcl_tcl_error: "Fehler: FCL + CCL darf TCL nicht überschreiten. Bitte Werte prüfen.",
     param_ph_long: "Wasserstoffpotenzial", param_fcl_long: "Freies Chlor", param_tcl_long: "Gesamtchlor",
@@ -1392,7 +1407,12 @@ const TRANSLATIONS = {
     diag_analyzing: "Analisi in corso...",
     diag_confidence: "Indice di fiducia",
     diag_off_topic: "Questa domanda non riguarda il trattamento dell'acqua della piscina. Rispondo solo a domande sulla chimica dell'acqua, sui prodotti di trattamento e sulle attrezzature per piscine.",
-        diag_error: "Analisi impossibile",
+            diag_error: "Analisi impossibile",
+    import_pdf_btn: "Importa rapporto PDF",
+    import_pdf_prefill_title: "Misurazione importata da PDF",
+    import_pdf_analyzing: "L'IA sta leggendo il file...",
+    import_pdf_error: "Impossibile leggere questo file",
+    import_pdf_no_values: "Nessun valore trovato in questo file",
     legend_title: "Legenda parametri e valori target",
     ccl_fcl_tcl_error: "Errore: FCL + CCL non può superare TCL. Verificare i valori inseriti.",
     param_ph_long: "Potenziale di idrogeno", param_fcl_long: "Cloro libero", param_tcl_long: "Cloro totale",
@@ -1808,7 +1828,12 @@ const TRANSLATIONS = {
     diag_analyzing: "Analizando...",
     diag_confidence: "Índice de confianza",
     diag_off_topic: "Esta pregunta no está relacionada con el tratamiento del agua de piscina. Solo respondo preguntas sobre química del agua, productos de tratamiento y equipos de piscina.",
-        diag_error: "Análisis fallido",
+            diag_error: "Análisis fallido",
+    import_pdf_btn: "Importar informe PDF",
+    import_pdf_prefill_title: "Medición importada desde PDF",
+    import_pdf_analyzing: "La IA está leyendo el archivo...",
+    import_pdf_error: "No se puede leer este archivo",
+    import_pdf_no_values: "No se encontraron valores en este archivo",
     legend_title: "Leyenda de parámetros y valores objetivo",
     ccl_fcl_tcl_error: "Error: FCL + CCL no puede superar TCL. Verifica los valores introducidos.",
     param_ph_long: "Potencial de hidrógeno", param_fcl_long: "Cloro libre", param_tcl_long: "Cloro total",
@@ -2224,7 +2249,12 @@ const TRANSLATIONS = {
     diag_analyzing: "A analisar...",
     diag_confidence: "Índice de confiança",
     diag_off_topic: "Esta pergunta não está relacionada com o tratamento da água da piscina. Só respondo a perguntas sobre química da água, produtos de tratamento e equipamentos de piscina.",
-        diag_error: "Análise impossível",
+            diag_error: "Análise impossível",
+    import_pdf_btn: "Importar relatório PDF",
+    import_pdf_prefill_title: "Medição importada de PDF",
+    import_pdf_analyzing: "A IA está a ler o ficheiro...",
+    import_pdf_error: "Impossível ler este ficheiro",
+    import_pdf_no_values: "Nenhum valor encontrado neste ficheiro",
     legend_title: "Legenda dos parâmetros e valores alvo",
     ccl_fcl_tcl_error: "Erro: FCL + CCL não pode ultrapassar TCL. Verifica os valores introduzidos.",
     param_ph_long: "Potencial de hidrogénio", param_fcl_long: "Cloro livre", param_tcl_long: "Cloro total",
@@ -4131,6 +4161,10 @@ function PoolApp() {
             onDelete={deleteMeasure}
             onEdit={handleEditMeasure}
             onAdd={handleOpenAddMeasure}
+            onAddPrefilled={(prefilled) => {
+              setEditingMeasure({ ...prefilled, __prefilled: true });
+              setShowAddMeasure(true);
+            }}
             onValidateApplication={handleValidateApplication}
             applications={poolApplications}
             isPremium={isPremium}
@@ -5303,12 +5337,116 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
 }
 
 // ---------- Historique ----------
-function HistoryView({ measures, onDelete, onEdit, onAdd, onValidateApplication, applications, isPremium, poolName, onGenerateReport, onWantPremiumForReport, lang, apiKey, apiProvider, authUid, pool }) {
+function HistoryView({ measures, onDelete, onEdit, onAdd, onAddPrefilled, onValidateApplication, applications, isPremium, poolName, onGenerateReport, onWantPremiumForReport, lang, apiKey, apiProvider, authUid, pool }) {
   const t = useT(lang);
   const [diagText, setDiagText] = useState("");
   const [diagResult, setDiagResult] = useState(null);
   const [diagLoading, setDiagLoading] = useState(false);
   const [diagError, setDiagError] = useState(null);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importError, setImportError] = useState(null);
+  const importFileRef = useRef(null);
+
+  async function handleImportFile(e) {
+    const file = e.target.files?.[0];
+    if (!file || !apiKey) return;
+    e.target.value = "";
+    setImportLoading(true); setImportError(null);
+    try {
+      // Convertir en base64
+      const base64 = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(",")[1]);
+        reader.onerror = () => rej(new Error("Lecture impossible"));
+        reader.readAsDataURL(file);
+      });
+
+      const isPdf = file.type === "application/pdf";
+      const mediaType = isPdf ? "application/pdf" : (file.type || "image/jpeg");
+
+      const prompt = `Tu es un expert en chimie de l'eau de piscine. Analyse ce document (rapport de mesures, relevé de labo, photo de photomètre ou de bandelette).
+Extrait toutes les valeurs de paramètres de qualité d'eau présentes, ainsi qu'une date si visible, et une note textuelle si présente (commentaire, observation).
+
+Réponds UNIQUEMENT en JSON valide, sans texte avant ni après :
+{
+  "pH": <number|null>,
+  "fCl": <number|null>,
+  "tCl": <number|null>,
+  "ccl": <number|null>,
+  "tac": <number|null>,
+  "cya": <number|null>,
+  "hard": <number|null>,
+  "phos": <number|null>,
+  "copper": <number|null>,
+  "iron": <number|null>,
+  "temp": <number|null>,
+  "sel": <number|null>,
+  "brome": <number|null>,
+  "date": "<ISO date string or null>",
+  "note": "<texte de note ou null>"
+}`;
+
+      const { jsPDF: _j, ...rest } = {}; // just to ensure closure
+      const response = await fetch(apiKey.startsWith("http") ? `${apiKey}/v1/messages` : "https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "anthropic-version": "2023-06-01",
+          ...(apiKey.startsWith("http") ? { "x-uid": authUid || "" } : { "x-api-key": apiKey, "anthropic-dangerous-direct-browser-access": "true" }),
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          messages: [{
+            role: "user",
+            content: [
+              {
+                type: isPdf ? "document" : "image",
+                source: { type: "base64", media_type: mediaType, data: base64 },
+              },
+              { type: "text", text: prompt },
+            ],
+          }],
+        }),
+      });
+
+      const data = await response.json();
+      const text = data.content?.map(c => c.text || "").join("").trim();
+      const clean = text.replace(/```json|```/g, "").trim();
+      const parsed = JSON.parse(clean);
+
+      // Vérifier qu'au moins une valeur a été trouvée
+      const numKeys = ["pH","fCl","tCl","ccl","tac","cya","hard","phos","copper","iron","temp","sel","brome"];
+      const hasValues = numKeys.some(k => parsed[k] != null);
+      if (!hasValues) throw new Error(t("import_pdf_no_values"));
+
+      // Pré-remplir la mesure
+      const prefilled = {
+        __prefilled: true,
+        date: parsed.date ? new Date(parsed.date).toISOString() : new Date().toISOString(),
+        pH:     parsed.pH     != null ? String(parsed.pH)     : "",
+        fCl:    parsed.fCl    != null ? String(parsed.fCl)    : "",
+        tCl:    parsed.tCl    != null ? String(parsed.tCl)    : "",
+        ccl:    parsed.ccl    != null ? String(parsed.ccl)    : "",
+        tac:    parsed.tac    != null ? String(parsed.tac)    : "",
+        cya:    parsed.cya    != null ? String(parsed.cya)    : "",
+        hard:   parsed.hard   != null ? String(parsed.hard)   : "",
+        phos:   parsed.phos   != null ? String(parsed.phos)   : "",
+        copper: parsed.copper != null ? String(parsed.copper) : "",
+        iron:   parsed.iron   != null ? String(parsed.iron)   : "",
+        temp:   parsed.temp   != null ? String(parsed.temp)   : "",
+        sel:    parsed.sel    != null ? String(parsed.sel)    : "",
+        brome:  parsed.brome  != null ? String(parsed.brome)  : "",
+        note:   parsed.note   || "",
+      };
+      onAddPrefilled(prefilled);
+    } catch(e) {
+      console.error("Import PDF error", e);
+      setImportError(e.message || t("import_pdf_error"));
+    } finally {
+      setImportLoading(false);
+    }
+  }
 
   async function handleDiag() {
     if (!diagText.trim() || !apiKey) return;
@@ -5545,6 +5683,32 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
         <span style={styles.sectionLabel}>{t("journal")}</span>
       </div>
 
+      {/* Bouton import PDF */}
+      {apiKey && (
+        <div style={{ marginBottom: 8 }}>
+          <input
+            ref={importFileRef}
+            type="file"
+            accept="application/pdf,image/jpeg,image/png,image/webp"
+            style={{ display: "none" }}
+            onChange={handleImportFile}
+          />
+          <button
+            style={{ ...styles.validateApplyBtn, background: importLoading ? "#6a7d90" : "#0a6ebd", fontSize: 13, padding: "9px 14px" }}
+            onClick={() => importFileRef.current?.click()}
+            disabled={importLoading}
+          >
+            {importLoading ? <Loader2 size={15} className="spin" /> : <FileText size={15} />}
+            {importLoading ? t("import_pdf_analyzing") : t("import_pdf_btn")}
+          </button>
+          {importError && (
+            <div style={{ marginTop: 6, fontSize: 12, color: "#c0392b", padding: "6px 10px", background: "#fdf0ef", borderRadius: 8 }}>
+              <AlertTriangle size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />{importError}
+            </div>
+          )}
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {measures.map((m) => (
           <MeasureRow
@@ -5766,7 +5930,8 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
 // ---------- Modal Ajout mesure ----------
 function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, apiKey, apiProvider, activeParamKeys, lang, onRequestPhotoAccess, authUid }) {
   const t = useT(lang || "fr");
-  const isEditing = !!measure;
+  const isPrefilled = !!measure?.__prefilled;
+  const isEditing = !!measure && !isPrefilled;
   const [date, setDate] = useState(
     measure ? new Date(measure.date).toISOString().slice(0, 16) : todayLocalDatetime()
   );
@@ -6001,7 +6166,7 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
     : ALL_FIELDS.filter((f) => ["pH","fCl","tCl","tac","cya","temp"].includes(f.key));
 
   return (
-    <ModalShell onClose={onClose} title={isEditing ? t("edit_measure_title") : t("new_measure_title")}>
+    <ModalShell onClose={onClose} title={isEditing ? t("edit_measure_title") : isPrefilled ? t("import_pdf_prefill_title") : t("new_measure_title")}>
       <label style={styles.fieldLabel}>{t("date_time")}</label>
       <input
         type="datetime-local"
