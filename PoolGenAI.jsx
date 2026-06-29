@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.15.6";
+const APP_VERSION = "1.15.7";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4178,6 +4178,9 @@ function PoolApp() {
     );
     setActivePlan({ ...activePlan, steps: newSteps });
   }
+
+  // Passe une étape
+  function skipWizardStep(stepIdx) {
     if (!activePlan) return;
     const newSteps = activePlan.steps.map((s, i) =>
       i === stepIdx ? { ...s, skipped: true, appliedAt: new Date().toISOString() } : s
