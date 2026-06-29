@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.15.4";
+const APP_VERSION = "1.15.5";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -222,6 +222,7 @@ const TRANSLATIONS = {
     wizard_next_step: "Prochaine étape",
     wizard_start: "Démarrer le plan",
     plan_in_progress: "Plan de traitement en cours",
+    wizard_apply_time: "Heure d'application",
     wizard_resume: "Reprendre le plan",
     wizard_completed: "Plan de traitement terminé ✓",
     wizard_partial: "Plan en cours",
@@ -652,6 +653,7 @@ const TRANSLATIONS = {
     wizard_next_step: "Next step",
     wizard_start: "Start plan",
     plan_in_progress: "Treatment plan in progress",
+    wizard_apply_time: "Application time",
     wizard_resume: "Resume plan",
     wizard_completed: "Treatment plan completed ✓",
     wizard_partial: "Plan in progress",
@@ -1075,6 +1077,7 @@ const TRANSLATIONS = {
     wizard_next_step: "Nächster Schritt",
     wizard_start: "Plan starten",
     plan_in_progress: "Behandlungsplan läuft",
+    wizard_apply_time: "Anwendungszeitpunkt",
     wizard_resume: "Plan fortsetzen",
     wizard_completed: "Behandlungsplan abgeschlossen ✓",
     wizard_partial: "Plan läuft",
@@ -1501,6 +1504,7 @@ const TRANSLATIONS = {
     wizard_next_step: "Prossimo passo",
     wizard_start: "Avvia piano",
     plan_in_progress: "Piano di trattamento in corso",
+    wizard_apply_time: "Orario di applicazione",
     wizard_resume: "Riprendi piano",
     wizard_completed: "Piano di trattamento completato ✓",
     wizard_partial: "Piano in corso",
@@ -1924,6 +1928,7 @@ const TRANSLATIONS = {
     wizard_next_step: "Siguiente paso",
     wizard_start: "Iniciar plan",
     plan_in_progress: "Plan de tratamiento en curso",
+    wizard_apply_time: "Hora de aplicación",
     wizard_resume: "Reanudar plan",
     wizard_completed: "Plan de tratamiento completado ✓",
     wizard_partial: "Plan en curso",
@@ -2347,6 +2352,7 @@ const TRANSLATIONS = {
     wizard_next_step: "Próximo passo",
     wizard_start: "Iniciar plano",
     plan_in_progress: "Plano de tratamento em curso",
+    wizard_apply_time: "Hora de aplicação",
     wizard_resume: "Retomar plano",
     wizard_completed: "Plano de tratamento concluído ✓",
     wizard_partial: "Plano em andamento",
@@ -4122,9 +4128,9 @@ function PoolApp() {
   }
 
   // Valide une étape du wizard — version sans appel de setter dans setter
-  function applyWizardStep(stepIdx, amount) {
+  function applyWizardStep(stepIdx, amount, appliedAt) {
     if (!activePlan) return;
-    const now = new Date().toISOString();
+    const now = appliedAt || new Date().toISOString();
     const newSteps = activePlan.steps.map((s, i) => {
       if (i !== stepIdx) return s;
       return { ...s, appliedAt: now, appliedAmount: amount, skipped: false };
@@ -4619,7 +4625,7 @@ function PoolApp() {
           products={poolProducts}
           manageStock={!!activePool?.manageStock}
           lang={lang}
-          onApplyStep={(idx, amount) => { applyWizardStep(idx, amount, false); }}
+          onApplyStep={(idx, amount, appliedAt) => { applyWizardStep(idx, amount, appliedAt); }}
           onSkipStep={(idx) => { skipWizardStep(idx); }}
           onClose={() => { setShowWizard(false); }}
           onCancel={() => { cancelPlan(); setShowWizard(false); }}
@@ -5045,19 +5051,22 @@ Réponds directement en français, sans titre ni introduction.`;
           {recs.length > 1 && (
             <p style={styles.helpText}>{t("follow_order")}</p>
           )}
-          {recs.map((r, i) => (
-            <RecoCard
-              key={i}
-              reco={r}
-              isLast={i === recs.length - 1}
-              selectable={!applicationForLatest}
-              selected={!!selectedRecs[i]}
-              onToggle={() => setSelectedRecs((prev) => ({ ...prev, [i]: !prev[i] }))}
-              manageStock={manageStock}
-              products={products}
-              lang={lang}
-            />
-          ))}
+          {recs.map((r, i) => {
+            const planForLatest = activePlan && latest && activePlan.measureId === latest.id ? activePlan : null;
+            return (
+              <RecoCard
+                key={i}
+                reco={r}
+                isLast={i === recs.length - 1}
+                selectable={!applicationForLatest && !planForLatest}
+                selected={!!selectedRecs[i]}
+                onToggle={() => setSelectedRecs((prev) => ({ ...prev, [i]: !prev[i] }))}
+                manageStock={manageStock}
+                products={products}
+                lang={lang}
+              />
+            );
+          })}
 
           {(() => {
             const planForLatest = activePlan && latest && activePlan.measureId === latest.id ? activePlan : null;
@@ -6748,6 +6757,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
   const t = useT(lang);
   const [now, setNow] = React.useState(Date.now());
   const [editAmount, setEditAmount] = React.useState(null);
+  const [editTime, setEditTime] = React.useState("");
 
   useEffect(() => {
     const iv = setInterval(() => setNow(Date.now()), 1000);
@@ -6758,11 +6768,13 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
     if (plan && plan.currentStepIdx >= 0) {
       const step = plan.steps[plan.currentStepIdx];
       if (step) {
-        // Pré-remplir avec computedDoseAmount même si le produit n'est pas en stock
         const amount = step.computedDoseAmount ?? step.appliedAmount;
         const unit = step.doseUnit || "g";
         const { value } = toDisplayUnit(amount, unit);
         setEditAmount(value != null && value !== "" ? String(value) : "");
+        // Heure par défaut = maintenant en format HH:MM
+        const d = new Date();
+        setEditTime(`${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`);
       }
     }
   }, [plan?.currentStepIdx]);
@@ -6816,7 +6828,15 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
 
   function handleApply() {
     const amount = toBaseUnit(editAmount, displayUnit, baseUnit);
-    onApplyStep(currentIdx, amount);
+    // Construire l'heure d'application depuis editTime (HH:MM) + date du jour
+    let appliedAt = new Date().toISOString();
+    if (editTime) {
+      const [h, m] = editTime.split(":").map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      appliedAt = d.toISOString();
+    }
+    onApplyStep(currentIdx, amount, appliedAt);
   }
 
   return (
@@ -6907,7 +6927,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
 
         {/* Quantité */}
         {baseUnit && (
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 12 }}>
             <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
               {t("quantity_applied")}
             </label>
@@ -6923,6 +6943,19 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
             </div>
           </div>
         )}
+
+        {/* Heure d'application */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
+            {t("wizard_apply_time")}
+          </label>
+          <input
+            type="time"
+            value={editTime}
+            onChange={(e) => setEditTime(e.target.value)}
+            style={{ width: "100%", boxSizing: "border-box", fontSize: 18, fontWeight: 700, color: "#0a6ebd", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none" }}
+          />
+        </div>
 
         {/* Boutons */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
