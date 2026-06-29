@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.15.2";
+const APP_VERSION = "1.15.3";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4276,6 +4276,8 @@ function PoolApp() {
     if (!loaded || !authUser?.uid) return;
     syncConfig({ apiProvider });
   }, [apiProvider]);
+
+  function addPool(pool) {
     const id = uid();
     setPools((prev) => [...prev, { id, ...pool }]);
     setProducts((prev) => {
