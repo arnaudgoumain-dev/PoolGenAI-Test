@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.15.9";
+const APP_VERSION = "1.16.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4146,11 +4146,13 @@ function PoolApp() {
   }
 
   // Helper : construit finalSteps depuis un tableau de steps
+  // Pour les steps non encore confirmés (pas d'appliedAt), on ne garde que computedDoseAmount
   function buildFinalSteps(steps) {
     return steps.map(s => ({
       action: s.action, title: s.title, productName: s.productName,
       computedDoseAmount: s.computedDoseAmount,
-      appliedAmount: s.appliedAmount, doseUnit: s.doseUnit,
+      appliedAmount: (s.appliedAt && !s.skipped) ? s.appliedAmount : null,
+      doseUnit: s.doseUnit,
       appliedAt: s.appliedAt, skipped: s.skipped, scheduledAt: s.scheduledAt,
     }));
   }
