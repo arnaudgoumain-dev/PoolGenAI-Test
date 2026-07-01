@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.18.0";
+const APP_VERSION = "1.19.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -148,6 +148,8 @@ const TRANSLATIONS = {
     import_pdf_error: "Impossible de lire ce fichier",
     import_pdf_no_values: "Aucune valeur trouvée dans ce fichier",
     import_pdf_needs_ai: "Import PDF disponible avec l'analyse IA (Réglages → Activer l'analyse IA)",
+    import_diag_added_one: "1 diagnostic IA importé depuis ce document.",
+    import_diag_added_many: "{n} diagnostics IA importés depuis ce document.",
     legend_title: "Légende des paramètres et valeurs cibles",
     ccl_fcl_tcl_error: "Erreur : FCL + CCL ne peut pas dépasser TCL. Vérifie les valeurs saisies.",
     param_ph_long: "Potentiel Hydrogène", param_fcl_long: "Chlore libre", param_tcl_long: "Chlore total",
@@ -598,6 +600,8 @@ const TRANSLATIONS = {
     import_pdf_error: "Unable to read this file",
     import_pdf_no_values: "No values found in this file",
     import_pdf_needs_ai: "PDF import available with AI analysis (Settings → Enable AI analysis)",
+    import_diag_added_one: "1 AI diagnostic imported from this document.",
+    import_diag_added_many: "{n} AI diagnostics imported from this document.",
     legend_title: "Parameters legend and target values",
     ccl_fcl_tcl_error: "Error: FCL + CCL cannot exceed TCL. Check the entered values.",
     param_ph_long: "Hydrogen Potential", param_fcl_long: "Free chlorine", param_tcl_long: "Total chlorine",
@@ -1038,6 +1042,8 @@ const TRANSLATIONS = {
     import_pdf_error: "Diese Datei kann nicht gelesen werden",
     import_pdf_no_values: "Keine Werte in dieser Datei gefunden",
     import_pdf_needs_ai: "PDF-Import verfügbar mit KI-Analyse (Einstellungen → KI-Analyse aktivieren)",
+    import_diag_added_one: "1 KI-Diagnose aus diesem Dokument importiert.",
+    import_diag_added_many: "{n} KI-Diagnosen aus diesem Dokument importiert.",
     legend_title: "Parameterlegende und Zielwerte",
     ccl_fcl_tcl_error: "Fehler: FCL + CCL darf TCL nicht überschreiten. Bitte Werte prüfen.",
     param_ph_long: "Wasserstoffpotenzial", param_fcl_long: "Freies Chlor", param_tcl_long: "Gesamtchlor",
@@ -1480,6 +1486,8 @@ const TRANSLATIONS = {
     import_pdf_error: "Impossibile leggere questo file",
     import_pdf_no_values: "Nessun valore trovato in questo file",
     import_pdf_needs_ai: "Importazione PDF disponibile con analisi IA (Impostazioni → Attiva analisi IA)",
+    import_diag_added_one: "1 diagnosi IA importata da questo documento.",
+    import_diag_added_many: "{n} diagnosi IA importate da questo documento.",
     legend_title: "Legenda parametri e valori target",
     ccl_fcl_tcl_error: "Errore: FCL + CCL non può superare TCL. Verificare i valori inseriti.",
     param_ph_long: "Potenziale di idrogeno", param_fcl_long: "Cloro libero", param_tcl_long: "Cloro totale",
@@ -1919,6 +1927,8 @@ const TRANSLATIONS = {
     import_pdf_error: "No se puede leer este archivo",
     import_pdf_no_values: "No se encontraron valores en este archivo",
     import_pdf_needs_ai: "Importación PDF disponible con análisis IA (Ajustes → Activar análisis IA)",
+    import_diag_added_one: "1 diagnóstico IA importado desde este documento.",
+    import_diag_added_many: "{n} diagnósticos IA importados desde este documento.",
     legend_title: "Leyenda de parámetros y valores objetivo",
     ccl_fcl_tcl_error: "Error: FCL + CCL no puede superar TCL. Verifica los valores introducidos.",
     param_ph_long: "Potencial de hidrógeno", param_fcl_long: "Cloro libre", param_tcl_long: "Cloro total",
@@ -2358,6 +2368,8 @@ const TRANSLATIONS = {
     import_pdf_error: "Impossível ler este ficheiro",
     import_pdf_no_values: "Nenhum valor encontrado neste ficheiro",
     import_pdf_needs_ai: "Importação PDF disponível com análise IA (Definições → Ativar análise IA)",
+    import_diag_added_one: "1 diagnóstico IA importado deste documento.",
+    import_diag_added_many: "{n} diagnósticos IA importados deste documento.",
     legend_title: "Legenda dos parâmetros e valores alvo",
     ccl_fcl_tcl_error: "Erro: FCL + CCL não pode ultrapassar TCL. Verifica os valores introduzidos.",
     param_ph_long: "Potencial de hidrogénio", param_fcl_long: "Cloro livre", param_tcl_long: "Cloro total",
@@ -2982,6 +2994,29 @@ function todayLocalDatetime() {
   return d.toISOString().slice(0, 16);
 }
 
+// Parse une date retournée par l'IA (extraction depuis document importé).
+// Si pas d'indicateur de fuseau (ni Z ni +HH:MM), on l'interprète comme heure locale
+// pour éviter le décalage UTC → local. Retourne null si rawDate est vide/invalide.
+function parseFlexibleDate(rawDate) {
+  if (!rawDate) return null;
+  const raw = String(rawDate).trim();
+  if (!raw) return null;
+  const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(raw);
+  try {
+    if (!hasTimezone) {
+      const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+      if (match) {
+        const [, y, mo, d, h, mi, s] = match;
+        return new Date(+y, +mo - 1, +d, +h, +mi, +(s || 0)).toISOString();
+      }
+      return new Date(raw).toISOString();
+    }
+    return new Date(raw).toISOString();
+  } catch (e) {
+    return null;
+  }
+}
+
 function statusFor(param, value, customTargets) {
   if (value === undefined || value === null || value === "") return null;
   const targets = customTargets || TARGETS;
@@ -3359,6 +3394,12 @@ const FB = {
     return window._fbOnSnapshot(col, (snap) => {
       cb(snap.docs.map(d => d.data()));
     });
+  },
+  getDiagnostics: async (uid) => {
+    if (!window._fbDb || !window._fbGetDocs) return [];
+    const col = window._fbCollection(window._fbDb, "users", uid, "diagnostics");
+    const snap = await window._fbGetDocs(col);
+    return snap.docs.map(d => d.data());
   },
   // ── Config sync (pools, products, activePlan, settings) ──
   saveConfig: async (uid, config) => {
@@ -4851,6 +4892,8 @@ function PoolApp() {
           onClose={() => setShowReport(false)}
           manageStock={!!activePool?.manageStock}
           lang={lang}
+          authUid={authUser?.uid}
+          isPremium={isPremium}
         />
       )}
 
@@ -5779,6 +5822,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onAddPrefilled, onVali
   const [diagHistory, setDiagHistory] = useState([]);
   const [importLoading, setImportLoading] = useState(false);
   const [importError, setImportError] = useState(null);
+  const [importInfo, setImportInfo] = useState(null);
   const importFileRef = useRef(null);
 
   useEffect(() => {
@@ -5798,7 +5842,7 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onAddPrefilled, onVali
     const file = e.target.files?.[0];
     if (!file || !apiKey) return;
     e.target.value = "";
-    setImportLoading(true); setImportError(null);
+    setImportLoading(true); setImportError(null); setImportInfo(null);
     try {
       // Convertir en base64
       const base64 = await new Promise((res, rej) => {
@@ -5811,11 +5855,13 @@ function HistoryView({ measures, onDelete, onEdit, onAdd, onAddPrefilled, onVali
       const isPdf = file.type === "application/pdf";
       const mediaType = isPdf ? "application/pdf" : (file.type || "image/jpeg");
 
-      const prompt = `Tu es un expert en chimie de l'eau de piscine. Analyse ce document (rapport de mesures, relevé de labo, photo de photomètre ou de bandelette).
+      const prompt = `Tu es un expert en chimie de l'eau de piscine. Analyse ce document (rapport de mesures, relevé de labo, photo de photomètre ou de bandelette, ou export de l'application PoolGenAI).
 Extrait toutes les valeurs de paramètres de qualité d'eau présentes, ainsi que la date ET l'heure exactes si visibles, et une note textuelle si présente (commentaire, observation).
 
+Si le document contient une section ou un tableau "Diagnostic IA" / "AI diagnostics" (avec des colonnes du type Date / Note / Réponse IA / Confiance), extrait CHAQUE ligne de ce tableau séparément dans le tableau "diagnostics".
+
 IMPORTANT pour la date/heure :
-- Si tu vois une date ET une heure (ex: "28/06/2026 16:48" ou "28 juin 2026 à 16:48"), inclus les deux dans "date" au format ISO 8601 complet (ex: "2026-06-28T16:48:00")
+- Si tu vois une date ET une heure (ex: "28/06/2026 16:48" ou "28 juin 2026 à 16:48"), inclus les deux au format ISO 8601 complet (ex: "2026-06-28T16:48:00")
 - Si tu vois seulement une date sans heure, mets l'heure à 00:00:00
 - Si aucune date visible, retourne null
 
@@ -5835,8 +5881,17 @@ Réponds UNIQUEMENT en JSON valide, sans texte avant ni après :
   "sel": <number|null>,
   "brome": <number|null>,
   "date": "<ISO 8601 datetime string or null>",
-  "note": "<texte de note ou null>"
-}`;
+  "note": "<texte de note ou null>",
+  "diagnostics": [
+    {
+      "date": "<ISO 8601 datetime string or null>",
+      "note": "<texte de la note/problème signalé>",
+      "response": "<texte de la réponse IA>",
+      "confidence": <entier de 1 à 5, ou null>
+    }
+  ]
+}
+Si aucun tableau Diagnostic IA n'est présent dans le document, retourne "diagnostics": [].`;
 
       const { jsPDF: _j, ...rest } = {}; // just to ensure closure
       const response = await fetch(apiKey.startsWith("http") ? `${apiKey}/v1/messages` : "https://api.anthropic.com/v1/messages", {
@@ -5848,7 +5903,7 @@ Réponds UNIQUEMENT en JSON valide, sans texte avant ni après :
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 1000,
+          max_tokens: 1600,
           messages: [{
             role: "user",
             content: [
@@ -5867,54 +5922,56 @@ Réponds UNIQUEMENT en JSON valide, sans texte avant ni après :
       const clean = text.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
 
-      // Vérifier qu'au moins une valeur a été trouvée
+      // Vérifier qu'au moins une valeur a été trouvée (mesure OU diagnostic)
       const numKeys = ["pH","fCl","tCl","ccl","tac","cya","hard","phos","copper","iron","temp","sel","brome"];
       const hasValues = numKeys.some(k => parsed[k] != null);
-      if (!hasValues) throw new Error(t("import_pdf_no_values"));
+      const importedDiagnostics = Array.isArray(parsed.diagnostics) ? parsed.diagnostics.filter(d => d && (d.note || d.response)) : [];
+      if (!hasValues && importedDiagnostics.length === 0) throw new Error(t("import_pdf_no_values"));
 
-      // Pré-remplir la mesure
-      // Si la date retournée par l'IA n'a pas d'info timezone (pas de Z ni +HH:MM),
-      // on l'interprète comme heure locale en ajoutant un offset fictif pour éviter
-      // la conversion UTC → local qui décale l'heure
-      let parsedDate = new Date().toISOString();
-      if (parsed.date) {
-        const raw = parsed.date.trim();
-        // Si pas de timezone indicator → interpréter comme local
-        const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(raw);
-        if (!hasTimezone) {
-          // Créer la date en local via les composants individuels
-          const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
-          if (match) {
-            const [,y,mo,d,h,mi,s] = match;
-            parsedDate = new Date(+y, +mo-1, +d, +h, +mi, +(s||0)).toISOString();
-          } else {
-            parsedDate = new Date(raw).toISOString();
-          }
-        } else {
-          parsedDate = new Date(raw).toISOString();
-        }
+      if (hasValues) {
+        // Pré-remplir la mesure
+        const parsedDate = parseFlexibleDate(parsed.date) || new Date().toISOString();
+        const prefilled = {
+          __prefilled: true,
+          importedFromPdf: true,
+          date: parsedDate,
+          pH:     parsed.pH     != null ? String(parsed.pH)     : "",
+          fCl:    parsed.fCl    != null ? String(parsed.fCl)    : "",
+          tCl:    parsed.tCl    != null ? String(parsed.tCl)    : "",
+          ccl:    parsed.ccl    != null ? String(parsed.ccl)    : "",
+          tac:    parsed.tac    != null ? String(parsed.tac)    : "",
+          cya:    parsed.cya    != null ? String(parsed.cya)    : "",
+          hard:   parsed.hard   != null ? String(parsed.hard)   : "",
+          phos:   parsed.phos   != null ? String(parsed.phos)   : "",
+          copper: parsed.copper != null ? String(parsed.copper) : "",
+          iron:   parsed.iron   != null ? String(parsed.iron)   : "",
+          temp:   parsed.temp   != null ? String(parsed.temp)   : "",
+          sel:    parsed.sel    != null ? String(parsed.sel)    : "",
+          brome:  parsed.brome  != null ? String(parsed.brome)  : "",
+          note:   parsed.note   || "",
+        };
+        onAddPrefilled(prefilled);
       }
 
-      const prefilled = {
-        __prefilled: true,
-        importedFromPdf: true,
-        date: parsedDate,
-        pH:     parsed.pH     != null ? String(parsed.pH)     : "",
-        fCl:    parsed.fCl    != null ? String(parsed.fCl)    : "",
-        tCl:    parsed.tCl    != null ? String(parsed.tCl)    : "",
-        ccl:    parsed.ccl    != null ? String(parsed.ccl)    : "",
-        tac:    parsed.tac    != null ? String(parsed.tac)    : "",
-        cya:    parsed.cya    != null ? String(parsed.cya)    : "",
-        hard:   parsed.hard   != null ? String(parsed.hard)   : "",
-        phos:   parsed.phos   != null ? String(parsed.phos)   : "",
-        copper: parsed.copper != null ? String(parsed.copper) : "",
-        iron:   parsed.iron   != null ? String(parsed.iron)   : "",
-        temp:   parsed.temp   != null ? String(parsed.temp)   : "",
-        sel:    parsed.sel    != null ? String(parsed.sel)    : "",
-        brome:  parsed.brome  != null ? String(parsed.brome)  : "",
-        note:   parsed.note   || "",
-      };
-      onAddPrefilled(prefilled);
+      // Recréer les entrées de diagnostic IA détectées dans le document, s'il y en a
+      if (importedDiagnostics.length > 0 && authUid) {
+        importedDiagnostics.forEach((d) => {
+          const entry = {
+            id: uid(),
+            date: parseFlexibleDate(d.date) || new Date().toISOString(),
+            note: d.note || "",
+            suggestion: d.response || "",
+            confidence: typeof d.confidence === "number" ? d.confidence : 0,
+            confidence_reason: "",
+          };
+          FB.saveDiagnostic(authUid, entry).catch(() => {});
+        });
+        setImportInfo(
+          importedDiagnostics.length === 1
+            ? t("import_diag_added_one")
+            : t("import_diag_added_many").replace("{n}", String(importedDiagnostics.length))
+        );
+      }
     } catch(e) {
       console.error("Import PDF error", e);
       setImportError(e.message || t("import_pdf_error"));
@@ -5927,8 +5984,8 @@ Réponds UNIQUEMENT en JSON valide, sans texte avant ni après :
     if (!diagText.trim() || !apiKey) return;
     setDiagLoading(true); setDiagError(null); setDiagResult(null);
     try {
-      const last10 = [...measures].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
-      const measuresStr = last10.map(m => {
+      const last50 = [...measures].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 50);
+      const measuresStr = last50.map(m => {
         const d = new Date(m.date).toLocaleDateString();
         const vals = [];
         if (m.pH != null && m.pH !== "") vals.push(`pH=${m.pH}`);
@@ -6066,6 +6123,11 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
             {importError && (
               <div style={{ marginTop: 6, fontSize: 12, color: "#c0392b", padding: "6px 10px", background: "#fdf0ef", borderRadius: 8 }}>
                 <AlertTriangle size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />{importError}
+              </div>
+            )}
+            {importInfo && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#5b3fa0", padding: "6px 10px", background: "#f3effa", borderRadius: 8 }}>
+                {importInfo}
               </div>
             )}
           </>
@@ -6220,6 +6282,11 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
             {importError && (
               <div style={{ marginTop: 6, fontSize: 12, color: "#c0392b", padding: "6px 10px", background: "#fdf0ef", borderRadius: 8 }}>
                 <AlertTriangle size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />{importError}
+              </div>
+            )}
+            {importInfo && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#5b3fa0", padding: "6px 10px", background: "#f3effa", borderRadius: 8 }}>
+                {importInfo}
               </div>
             )}
           </>
@@ -8494,11 +8561,22 @@ function AddPoolModal({ onClose, onSave, lang, existingPool }) {
 }
 
 // ---------- Rapport ----------
-function ReportView({ pool, measures, applications, products, onClose, manageStock, lang }) {
+function ReportView({ pool, measures, applications, products, onClose, manageStock, lang, authUid, isPremium }) {
   const t = useT(lang);
   const [showValues, setShowValues] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState(null);
+  const [diagHistory, setDiagHistory] = useState([]);
+
+  useEffect(() => {
+    if (!authUid || !isPremium) { setDiagHistory([]); return; }
+    let cancelled = false;
+    FB.getDiagnostics(authUid).then((list) => {
+      if (cancelled) return;
+      setDiagHistory([...list].sort((a, b) => new Date(b.date) - new Date(a.date)));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [authUid, isPremium]);
 
   // Inject print CSS (kept for browser print fallback)
   useEffect(() => {
@@ -8887,6 +8965,56 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     });
     y += 6;
 
+    // ── Historique diagnostics IA ──
+    if (diagHistory.length > 0) {
+      sectionTitle(t("diag_history_title"));
+
+      const dColW = { date: 16, note: 42, confidence: 14 };
+      dColW.response = cW - dColW.date - dColW.note - dColW.confidence;
+      const dX = {
+        date: mL,
+        note: mL + dColW.date,
+        response: mL + dColW.date + dColW.note,
+        confidence: mL + dColW.date + dColW.note + dColW.response,
+      };
+
+      checkPage(6.5);
+      pdf.setFillColor(237, 231, 246);
+      pdf.rect(mL, y, cW, 6, "F");
+      pdf.setFontSize(6); pdf.setFont("helvetica","bold"); pdf.setTextColor(80,50,140);
+      pdf.text(t("diag_history_date"), dX.date+0.8, y+4, { maxWidth: dColW.date-1.2 });
+      pdf.text(t("diag_history_note"), dX.note+0.8, y+4, { maxWidth: dColW.note-1.2 });
+      pdf.text(t("diag_history_response"), dX.response+0.8, y+4, { maxWidth: dColW.response-1.2 });
+      pdf.text(t("diag_history_confidence"), dX.confidence+0.8, y+4, { maxWidth: dColW.confidence-1.2 });
+      pdf.setTextColor(0,0,0);
+      y += 6;
+
+      const sortedDiag = [...diagHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
+      sortedDiag.forEach((d, i) => {
+        pdf.setFontSize(6); pdf.setFont("helvetica","normal");
+        const dateStr = new Date(d.date).toLocaleDateString(localeMap[lang] || "fr-FR");
+        const noteLines = pdf.splitTextToSize(d.note || "—", dColW.note - 1.6);
+        const respLines = pdf.splitTextToSize(d.suggestion || "—", dColW.response - 1.6);
+        const lh = 3.1;
+        const lineCount = Math.max(1, noteLines.length, respLines.length);
+        const blockH = lineCount * lh + 1.8;
+
+        checkPage(blockH);
+        if (i % 2 === 0) { pdf.setFillColor(250, 247, 253); pdf.rect(mL, y, cW, blockH, "F"); }
+
+        pdf.setTextColor(30,30,30);
+        pdf.text(dateStr, dX.date+0.8, y+3.1, { maxWidth: dColW.date-1.6 });
+        pdf.text(noteLines, dX.note+0.8, y+3.1);
+        pdf.text(respLines, dX.response+0.8, y+3.1);
+        pdf.text(`${d.confidence || 0}/5`, dX.confidence+0.8, y+3.1);
+
+        y += blockH;
+        pdf.setDrawColor(225,215,240); pdf.setLineWidth(0.1);
+        pdf.line(mL, y, mL+cW, y);
+      });
+      y += 5;
+    }
+
     // Footer toutes pages
     const pageCount = pdf.internal.getNumberOfPages();
     for (let p = 1; p <= pageCount; p++) {
@@ -9181,6 +9309,42 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
             ))}
           </div>
         </div>
+
+        {diagHistory.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <div style={styles.reportSectionTitle}>{t("diag_history_title")}</div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={styles.diagHistTable}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.diagHistTh, width: 62 }}>{t("diag_history_date")}</th>
+                    <th style={styles.diagHistTh}>{t("diag_history_note")}</th>
+                    <th style={styles.diagHistTh}>{t("diag_history_response")}</th>
+                    <th style={{ ...styles.diagHistTh, width: 54 }}>{t("diag_history_confidence")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {diagHistory.map((d) => (
+                    <tr key={d.id}>
+                      <td style={styles.diagHistTd}>{formatDateShort(d.date)}</td>
+                      <td style={styles.diagHistTd}>{d.note}</td>
+                      <td style={styles.diagHistTd}>
+                        {d.suggestion}
+                        {d.confidence_reason && (
+                          <div style={{ fontSize: 10.5, color: "#6a7d90", marginTop: 4, fontStyle: "italic" }}>
+                            {d.confidence_reason}
+                          </div>
+                        )}
+                      </td>
+                      <td style={styles.diagHistTd}>{d.confidence || 0}/5</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {rows.some(({ measure }) => (measure.photos?.length || measure.photo || measure.poolPhotos?.length)) && (
           <div style={{ marginTop: 24 }}>
             <div style={styles.reportSectionTitle}>{t("photos_section")}</div>
