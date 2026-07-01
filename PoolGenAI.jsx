@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.21.0";
+const APP_VERSION = "1.21.1";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -338,6 +338,15 @@ const TRANSLATIONS = {
     error_email_required: "Email invalide.",
     account_created: "Compte créé !",
     verify_email_notice: "Un email de confirmation a été envoyé à ton adresse. Clique sur le lien pour activer ton compte.",
+    verify_gate_title: "Vérifie ton adresse email",
+    verify_gate_desc: "Pour accéder à l'application, confirme ton adresse en cliquant sur le lien reçu par email",
+    verify_gate_check_btn: "J'ai confirmé — Continuer",
+    verify_gate_checking: "Vérification...",
+    verify_gate_still_unverified: "Ton email n'est pas encore confirmé. Vérifie ta boîte de réception (et les spams).",
+    verify_gate_resend_btn: "Renvoyer l'email de confirmation",
+    verify_gate_resend_sent: "Email renvoyé — pense à vérifier tes spams.",
+    verify_gate_resend_error: "Impossible d'envoyer l'email pour le moment. Réessaie plus tard.",
+    verify_gate_signout: "Se déconnecter",
     account_created_sub: "Bienvenue sur PoolGenAI. Tu peux maintenant utiliser l'app.",
     start_app: "Démarrer l'app",
     sign_out: "Se déconnecter",
@@ -788,6 +797,15 @@ const TRANSLATIONS = {
     error_email_required: "Invalid email.",
     account_created: "Account created!",
     verify_email_notice: "A confirmation email has been sent to your address. Click the link to activate your account.",
+    verify_gate_title: "Verify your email address",
+    verify_gate_desc: "To access the app, confirm your address by clicking the link you received by email",
+    verify_gate_check_btn: "I've confirmed — Continue",
+    verify_gate_checking: "Checking...",
+    verify_gate_still_unverified: "Your email isn't confirmed yet. Check your inbox (and spam folder).",
+    verify_gate_resend_btn: "Resend confirmation email",
+    verify_gate_resend_sent: "Email resent — remember to check your spam folder.",
+    verify_gate_resend_error: "Couldn't send the email right now. Try again later.",
+    verify_gate_signout: "Sign out",
     account_created_sub: "Welcome to PoolGenAI. You can now use the app.",
     start_app: "Start the app",
     sign_out: "Sign out",
@@ -1240,6 +1258,15 @@ const TRANSLATIONS = {
     error_email_required: "Ungültige E-Mail.",
     account_created: "Konto erstellt!",
     verify_email_notice: "Eine Bestätigungs-E-Mail wurde an deine Adresse gesendet. Klicke auf den Link, um dein Konto zu aktivieren.",
+    verify_gate_title: "Bestätige deine E-Mail-Adresse",
+    verify_gate_desc: "Um die App zu nutzen, bestätige deine Adresse über den Link, den du per E-Mail erhalten hast",
+    verify_gate_check_btn: "Bestätigt — Weiter",
+    verify_gate_checking: "Wird geprüft...",
+    verify_gate_still_unverified: "Deine E-Mail ist noch nicht bestätigt. Prüfe dein Postfach (auch den Spam-Ordner).",
+    verify_gate_resend_btn: "Bestätigungs-E-Mail erneut senden",
+    verify_gate_resend_sent: "E-Mail erneut gesendet — prüfe auch deinen Spam-Ordner.",
+    verify_gate_resend_error: "E-Mail konnte gerade nicht gesendet werden. Versuch es später erneut.",
+    verify_gate_signout: "Abmelden",
     account_created_sub: "Willkommen bei PoolGenAI. Du kannst die App jetzt nutzen.",
     start_app: "App starten",
     sign_out: "Abmelden",
@@ -1689,6 +1716,15 @@ const TRANSLATIONS = {
     error_email_required: "Email non valida.",
     account_created: "Account creato!",
     verify_email_notice: "Un'email di conferma è stata inviata al tuo indirizzo. Clicca sul link per attivare il tuo account.",
+    verify_gate_title: "Verifica il tuo indirizzo email",
+    verify_gate_desc: "Per accedere all'app, conferma il tuo indirizzo cliccando sul link ricevuto via email",
+    verify_gate_check_btn: "Confermato — Continua",
+    verify_gate_checking: "Verifica in corso...",
+    verify_gate_still_unverified: "La tua email non è ancora confermata. Controlla la posta in arrivo (e lo spam).",
+    verify_gate_resend_btn: "Reinvia l'email di conferma",
+    verify_gate_resend_sent: "Email reinviata — controlla anche lo spam.",
+    verify_gate_resend_error: "Impossibile inviare l'email ora. Riprova più tardi.",
+    verify_gate_signout: "Disconnetti",
     account_created_sub: "Benvenuto su PoolGenAI. Puoi usare l'app ora.",
     start_app: "Avvia l'app",
     sign_out: "Disconnetti",
@@ -2138,6 +2174,15 @@ const TRANSLATIONS = {
     error_email_required: "Email inválido.",
     account_created: "¡Cuenta creada!",
     verify_email_notice: "Se ha enviado un email de confirmación a tu dirección. Haz clic en el enlace para activar tu cuenta.",
+    verify_gate_title: "Verifica tu dirección de email",
+    verify_gate_desc: "Para acceder a la app, confirma tu dirección haciendo clic en el enlace que recibiste por email",
+    verify_gate_check_btn: "Confirmado — Continuar",
+    verify_gate_checking: "Comprobando...",
+    verify_gate_still_unverified: "Tu email todavía no está confirmado. Revisa tu bandeja de entrada (y spam).",
+    verify_gate_resend_btn: "Reenviar email de confirmación",
+    verify_gate_resend_sent: "Email reenviado — revisa también el spam.",
+    verify_gate_resend_error: "No se pudo enviar el email ahora. Inténtalo más tarde.",
+    verify_gate_signout: "Cerrar sesión",
     account_created_sub: "Bienvenido a PoolGenAI. Ya puedes usar la app.",
     start_app: "Iniciar la app",
     sign_out: "Cerrar sesión",
@@ -2584,6 +2629,15 @@ const TRANSLATIONS = {
     error_email_required: "Email inválido.",
     account_created: "Conta criada!",
     verify_email_notice: "Um email de confirmação foi enviado para o teu endereço. Clica no link para ativar a tua conta.",
+    verify_gate_title: "Verifica o teu endereço de email",
+    verify_gate_desc: "Para aceder à app, confirma o teu endereço clicando no link recebido por email",
+    verify_gate_check_btn: "Confirmei — Continuar",
+    verify_gate_checking: "A verificar...",
+    verify_gate_still_unverified: "O teu email ainda não está confirmado. Verifica a caixa de entrada (e o spam).",
+    verify_gate_resend_btn: "Reenviar email de confirmação",
+    verify_gate_resend_sent: "Email reenviado — verifica também o spam.",
+    verify_gate_resend_error: "Não foi possível enviar o email agora. Tenta mais tarde.",
+    verify_gate_signout: "Terminar sessão",
     account_created_sub: "Bem-vindo ao PoolGenAI. Já podes usar a app.",
     start_app: "Iniciar a app",
     sign_out: "Sair",
@@ -3483,7 +3537,7 @@ function track(event, params) {
   try { window._fbLog && window._fbLog(event, params); } catch (e) {}
 }
 
-function LoginScreen({ lang, onSkip, onConsentChange, detectedLang, onSignupPending }) {
+function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
   const t = useT(lang || detectedLang || "fr");
   const [mode, setMode] = useState("login"); // login | signup | reset | done | disclaimer
   const [email, setEmail] = useState("");
@@ -3537,7 +3591,6 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang, onSignupPend
           cguAcceptedDate: new Date().toISOString(),
         }).catch(() => {});
         if (onConsentChange) onConsentChange({ gdpr: true, data: dataAccepted, cguVersion: CGU_VERSION, cguDate: new Date().toISOString() });
-        onSignupPending?.(true);
         setMode("done");
         // onAuthStateChanged se déclenchera et appellera onSuccess via PoolApp
       } else {
@@ -3840,7 +3893,11 @@ By creating an account, the user acknowledges having read this document in full 
 function PoolApp() {
   const [authUser, setAuthUser] = useState(undefined); // undefined=loading, null=anonymous, object=logged in
   const [showLogin, setShowLogin] = useState(false);
-  const [pendingEmailVerification, setPendingEmailVerification] = useState(false);
+  const [emailVerifiedNow, setEmailVerifiedNow] = useState(null); // null = se fier à authUser.emailVerified
+  const [verifyChecking, setVerifyChecking] = useState(false);
+  const [verifyCheckFailed, setVerifyCheckFailed] = useState(false);
+  const [verifySending, setVerifySending] = useState(false);
+  const [verifyResendStatus, setVerifyResendStatus] = useState(null); // null | "sent" | "error"
 
   const [pools, setPools] = useState([
     { id: "default", name: "Ma piscine", location: "Valbonne (06)", volume: 72, treatmentType: "chlore", filtration: "sable" },
@@ -4155,10 +4212,59 @@ function PoolApp() {
     if (!authUser && !fbUser) {
       // auth_skipped désactivé — connexion obligatoire
       if (!window._fbAuth?.currentUser) setShowLogin(true);
-    } else if (!pendingEmailVerification) {
+    } else {
       setShowLogin(false);
     }
-  }, [loaded, authResolved, authUser, pendingEmailVerification]);
+  }, [loaded, authResolved, authUser]);
+
+  // Réinitialise le statut de vérification email "rafraîchi" à chaque changement d'utilisateur
+  useEffect(() => {
+    setEmailVerifiedNow(null);
+    setVerifyCheckFailed(false);
+    setVerifyResendStatus(null);
+  }, [authUser?.uid]);
+
+  const isGoogleUser = !!authUser?.providerData?.some((p) => p.providerId === "google.com");
+  const needsEmailVerification =
+    !!authUser && !isGoogleUser &&
+    (emailVerifiedNow !== null ? !emailVerifiedNow : authUser.emailVerified === false);
+
+  async function handleCheckEmailVerified() {
+    if (!window._fbAuth?.currentUser) return;
+    setVerifyChecking(true);
+    setVerifyCheckFailed(false);
+    try {
+      await window._fbAuth.currentUser.reload();
+      const nowVerified = !!window._fbAuth.currentUser.emailVerified;
+      setEmailVerifiedNow(nowVerified);
+      if (!nowVerified) setVerifyCheckFailed(true);
+    } catch (e) {
+      setVerifyCheckFailed(true);
+    } finally {
+      setVerifyChecking(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    if (!authUser) return;
+    setVerifySending(true);
+    setVerifyResendStatus(null);
+    try {
+      await FB.sendVerification(authUser);
+      setVerifyResendStatus("sent");
+    } catch (e) {
+      setVerifyResendStatus("error");
+    } finally {
+      setVerifySending(false);
+    }
+  }
+
+  async function handleSignOutFromVerification() {
+    try { await FB.signOut(); } catch (e) {}
+    window.storage.set("auth_skipped", "").catch(() => {});
+    setAuthUser(null);
+    setShowLogin(true);
+  }
 
   // --- Chargement initial depuis le stockage persistant ---
   useEffect(() => {
@@ -4741,6 +4847,53 @@ function PoolApp() {
         </div>
       </div>
     )}
+    {needsEmailVerification && !forceUpdate && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 3050, background: "rgba(10,60,50,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
+          <div style={{ fontSize: 34, marginBottom: 10 }}>📧</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("verify_gate_title")}</div>
+          <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+            {t("verify_gate_desc")}{authUser?.email ? ` (${authUser.email})` : ""}
+          </div>
+          {verifyCheckFailed && (
+            <div style={{ fontSize: 12.5, color: "#c0392b", marginBottom: 12, background: "#fdf0ef", borderRadius: 8, padding: "8px 10px" }}>
+              {t("verify_gate_still_unverified")}
+            </div>
+          )}
+          {verifyResendStatus === "sent" && (
+            <div style={{ fontSize: 12.5, color: "#1a7a4a", marginBottom: 12, background: "#eafaf1", borderRadius: 8, padding: "8px 10px" }}>
+              {t("verify_gate_resend_sent")}
+            </div>
+          )}
+          {verifyResendStatus === "error" && (
+            <div style={{ fontSize: 12.5, color: "#c0392b", marginBottom: 12, background: "#fdf0ef", borderRadius: 8, padding: "8px 10px" }}>
+              {t("verify_gate_resend_error")}
+            </div>
+          )}
+          <button
+            onClick={handleCheckEmailVerified}
+            disabled={verifyChecking}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: verifyChecking ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}
+          >
+            {verifyChecking ? <Loader2 size={16} className="spin" /> : null}
+            {verifyChecking ? t("verify_gate_checking") : t("verify_gate_check_btn")}
+          </button>
+          <button
+            onClick={handleResendVerification}
+            disabled={verifySending}
+            style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#fff", color: "#0a6ebd", fontWeight: 600, fontSize: 13.5, cursor: verifySending ? "default" : "pointer", marginBottom: 14 }}
+          >
+            {verifySending ? "..." : t("verify_gate_resend_btn")}
+          </button>
+          <button
+            onClick={handleSignOutFromVerification}
+            style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 12.5, cursor: "pointer" }}
+          >
+            {t("verify_gate_signout")}
+          </button>
+        </div>
+      </div>
+    )}
     {suspended && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3100, background: "rgba(60,20,20,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
@@ -4763,7 +4916,7 @@ function PoolApp() {
         </div>
       </div>
     )}
-    {loaded && authUser && !suspended && !forceUpdate && !pendingEmailVerification && pools.length === 0 && (
+    {loaded && authUser && !suspended && !forceUpdate && !needsEmailVerification && pools.length === 0 && (
       <AddPoolModal forced onSave={addPool} lang={lang} />
     )}
     {showLogin && (
@@ -4772,11 +4925,9 @@ function PoolApp() {
           lang={lang}
           detectedLang={detectedLang}
           onSkip={() => {
-            // Bouton "Commencer l'app" de l'écran de confirmation post-inscription :
-            // acquitte l'attente de vérification email et laisse passer vers l'app.
-            setPendingEmailVerification(false);
+            // Désactivé — la vérification email persistante (needsEmailVerification)
+            // prend le relais automatiquement une fois cet écran fermé.
           }}
-          onSignupPending={setPendingEmailVerification}
           onConsentChange={({ cguVersion: v, cguDate }) => {
             if (v) { setAcceptedCguVersion(v); setCguAcceptedDate(cguDate || new Date().toISOString()); }
           }}
