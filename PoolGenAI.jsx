@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.20.2";
+const APP_VERSION = "1.21.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -308,6 +308,8 @@ const TRANSLATIONS = {
     paywall_close: "Plus tard",
     // Pool
     add_pool_title: "Nouveau bassin",
+    first_pool_title: "Bienvenue sur PoolGenAI",
+    first_pool_intro: "Configure ton premier bassin pour commencer à suivre sa chimie de l'eau.",
     edit_pool_title: "Modifier le bassin",
     pool_name_placeholder: "Ma piscine",
     pool_location_placeholder: "Jardin, terrasse...",
@@ -757,6 +759,8 @@ const TRANSLATIONS = {
     paywall_btn: "Activate unlimited version",
     paywall_close: "Later",
     add_pool_title: "New pool",
+    first_pool_title: "Welcome to PoolGenAI",
+    first_pool_intro: "Set up your first pool to start tracking its water chemistry.",
     edit_pool_title: "Edit pool",
     pool_name_placeholder: "My pool",
     pool_location_placeholder: "Garden, terrace...",
@@ -1204,6 +1208,8 @@ const TRANSLATIONS = {
     paywall_btn: "Unbegrenzte Version aktivieren",
     paywall_close: "Später",
     add_pool_title: "Neues Becken",
+    first_pool_title: "Willkommen bei PoolGenAI",
+    first_pool_intro: "Richte dein erstes Becken ein, um mit der Wasserchemie-Überwachung zu beginnen.",
     ai_timer_hint: "L'analisi può richiedere fino a 30 secondi.",
     ai_reliability: "Affidabilità dell'analisi",
     ai_no_values: "Nessun valore leggibile su questa foto. Controlla la qualità e l'orientamento dell'immagine.",
@@ -1657,6 +1663,8 @@ const TRANSLATIONS = {
     paywall_btn: "Attiva versione illimitata",
     paywall_close: "Più tardi",
     add_pool_title: "Nuova vasca",
+    first_pool_title: "Benvenuto su PoolGenAI",
+    first_pool_intro: "Configura la tua prima vasca per iniziare a monitorare la chimica dell'acqua.",
     edit_pool_title: "Modifica vasca",
     pool_name_placeholder: "La mia piscina",
     pool_location_placeholder: "Giardino, terrazza...",
@@ -2104,6 +2112,8 @@ const TRANSLATIONS = {
     paywall_btn: "Activar versión ilimitada",
     paywall_close: "Más tarde",
     add_pool_title: "Nueva piscina",
+    first_pool_title: "Bienvenido a PoolGenAI",
+    first_pool_intro: "Configura tu primera piscina para empezar a seguir su química del agua.",
     edit_pool_title: "Editar piscina",
     pool_name_placeholder: "Mi piscina",
     pool_location_placeholder: "Jardín, terraza...",
@@ -2548,6 +2558,8 @@ const TRANSLATIONS = {
     paywall_btn: "Ativar versão ilimitada",
     paywall_close: "Mais tarde",
     add_pool_title: "Nova piscina",
+    first_pool_title: "Bem-vindo ao PoolGenAI",
+    first_pool_intro: "Configura a tua primeira piscina para começar a acompanhar a química da água.",
     edit_pool_title: "Editar piscina",
     pool_name_placeholder: "Minha piscina",
     pool_location_placeholder: "Jardim, terraço...",
@@ -3471,7 +3483,7 @@ function track(event, params) {
   try { window._fbLog && window._fbLog(event, params); } catch (e) {}
 }
 
-function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
+function LoginScreen({ lang, onSkip, onConsentChange, detectedLang, onSignupPending }) {
   const t = useT(lang || detectedLang || "fr");
   const [mode, setMode] = useState("login"); // login | signup | reset | done | disclaimer
   const [email, setEmail] = useState("");
@@ -3525,6 +3537,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
           cguAcceptedDate: new Date().toISOString(),
         }).catch(() => {});
         if (onConsentChange) onConsentChange({ gdpr: true, data: dataAccepted, cguVersion: CGU_VERSION, cguDate: new Date().toISOString() });
+        onSignupPending?.(true);
         setMode("done");
         // onAuthStateChanged se déclenchera et appellera onSuccess via PoolApp
       } else {
@@ -3827,6 +3840,7 @@ By creating an account, the user acknowledges having read this document in full 
 function PoolApp() {
   const [authUser, setAuthUser] = useState(undefined); // undefined=loading, null=anonymous, object=logged in
   const [showLogin, setShowLogin] = useState(false);
+  const [pendingEmailVerification, setPendingEmailVerification] = useState(false);
 
   const [pools, setPools] = useState([
     { id: "default", name: "Ma piscine", location: "Valbonne (06)", volume: 72, treatmentType: "chlore", filtration: "sable" },
@@ -4141,10 +4155,10 @@ function PoolApp() {
     if (!authUser && !fbUser) {
       // auth_skipped désactivé — connexion obligatoire
       if (!window._fbAuth?.currentUser) setShowLogin(true);
-    } else {
+    } else if (!pendingEmailVerification) {
       setShowLogin(false);
     }
-  }, [loaded, authResolved, authUser]);
+  }, [loaded, authResolved, authUser, pendingEmailVerification]);
 
   // --- Chargement initial depuis le stockage persistant ---
   useEffect(() => {
@@ -4167,24 +4181,32 @@ function PoolApp() {
       } catch (e) {}
 
       if (!loadedPools) {
-        // Migration depuis l'ancien format mono-bassin
-        let legacyVolume = 72;
-        let legacyName = "Ma piscine";
-        let legacyLocation = "Valbonne (06)";
+        // Migration depuis l'ancien format mono-bassin — uniquement si de vraies
+        // données legacy existent (sinon c'est un utilisateur réellement nouveau,
+        // qui ne doit hériter d'aucun bassin/produit par défaut).
+        let legacySettings = null;
         try {
           const s = await window.storage.get(STORAGE_KEYS.settings);
-          if (s?.value) {
-            const parsed = JSON.parse(s.value);
-            if (parsed.volume) legacyVolume = parsed.volume;
-            if (parsed.poolName) legacyName = parsed.poolName;
-            if (parsed.location) legacyLocation = parsed.location;
-          }
+          if (s?.value) legacySettings = JSON.parse(s.value);
         } catch (e) {}
-        loadedPools = [
-          { id: "default", name: legacyName, location: legacyLocation, volume: legacyVolume },
-        ];
-        // Les mesures/produits existants n'avaient pas de poolId : on les rattache au bassin par défaut
-        loadedMeasures = loadedMeasures.map((m) => (m.poolId ? m : { ...m, poolId: "default" }));
+
+        const hasLegacyData = !!legacySettings || loadedMeasures.length > 0 || (loadedProducts && loadedProducts.length > 0);
+
+        if (hasLegacyData) {
+          loadedPools = [
+            {
+              id: "default",
+              name: legacySettings?.poolName || "Ma piscine",
+              location: legacySettings?.location || "",
+              volume: legacySettings?.volume || 50,
+            },
+          ];
+          // Les mesures/produits existants n'avaient pas de poolId : on les rattache au bassin par défaut
+          loadedMeasures = loadedMeasures.map((m) => (m.poolId ? m : { ...m, poolId: "default" }));
+        } else {
+          // Nouvel utilisateur : aucun bassin par défaut
+          loadedPools = [];
+        }
       }
       // Migration : ajoute treatmentType/filtration aux anciens bassins qui n'en ont pas
       loadedPools = loadedPools.map((p) => ({
@@ -4195,7 +4217,7 @@ function PoolApp() {
       }));
       setPools(loadedPools);
 
-      let loadedActiveId = loadedPools[0]?.id || "default";
+      let loadedActiveId = loadedPools[0]?.id || "";
       try {
         const ap = await window.storage.get(STORAGE_KEYS.activePool);
         if (ap?.value) {
@@ -4209,12 +4231,16 @@ function PoolApp() {
       // Upload des mesures locales vers Firestore si l'utilisateur est connecté
       if (authUser?.uid && loadedMeasures.length > 0) {
         loadedMeasures.forEach(m => FB.saveMeasure(authUser.uid, m).catch(() => {}));
-      }      if (loadedProducts) {
+      }
+      if (loadedProducts) {
         // Anciens produits sans poolId (avant la saisie par bassin) : rattachés au bassin actif
         loadedProducts = loadedProducts.map((p) =>
           p.poolId ? p : { ...p, poolId: loadedActiveId }
         );
         setProducts(loadedProducts);
+      } else if (loadedPools.length === 0) {
+        // Nouvel utilisateur : aucun produit/stock par défaut
+        setProducts([]);
       }
 
       try {
@@ -4681,13 +4707,12 @@ function PoolApp() {
   }
 
   function deletePool(id) {
-    if (pools.length <= 1) return; // toujours garder au moins un bassin
     setPools((prev) => prev.filter((p) => p.id !== id));
     setMeasures((prev) => prev.filter((m) => (m.poolId || "default") !== id));
     setProducts((prev) => prev.filter((p) => (p.poolId || "default") !== id));
     if (activePoolId === id) {
       const remaining = pools.filter((p) => p.id !== id);
-      setActivePoolId(remaining[0]?.id || "default");
+      setActivePoolId(remaining[0]?.id || "");
     }
   }
 
@@ -4738,14 +4763,20 @@ function PoolApp() {
         </div>
       </div>
     )}
+    {loaded && authUser && !suspended && !forceUpdate && !pendingEmailVerification && pools.length === 0 && (
+      <AddPoolModal forced onSave={addPool} lang={lang} />
+    )}
     {showLogin && (
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, overflowY: "auto" }}>
         <LoginScreen
           lang={lang}
           detectedLang={detectedLang}
           onSkip={() => {
-            // Désactivé — connexion obligatoire
+            // Bouton "Commencer l'app" de l'écran de confirmation post-inscription :
+            // acquitte l'attente de vérification email et laisse passer vers l'app.
+            setPendingEmailVerification(false);
           }}
+          onSignupPending={setPendingEmailVerification}
           onConsentChange={({ cguVersion: v, cguDate }) => {
             if (v) { setAcceptedCguVersion(v); setCguAcceptedDate(cguDate || new Date().toISOString()); }
           }}
@@ -8612,7 +8643,7 @@ function PaywallModal({ onClose, onActivate, lang }) {
 }
 
 // ---------- Ajout d'un bassin ----------
-function AddPoolModal({ onClose, onSave, lang, existingPool }) {
+function AddPoolModal({ onClose, onSave, lang, existingPool, forced }) {
   const t = useT(lang || "fr");
   const isEdit = !!existingPool;
   const [name, setName] = useState(existingPool?.name || "");
@@ -8664,7 +8695,12 @@ function AddPoolModal({ onClose, onSave, lang, existingPool }) {
   const filtrationOptions = filtrationTypes.map(ft => ({ value: ft.value, label: ft.label }));
 
   return (
-    <ModalShell onClose={onClose} title={isEdit ? t("edit_pool") : t("add_pool_title")}>
+    <ModalShell onClose={onClose} title={isEdit ? t("edit_pool") : forced ? t("first_pool_title") : t("add_pool_title")} forced={forced}>
+      {forced && (
+        <div style={{ fontSize: 13, color: "#4a6480", marginBottom: 16, lineHeight: 1.5 }}>
+          {t("first_pool_intro")}
+        </div>
+      )}
       {/* Photo */}
       <label style={styles.fieldLabel}>{t("pool_photo")}</label>
       <div>
@@ -9544,17 +9580,19 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
 }
 
 // ---------- Modal shell ----------
-function ModalShell({ children, onClose, title, rightAction }) {
+function ModalShell({ children, onClose, title, rightAction, forced }) {
   return (
-    <div style={styles.modalOverlay} onClick={onClose}>
+    <div style={styles.modalOverlay} onClick={forced ? undefined : onClose}>
       <div style={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
         <div style={styles.modalHeader}>
           <span style={styles.modalTitle}>{title}</span>
           <div style={{ display: "flex", gap: 8 }}>
             {rightAction}
-            <button style={styles.modalCloseBtn} onClick={onClose}>
-              <X size={18} />
-            </button>
+            {!forced && (
+              <button style={styles.modalCloseBtn} onClick={onClose}>
+                <X size={18} />
+              </button>
+            )}
           </div>
         </div>
         <div style={styles.modalBody}>{children}</div>
