@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.23.1";
+const APP_VERSION = "1.24.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -178,6 +178,7 @@ const TRANSLATIONS = {
     analyzing: "Analyse en cours...",
     analyze_locked: "Photo + analyse IA réservées à la version illimitée",
     product_ai_hint: "Active l'analyse IA dans les Réglages pour remplir ces champs automatiquement à partir de la photo.",
+    product_sync_error: "Échec de la synchronisation des produits — la photo est peut-être trop volumineuse, réessaie avec une photo plus légère.",
     note_optional: "Note (optionnel)",
     note_placeholder: "Eau trouble, fort ensoleillement, baignade prévue...",
     save_measure: "Enregistrer la mesure",
@@ -657,6 +658,7 @@ const TRANSLATIONS = {
     analyzing: "Analyzing...",
     analyze_locked: "Photo + AI analysis reserved for unlimited version",
     product_ai_hint: "Enable AI analysis in Settings to auto-fill these fields from the photo.",
+    product_sync_error: "Product sync failed — the photo may be too large, try again with a lighter photo.",
     note_optional: "Note (optional)",
     note_placeholder: "Cloudy water, strong sun, swimming planned...",
     save_measure: "Save reading",
@@ -1127,6 +1129,7 @@ const TRANSLATIONS = {
     analyzing: "Analysiere...",
     analyze_locked: "Foto + KI-Analyse nur in unbegrenzter Version",
     product_ai_hint: "Aktiviere die KI-Analyse in den Einstellungen, um diese Felder automatisch aus dem Foto auszufüllen.",
+    product_sync_error: "Produktsynchronisierung fehlgeschlagen — das Foto ist evtl. zu groß, versuche es mit einem leichteren Foto erneut.",
     note_optional: "Notiz (optional)",
     note_placeholder: "Trübes Wasser, starke Sonne, Schwimmen geplant...",
     save_measure: "Messung speichern",
@@ -1599,6 +1602,7 @@ const TRANSLATIONS = {
     analyzing: "Analisi in corso...",
     analyze_locked: "Foto + analisi IA riservate alla versione illimitata",
     product_ai_hint: "Attiva l'analisi IA nelle Impostazioni per compilare automaticamente questi campi dalla foto.",
+    product_sync_error: "Sincronizzazione prodotti fallita — la foto è forse troppo pesante, riprova con una foto più leggera.",
     note_optional: "Nota (opzionale)",
     note_placeholder: "Acqua torbida, sole forte, nuoto previsto...",
     save_measure: "Salva misurazione",
@@ -2068,6 +2072,7 @@ const TRANSLATIONS = {
     analyzing: "Analizando...",
     analyze_locked: "Foto + análisis IA reservados para versión ilimitada",
     product_ai_hint: "Activa el análisis IA en Ajustes para rellenar estos campos automáticamente a partir de la foto.",
+    product_sync_error: "Error al sincronizar productos — la foto quizá es demasiado pesada, prueba con una foto más ligera.",
     note_optional: "Nota (opcional)",
     note_placeholder: "Agua turbia, sol fuerte, natación prevista...",
     save_measure: "Guardar medición",
@@ -2537,6 +2542,7 @@ const TRANSLATIONS = {
     analyzing: "Analisando...",
     analyze_locked: "Foto + análise IA reservadas para versão ilimitada",
     product_ai_hint: "Ative a análise IA nas Definições para preencher estes campos automaticamente a partir da foto.",
+    product_sync_error: "Falha na sincronização dos produtos — a foto pode ser demasiado grande, tenta com uma foto mais leve.",
     note_optional: "Nota (opcional)",
     note_placeholder: "Água turva, sol forte, natação prevista...",
     save_measure: "Salvar medição",
@@ -3236,6 +3242,39 @@ async function fileToDataUrl(file) {
   });
 }
 
+// Redimensionne et recompresse une photo (dataURL) pour rester léger en stockage
+// Firestore (documents limités à 1 Mo) tout en gardant assez de résolution pour
+// la lecture (étiquette produit, bandelette...) et l'analyse IA.
+function compressImageDataUrl(dataUrl, maxDim = 1280, quality = 0.72) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      } catch (e) {
+        resolve(dataUrl); // fallback : on garde l'original si le canvas échoue
+      }
+    };
+    img.onerror = () => resolve(dataUrl); // fallback silencieux
+    img.src = dataUrl;
+  });
+}
+
 // Convertit un dataURL "data:image/jpeg;base64,XXXX" en {mediaType, data}
 function parseDataUrl(dataUrl) {
   const match = /^data:(image\/[a-zA-Z]+);base64,(.*)$/.exec(dataUrl);
@@ -3481,9 +3520,10 @@ Identifie sur l'étiquette :
 - La dose conseillée par le fabricant et son unité (g, kg, ml ou L)
 - L'effet annoncé sur le paramètre concerné pour un volume d'eau donné (ex : "20g augmente le pH de 0,1 pour 10m³") si l'information est visible
 - Le délai d'attente avant baignade recommandé en heures, si indiqué
+- La taille TOTALE du contenant/emballage tel que vendu (le poids ou volume net indiqué sur l'étiquette, ex : "5 kg", "25 kg", "1 L", "20 L") — c'est différent de la dose par traitement, c'est la quantité totale achetée
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, sans markdown :
-{"name": "nom du produit ou null", "action": "une des valeurs listées ci-dessus ou null", "doseAmount": nombre ou null, "doseUnit": "g" ou "kg" ou "ml" ou "L" ou null, "effectAmount": nombre ou null, "effectPer": nombre de m³ ou null, "waitHours": nombre ou null, "confidence": "haute" ou "moyenne" ou "basse", "note": "une phrase en français sur ce qui a été lu ou non sur l'étiquette"}
+{"name": "nom du produit ou null", "action": "une des valeurs listées ci-dessus ou null", "doseAmount": nombre ou null, "doseUnit": "g" ou "kg" ou "ml" ou "L" ou null, "effectAmount": nombre ou null, "effectPer": nombre de m³ ou null, "waitHours": nombre ou null, "containerAmount": nombre ou null, "containerUnit": "g" ou "kg" ou "ml" ou "L" ou null, "confidence": "haute" ou "moyenne" ou "basse", "note": "une phrase en français sur ce qui a été lu ou non sur l'étiquette"}
 
 Règles strictes :
 - null pour toute information absente ou illisible sur l'étiquette, ne devine jamais une valeur non présente
@@ -4989,7 +5029,10 @@ function PoolApp() {
 
   useEffect(() => {
     if (!loaded || !authUser?.uid) return;
-    syncConfig({ products });
+    if (!FB.ready()) return;
+    FB.saveConfig(authUser.uid, { products }).catch((e) => {
+      alert(t("product_sync_error") + (e?.message ? " (" + e.message + ")" : ""));
+    });
   }, [products]);
 
   useEffect(() => {
@@ -7238,7 +7281,9 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
     if (!files.length) return;
     setPhotoBusy(true);
     try {
-      const dataUrls = await Promise.all(files.map(fileToDataUrl));
+      const dataUrls = await Promise.all(
+        files.map(async (f) => compressImageDataUrl(await fileToDataUrl(f)))
+      );
       setPhotos((prev) => [...prev, ...dataUrls]);
     } catch (err) {
       // silencieux
@@ -8386,7 +8431,8 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
     setAiNote(null);
     try {
       const dataUrl = await fileToDataUrl(file);
-      setPhoto(dataUrl);
+      const compressed = await compressImageDataUrl(dataUrl);
+      setPhoto(compressed);
     } catch (err) {
       // silencieux
     } finally {
@@ -8408,6 +8454,8 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       if (result.effectAmount != null) setEffectAmount(result.effectAmount);
       if (result.effectPer != null) setEffectPer(result.effectPer);
       if (result.waitHours != null) setWaitHours(result.waitHours);
+      if (result.containerAmount != null) setContainerAmount(result.containerAmount);
+      if (result.containerUnit) setContainerUnit(result.containerUnit);
       if (result.note) setAiNote(result.note);
     } catch (err) {
       setAiError(t("error_analyze") + " : " + (err?.message || t("verify_connection")));
@@ -9311,7 +9359,8 @@ function AddPoolModal({ onClose, onSave, lang, existingPool, forced }) {
     setPhotoBusy(true);
     try {
       const dataUrl = await fileToDataUrl(file);
-      setPhoto(dataUrl);
+      const compressed = await compressImageDataUrl(dataUrl);
+      setPhoto(compressed);
     } catch (err) {}
     finally { setPhotoBusy(false); }
   }
