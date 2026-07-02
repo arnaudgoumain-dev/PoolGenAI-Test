@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.26.0";
+const APP_VERSION = "1.27.1";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -352,6 +352,18 @@ const TRANSLATIONS = {
     verify_gate_title: "Vérifie ton adresse email",
     verify_gate_desc: "Pour accéder à l'application, confirme ton adresse en cliquant sur le lien reçu par email",
     verify_gate_check_btn: "J'ai confirmé — Continuer",
+    verify_link_checking: "Vérification de ton email en cours…",
+    verify_link_verified_title: "Email vérifié !",
+    verify_link_verified_desc: "Ton adresse email est confirmée. Tu peux continuer.",
+    verify_link_already_title: "Déjà vérifié",
+    verify_link_already_desc: "Cette adresse email était déjà confirmée.",
+    verify_link_expired_title: "Lien expiré",
+    verify_link_expired_desc: "Ce lien de vérification a expiré. Redemande un nouvel email depuis l'app.",
+    verify_link_invalid_title: "Lien invalide",
+    verify_link_invalid_desc: "Ce lien de vérification n'est pas valide. Redemande un nouvel email depuis l'app.",
+    verify_link_error_title: "Erreur",
+    verify_link_error_desc: "Impossible de vérifier ton email pour le moment. Réessaie plus tard.",
+    verify_link_continue_btn: "Continuer vers l'app",
     verify_gate_checking: "Vérification...",
     verify_gate_still_unverified: "Ton email n'est pas encore confirmé. Vérifie ta boîte de réception (et les spams).",
     verify_gate_resend_btn: "Renvoyer l'email de confirmation",
@@ -828,6 +840,18 @@ const TRANSLATIONS = {
     verify_gate_title: "Verify your email address",
     verify_gate_desc: "To access the app, confirm your address by clicking the link you received by email",
     verify_gate_check_btn: "I've confirmed — Continue",
+    verify_link_checking: "Verifying your email…",
+    verify_link_verified_title: "Email verified!",
+    verify_link_verified_desc: "Your email address is confirmed. You can continue.",
+    verify_link_already_title: "Already verified",
+    verify_link_already_desc: "This email address was already confirmed.",
+    verify_link_expired_title: "Link expired",
+    verify_link_expired_desc: "This verification link has expired. Request a new email from the app.",
+    verify_link_invalid_title: "Invalid link",
+    verify_link_invalid_desc: "This verification link isn't valid. Request a new email from the app.",
+    verify_link_error_title: "Error",
+    verify_link_error_desc: "Couldn't verify your email right now. Try again later.",
+    verify_link_continue_btn: "Continue to the app",
     verify_gate_checking: "Checking...",
     verify_gate_still_unverified: "Your email isn't confirmed yet. Check your inbox (and spam folder).",
     verify_gate_resend_btn: "Resend confirmation email",
@@ -1306,6 +1330,18 @@ const TRANSLATIONS = {
     verify_gate_title: "Bestätige deine E-Mail-Adresse",
     verify_gate_desc: "Um die App zu nutzen, bestätige deine Adresse über den Link, den du per E-Mail erhalten hast",
     verify_gate_check_btn: "Bestätigt — Weiter",
+    verify_link_checking: "E-Mail wird überprüft…",
+    verify_link_verified_title: "E-Mail bestätigt!",
+    verify_link_verified_desc: "Deine E-Mail-Adresse ist bestätigt. Du kannst fortfahren.",
+    verify_link_already_title: "Bereits bestätigt",
+    verify_link_already_desc: "Diese E-Mail-Adresse war bereits bestätigt.",
+    verify_link_expired_title: "Link abgelaufen",
+    verify_link_expired_desc: "Dieser Bestätigungslink ist abgelaufen. Fordere eine neue E-Mail in der App an.",
+    verify_link_invalid_title: "Ungültiger Link",
+    verify_link_invalid_desc: "Dieser Bestätigungslink ist ungültig. Fordere eine neue E-Mail in der App an.",
+    verify_link_error_title: "Fehler",
+    verify_link_error_desc: "E-Mail konnte gerade nicht überprüft werden. Versuche es später erneut.",
+    verify_link_continue_btn: "Weiter zur App",
     verify_gate_checking: "Wird geprüft...",
     verify_gate_still_unverified: "Deine E-Mail ist noch nicht bestätigt. Prüfe dein Postfach (auch den Spam-Ordner).",
     verify_gate_resend_btn: "Bestätigungs-E-Mail erneut senden",
@@ -1781,6 +1817,18 @@ const TRANSLATIONS = {
     verify_gate_title: "Verifica il tuo indirizzo email",
     verify_gate_desc: "Per accedere all'app, conferma il tuo indirizzo cliccando sul link ricevuto via email",
     verify_gate_check_btn: "Confermato — Continua",
+    verify_link_checking: "Verifica della tua email in corso…",
+    verify_link_verified_title: "Email verificata!",
+    verify_link_verified_desc: "Il tuo indirizzo email è confermato. Puoi continuare.",
+    verify_link_already_title: "Già verificata",
+    verify_link_already_desc: "Questo indirizzo email era già confermato.",
+    verify_link_expired_title: "Link scaduto",
+    verify_link_expired_desc: "Questo link di verifica è scaduto. Richiedi una nuova email dall'app.",
+    verify_link_invalid_title: "Link non valido",
+    verify_link_invalid_desc: "Questo link di verifica non è valido. Richiedi una nuova email dall'app.",
+    verify_link_error_title: "Errore",
+    verify_link_error_desc: "Impossibile verificare la tua email al momento. Riprova più tardi.",
+    verify_link_continue_btn: "Continua verso l'app",
     verify_gate_checking: "Verifica in corso...",
     verify_gate_still_unverified: "La tua email non è ancora confermata. Controlla la posta in arrivo (e lo spam).",
     verify_gate_resend_btn: "Reinvia l'email di conferma",
@@ -2256,6 +2304,18 @@ const TRANSLATIONS = {
     verify_gate_title: "Verifica tu dirección de email",
     verify_gate_desc: "Para acceder a la app, confirma tu dirección haciendo clic en el enlace que recibiste por email",
     verify_gate_check_btn: "Confirmado — Continuar",
+    verify_link_checking: "Verificando tu email…",
+    verify_link_verified_title: "¡Email verificado!",
+    verify_link_verified_desc: "Tu dirección de email está confirmada. Puedes continuar.",
+    verify_link_already_title: "Ya verificado",
+    verify_link_already_desc: "Esta dirección de email ya estaba confirmada.",
+    verify_link_expired_title: "Enlace caducado",
+    verify_link_expired_desc: "Este enlace de verificación ha caducado. Solicita un nuevo email desde la app.",
+    verify_link_invalid_title: "Enlace no válido",
+    verify_link_invalid_desc: "Este enlace de verificación no es válido. Solicita un nuevo email desde la app.",
+    verify_link_error_title: "Error",
+    verify_link_error_desc: "No se pudo verificar tu email en este momento. Inténtalo más tarde.",
+    verify_link_continue_btn: "Continuar a la app",
     verify_gate_checking: "Comprobando...",
     verify_gate_still_unverified: "Tu email todavía no está confirmado. Revisa tu bandeja de entrada (y spam).",
     verify_gate_resend_btn: "Reenviar email de confirmación",
@@ -2728,6 +2788,18 @@ const TRANSLATIONS = {
     verify_gate_title: "Verifica o teu endereço de email",
     verify_gate_desc: "Para aceder à app, confirma o teu endereço clicando no link recebido por email",
     verify_gate_check_btn: "Confirmei — Continuar",
+    verify_link_checking: "A verificar o teu email…",
+    verify_link_verified_title: "Email verificado!",
+    verify_link_verified_desc: "O teu endereço de email está confirmado. Podes continuar.",
+    verify_link_already_title: "Já verificado",
+    verify_link_already_desc: "Este endereço de email já estava confirmado.",
+    verify_link_expired_title: "Link expirado",
+    verify_link_expired_desc: "Este link de verificação expirou. Pede um novo email na app.",
+    verify_link_invalid_title: "Link inválido",
+    verify_link_invalid_desc: "Este link de verificação não é válido. Pede um novo email na app.",
+    verify_link_error_title: "Erro",
+    verify_link_error_desc: "Não foi possível verificar o teu email agora. Tenta mais tarde.",
+    verify_link_continue_btn: "Continuar para a app",
     verify_gate_checking: "A verificar...",
     verify_gate_still_unverified: "O teu email ainda não está confirmado. Verifica a caixa de entrada (e o spam).",
     verify_gate_resend_btn: "Reenviar email de confirmação",
@@ -3649,8 +3721,20 @@ const FB = {
   signUp: (email, pwd) => window._fbSignUp(window._fbAuth, email, pwd),
   resetPwd: (email) => window._fbResetPwd(window._fbAuth, email),
   sendVerification: async (user) => {
-    if (!window._fbSendEmailVerification) return;
-    await window._fbSendEmailVerification(user);
+    if (!user) return;
+    const idToken = await user.getIdToken();
+    const res = await fetch("https://poolgenai-proxy.support-poolgenai.workers.dev/send-verification-email", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${idToken}` },
+    });
+    if (!res.ok) {
+      let msg = `Erreur ${res.status}`;
+      try {
+        const data = await res.json();
+        if (data?.error) msg = data.error;
+      } catch (e) {}
+      throw new Error(msg);
+    }
   },
   deleteAccount: async () => {
     if (!window._fbDeleteUser || !window._fbAuth?.currentUser) return;
@@ -4190,6 +4274,43 @@ function PoolApp() {
   const [verifyCheckFailed, setVerifyCheckFailed] = useState(false);
   const [verifySending, setVerifySending] = useState(false);
   const [verifyResendStatus, setVerifyResendStatus] = useState(null); // null | "sent" | "error"
+
+  // ── Lien de vérification email entrant (?token=xxx) ──
+  // null tant qu'aucun token n'est présent dans l'URL ; sinon "verifying" |
+  // "verified" | "already_verified" | "expired" | "invalid" | "error".
+  const [verifyLinkStatus, setVerifyLinkStatus] = useState(null);
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("token");
+    if (!token) return;
+    setVerifyLinkStatus("verifying");
+    fetch("https://poolgenai-proxy.support-poolgenai.workers.dev/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    })
+      .then(async (res) => {
+        if (res.status === 410) { setVerifyLinkStatus("expired"); return; }
+        if (res.status === 404) { setVerifyLinkStatus("invalid"); return; }
+        if (!res.ok) { setVerifyLinkStatus("error"); return; }
+        const data = await res.json().catch(() => ({}));
+        setVerifyLinkStatus(data.status === "already_verified" ? "already_verified" : "verified");
+        // Le champ emailVerified est mis à jour côté Firebase Auth par le Worker, mais
+        // le SDK client ne le sait pas tant qu'on ne force pas un reload() — sinon
+        // authUser.emailVerified reste périmé en mémoire jusqu'au prochain rechargement complet.
+        try {
+          if (window._fbAuth?.currentUser) {
+            await window._fbAuth.currentUser.reload();
+            setEmailVerifiedNow(!!window._fbAuth.currentUser.emailVerified);
+          }
+        } catch (e) {}
+      })
+      .catch(() => setVerifyLinkStatus("error"))
+      .finally(() => {
+        // Nettoie l'URL pour éviter de retraiter le même token si l'utilisateur recharge
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, "", cleanUrl);
+      });
+  }, []);
 
   const [pools, setPools] = useState([
     { id: "default", name: "Ma piscine", location: "Valbonne (06)", volume: 72, treatmentType: "chlore", filtration: "sable" },
@@ -5207,6 +5328,36 @@ function PoolApp() {
 
   return (
     <>
+    {verifyLinkStatus && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+          {verifyLinkStatus === "verifying" ? (
+            <>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
+              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("verify_link_checking")}</div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>
+                {verifyLinkStatus === "verified" || verifyLinkStatus === "already_verified" ? "✅" : "⚠️"}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+                {t(`verify_link_${verifyLinkStatus}_title`)}
+              </div>
+              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+                {t(`verify_link_${verifyLinkStatus}_desc`)}
+              </div>
+              <button
+                onClick={() => setVerifyLinkStatus(null)}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+              >
+                {t("verify_link_continue_btn")}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    )}
     {forceUpdate && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
