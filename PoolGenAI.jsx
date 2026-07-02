@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.21.1";
+const APP_VERSION = "1.21.2";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -347,6 +347,9 @@ const TRANSLATIONS = {
     verify_gate_resend_sent: "Email renvoyé — pense à vérifier tes spams.",
     verify_gate_resend_error: "Impossible d'envoyer l'email pour le moment. Réessaie plus tard.",
     verify_gate_signout: "Se déconnecter",
+    verify_email_send_failed: "L'email de confirmation n'a pas pu être envoyé. Réessaie ci-dessous.",
+    verify_email_retry_btn: "Renvoyer l'email",
+    verify_email_resent: "Email renvoyé ✓",
     account_created_sub: "Bienvenue sur PoolGenAI. Tu peux maintenant utiliser l'app.",
     start_app: "Démarrer l'app",
     sign_out: "Se déconnecter",
@@ -806,6 +809,9 @@ const TRANSLATIONS = {
     verify_gate_resend_sent: "Email resent — remember to check your spam folder.",
     verify_gate_resend_error: "Couldn't send the email right now. Try again later.",
     verify_gate_signout: "Sign out",
+    verify_email_send_failed: "The confirmation email couldn't be sent. Try again below.",
+    verify_email_retry_btn: "Resend email",
+    verify_email_resent: "Email resent ✓",
     account_created_sub: "Welcome to PoolGenAI. You can now use the app.",
     start_app: "Start the app",
     sign_out: "Sign out",
@@ -1267,6 +1273,9 @@ const TRANSLATIONS = {
     verify_gate_resend_sent: "E-Mail erneut gesendet — prüfe auch deinen Spam-Ordner.",
     verify_gate_resend_error: "E-Mail konnte gerade nicht gesendet werden. Versuch es später erneut.",
     verify_gate_signout: "Abmelden",
+    verify_email_send_failed: "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Versuch es unten erneut.",
+    verify_email_retry_btn: "E-Mail erneut senden",
+    verify_email_resent: "E-Mail erneut gesendet ✓",
     account_created_sub: "Willkommen bei PoolGenAI. Du kannst die App jetzt nutzen.",
     start_app: "App starten",
     sign_out: "Abmelden",
@@ -1725,6 +1734,9 @@ const TRANSLATIONS = {
     verify_gate_resend_sent: "Email reinviata — controlla anche lo spam.",
     verify_gate_resend_error: "Impossibile inviare l'email ora. Riprova più tardi.",
     verify_gate_signout: "Disconnetti",
+    verify_email_send_failed: "Impossibile inviare l'email di conferma. Riprova qui sotto.",
+    verify_email_retry_btn: "Reinvia email",
+    verify_email_resent: "Email reinviata ✓",
     account_created_sub: "Benvenuto su PoolGenAI. Puoi usare l'app ora.",
     start_app: "Avvia l'app",
     sign_out: "Disconnetti",
@@ -2183,6 +2195,9 @@ const TRANSLATIONS = {
     verify_gate_resend_sent: "Email reenviado — revisa también el spam.",
     verify_gate_resend_error: "No se pudo enviar el email ahora. Inténtalo más tarde.",
     verify_gate_signout: "Cerrar sesión",
+    verify_email_send_failed: "No se pudo enviar el email de confirmación. Inténtalo de nuevo abajo.",
+    verify_email_retry_btn: "Reenviar email",
+    verify_email_resent: "Email reenviado ✓",
     account_created_sub: "Bienvenido a PoolGenAI. Ya puedes usar la app.",
     start_app: "Iniciar la app",
     sign_out: "Cerrar sesión",
@@ -2638,6 +2653,9 @@ const TRANSLATIONS = {
     verify_gate_resend_sent: "Email reenviado — verifica também o spam.",
     verify_gate_resend_error: "Não foi possível enviar o email agora. Tenta mais tarde.",
     verify_gate_signout: "Terminar sessão",
+    verify_email_send_failed: "Não foi possível enviar o email de confirmação. Tenta novamente abaixo.",
+    verify_email_retry_btn: "Reenviar email",
+    verify_email_resent: "Email reenviado ✓",
     account_created_sub: "Bem-vindo ao PoolGenAI. Já podes usar a app.",
     start_app: "Iniciar a app",
     sign_out: "Sair",
@@ -3546,6 +3564,9 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
+  const [verifyEmailFailed, setVerifyEmailFailed] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
   const [cguAccepted, setCguAccepted] = useState(false);
   const [dataAccepted, setDataAccepted] = useState(false);
 
@@ -3576,8 +3597,15 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
         if (!cguAccepted) { setError(t("disclaimer_required")); setBusy(false); return; }
         const cred = await FB.signUp(email, pwd);
         track("sign_up", { method: "email" });
-        // Envoie l'email de vérification
-        await FB.sendVerification(cred.user).catch(() => {});
+        // Envoie l'email de vérification — erreur loggée et exposée à l'écran "done"
+        // plutôt qu'avalée silencieusement (impossible jusqu'ici de savoir si ça échouait)
+        try {
+          await FB.sendVerification(cred.user);
+          setVerifyEmailFailed(false);
+        } catch (verifyErr) {
+          console.error("Échec d'envoi de l'email de vérification :", verifyErr.code, verifyErr.message);
+          setVerifyEmailFailed(true);
+        }
         // Enregistre le profil dans Firestore
         await FB.saveUser(cred.user.uid, {
           email: cred.user.email,
@@ -3724,9 +3752,34 @@ By creating an account, the user acknowledges having read this document in full 
           </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("account_created")}</div>
           <div style={{ fontSize: 13, color: "#6a7d90", marginBottom: 12 }}>{t("account_created_sub")}</div>
-          <div style={{ fontSize: 12, color: "#a8721a", background: "#fff8e1", border: "1px solid #ffe082", borderRadius: 10, padding: "10px 14px", marginBottom: 20, textAlign: "left" }}>
-            📧 {t("verify_email_notice")}
-          </div>
+          {verifyEmailFailed ? (
+            <div style={{ fontSize: 12, color: "#c0392b", background: "#fdf0ef", border: "1px solid #f3c9c4", borderRadius: 10, padding: "10px 14px", marginBottom: 14, textAlign: "left" }}>
+              ⚠️ {t("verify_email_send_failed")}
+            </div>
+          ) : (
+            <div style={{ fontSize: 12, color: "#a8721a", background: "#fff8e1", border: "1px solid #ffe082", borderRadius: 10, padding: "10px 14px", marginBottom: 14, textAlign: "left" }}>
+              📧 {t("verify_email_notice")}
+            </div>
+          )}
+          {verifyEmailFailed && (
+            <button
+              style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 600, fontSize: 13.5, cursor: resendBusy ? "default" : "pointer", marginBottom: 14 }}
+              disabled={resendBusy}
+              onClick={async () => {
+                setResendBusy(true);
+                try {
+                  await FB.sendVerification(window._fbAuth?.currentUser);
+                  setVerifyEmailFailed(false);
+                  setResendDone(true);
+                } catch (e) {
+                  console.error("Échec du renvoi de l'email de vérification :", e.code, e.message);
+                }
+                setResendBusy(false);
+              }}
+            >
+              {resendBusy ? "..." : resendDone ? t("verify_email_resent") : t("verify_email_retry_btn")}
+            </button>
+          )}
           <button
             style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
             onClick={onSkip}
