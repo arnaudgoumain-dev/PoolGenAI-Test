@@ -34,7 +34,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, anthropic-version, Authorization",
+    "Access-Control-Allow-Headers": "Content-Type, anthropic-version, Authorization, x-uid",
     "Access-Control-Max-Age": "86400",
   };
 }
