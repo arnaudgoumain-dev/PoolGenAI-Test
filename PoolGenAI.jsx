@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.29.0";
+const APP_VERSION = "1.29.1";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4697,6 +4697,7 @@ function PoolApp() {
   // On annule tout debounce en attente avant de se déconnecter.
   async function performDeleteAccount() {
     const uid = authUser?.uid;
+    teardownRef.current = true;
     if (syncDebounceRef.current) { clearTimeout(syncDebounceRef.current); syncDebounceRef.current = null; }
     syncPendingRef.current = {};
     if (uid) {
@@ -4742,6 +4743,7 @@ function PoolApp() {
     if (!ok) return;
     setErasingData(true);
     try {
+      teardownRef.current = true;
       if (syncDebounceRef.current) { clearTimeout(syncDebounceRef.current); syncDebounceRef.current = null; }
       syncPendingRef.current = {};
       await eraseAllUserData(authUser.uid);
@@ -4768,10 +4770,20 @@ function PoolApp() {
   // les changements survenant dans une fenêtre de 800ms en un seul appel réseau,
   // et absorbe le ping-pong au lieu de le laisser consommer le quota Firestore.
   // L'erreur est désormais remontée (alert) au lieu d'être avalée en silence.
+  // Fix v1.29.1 : resetLocalAppState() remet pools/products/activePlan à leurs
+  // valeurs par défaut AVANT signOut() (suppression de compte, effacement RGPD).
+  // Ces changements d'état déclenchent les useEffect de synchro alors qu'authUser
+  // est encore renseigné, programmant une écriture qui échoue 800ms plus tard,
+  // une fois la session coupée — d'où l'alerte "Missing or insufficient
+  // permissions" sur l'écran de connexion. teardownRef bloque toute nouvelle
+  // programmation dès le début d'une séquence de sortie (déconnexion,
+  // suppression de compte, effacement RGPD), quelle que soit la source du
+  // changement d'état qui suit.
   const syncDebounceRef = useRef(null);
   const syncPendingRef = useRef({});
+  const teardownRef = useRef(false);
   function syncConfig(partial, errorKey) {
-    if (!authUser?.uid || !FB.ready()) return;
+    if (!authUser?.uid || !FB.ready() || teardownRef.current) return;
     syncPendingRef.current = { ...syncPendingRef.current, ...partial };
     if (syncDebounceRef.current) clearTimeout(syncDebounceRef.current);
     syncDebounceRef.current = setTimeout(() => {
@@ -4873,6 +4885,7 @@ function PoolApp() {
 
     const unsub = FB.onAuth(async (user) => {
       if (user) {
+        teardownRef.current = false;
         // Détection de changement d'utilisateur sur cet appareil : si un compte
         // différent a été utilisé avant (même sans déconnexion explicite), on
         // nettoie tout AVANT de charger/synchroniser quoi que ce soit, pour ne
@@ -5866,6 +5879,7 @@ function PoolApp() {
             onRepairOrphanedData={repairOrphanedData}
             authUser={authUser}
             onSignOut={async () => {
+              teardownRef.current = true;
               if (syncDebounceRef.current) { clearTimeout(syncDebounceRef.current); syncDebounceRef.current = null; }
               syncPendingRef.current = {};
               await FB.signOut().catch(() => {});
