@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.29.6";
+const APP_VERSION = "1.29.9";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -458,6 +458,7 @@ const TRANSLATIONS = {
     reco_cl_shock_text: "ce soir (choc renforcé)",
     reco_note_tac: "Un TAC bas rend le pH instable.",
     reco_no_product_note: "Aucun produit configuré pour cette action. Ajoute-en un dans l'onglet Produits.",
+    product_empty_delete_confirm: "{name} est à 0% de stock. Le supprimer de la liste ?",
     reco_note_ph_before_tac: "pH corrigé avant le TAC : à ce pH le chlore serait peu efficace, et le TAC n'est pas assez bas pour être urgent.",
     reco_note_combined: "Chlore combiné = chloramines, signe d'une désinfection insuffisante. Verser le soir, filtration en continu.",
     reco_note_sel: "Utiliser du sel spécial piscine (NaCl pur ≥ 99%). Dissoudre avant l'ajout ou verser directement près du skimmer, filtration en marche 24h.",
@@ -966,6 +967,7 @@ const TRANSLATIONS = {
     reco_cl_shock_text: "tonight (shock treatment)",
     reco_note_tac: "Low TAC makes pH unstable.",
     reco_no_product_note: "No product configured for this action. Add one in the Products tab.",
+    product_empty_delete_confirm: "{name} is at 0% stock. Remove it from the list?",
     reco_note_ph_before_tac: "pH corrected before TAC: chlorine would be inefficient at this pH, and TAC isn't low enough to be urgent.",
     reco_note_combined: "Combined chlorine = chloramines, sign of insufficient disinfection. Add in the evening, keep filtration running.",
     reco_note_sel: "Use pool-grade salt (pure NaCl ≥ 99%). Dissolve before adding or pour directly near the skimmer, run filtration for 24h.",
@@ -1476,6 +1478,7 @@ const TRANSLATIONS = {
     reco_cl_shock_text: "heute Abend (Schockbehandlung)",
     reco_note_tac: "Niedriger KH macht den pH instabil.",
     reco_no_product_note: "Kein Produkt für diese Aktion konfiguriert. Füge eines im Tab Produkte hinzu.",
+    product_empty_delete_confirm: "{name} hat 0% Bestand. Aus der Liste entfernen?",
     reco_note_ph_before_tac: "pH vor KH korrigiert: Chlor wäre bei diesem pH-Wert wenig wirksam, und der KH ist nicht niedrig genug, um dringend zu sein.",
     reco_note_combined: "Gebundenes Chlor = Chloramine, Zeichen unzureichender Desinfektion. Abends zugeben, Filtration durchlaufen lassen.",
     reco_note_sel: "Poolsalz (reines NaCl ≥ 99%) verwenden. Vor dem Zugeben auflösen oder direkt beim Skimmer zugeben, 24h filtrieren.",
@@ -1983,6 +1986,7 @@ const TRANSLATIONS = {
     reco_cl_shock_text: "stasera (trattamento shock)",
     reco_note_tac: "Un TAC basso rende il pH instabile.",
     reco_no_product_note: "Nessun prodotto configurato per questa azione. Aggiungine uno nella scheda Prodotti.",
+    product_empty_delete_confirm: "{name} è allo 0% di scorta. Rimuoverlo dalla lista?",
     reco_note_ph_before_tac: "pH corretto prima del TAC: a questo pH il cloro sarebbe poco efficace, e il TAC non è abbastanza basso da essere urgente.",
     reco_note_combined: "Cloro combinato = cloramine, segno di disinfezione insufficiente. Aggiungere la sera, filtrazione in continuo.",
     reco_note_sel: "Usare sale da piscina (NaCl puro ≥ 99%). Sciogliere prima dell'aggiunta o versare vicino allo skimmer, filtrazione 24h.",
@@ -2490,6 +2494,7 @@ const TRANSLATIONS = {
     reco_cl_shock_text: "esta noche (tratamiento de choque)",
     reco_note_tac: "Un TAC bajo hace el pH inestable.",
     reco_no_product_note: "No hay ningún producto configurado para esta acción. Añade uno en la pestaña Productos.",
+    product_empty_delete_confirm: "{name} está al 0% de stock. ¿Eliminarlo de la lista?",
     reco_note_ph_before_tac: "pH corregido antes que el TAC: a este pH el cloro sería poco eficaz, y el TAC no está lo bastante bajo para ser urgente.",
     reco_note_combined: "Cloro combinado = cloraminas, señal de desinfección insuficiente. Añadir por la noche, filtración continua.",
     reco_note_sel: "Usar sal de piscina (NaCl puro ≥ 99%). Disolver antes de añadir o verter cerca del skimmer, filtración 24h.",
@@ -2994,6 +2999,7 @@ const TRANSLATIONS = {
     reco_cl_shock_text: "esta noite (tratamento de choque)",
     reco_note_tac: "Um TAC baixo torna o pH instável.",
     reco_no_product_note: "Nenhum produto configurado para esta ação. Adiciona um no separador Produtos.",
+    product_empty_delete_confirm: "{name} está a 0% de stock. Remover da lista?",
     reco_note_ph_before_tac: "pH corrigido antes do TAC: a este pH o cloro seria pouco eficaz, e o TAC não está baixo o suficiente para ser urgente.",
     reco_note_combined: "Cloro combinado = cloraminas, sinal de desinfecção insuficiente. Adicionar à noite, filtração contínua.",
     reco_note_sel: "Usar sal de piscina (NaCl puro ≥ 99%). Dissolver antes de adicionar ou verter perto do skimmer, filtração 24h.",
@@ -3199,6 +3205,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 1000,
     containerUnit: "kg",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "ph-plus",
@@ -3215,6 +3222,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 1000,
     containerUnit: "kg",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "chlore-choc",
@@ -3231,6 +3239,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 1000,
     containerUnit: "kg",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "galets-stabilises",
@@ -3247,6 +3256,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 1000,
     containerUnit: "kg",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "tac-plus",
@@ -3263,6 +3273,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 5,
     containerUnit: "kg",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "calcium-plus",
@@ -3279,6 +3290,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 5,
     containerUnit: "kg",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "anti-phosphates",
@@ -3295,6 +3307,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 1,
     containerUnit: "L",
     stockPercent: 100,
+    isDefault: true,
   },
   {
     id: "sequestrant",
@@ -3311,6 +3324,7 @@ const DEFAULT_PRODUCTS = [
     containerAmount: 1,
     containerUnit: "L",
     stockPercent: 100,
+    isDefault: true,
   },
 ];
 
@@ -5383,6 +5397,7 @@ function PoolApp() {
     if (allApplied) {
       const stepsWithAmount = steps.filter((s) => s.appliedAmount && !s.skipped);
       if (stepsWithAmount.length > 0) {
+        const justEmptied = [];
         setProducts((prev) => prev.map((prod) => {
           const step = stepsWithAmount.find((s) => s.productName === prod.name);
           if (!step || !prod.containerAmount) return prod;
@@ -5391,9 +5406,30 @@ function PoolApp() {
           if (cUnit === "kg" && step.doseUnit === "g") appliedInContainerUnit = step.appliedAmount / 1000;
           if (cUnit === "L" && step.doseUnit === "mL") appliedInContainerUnit = step.appliedAmount / 1000;
           const consumed = (appliedInContainerUnit / prod.containerAmount) * 100;
-          const newStock = Math.max(0, (prod.stockPercent ?? 100) - consumed);
-          return { ...prod, stockPercent: Math.round(newStock * 10) / 10 };
+          const prevStock = prod.stockPercent ?? 100;
+          const newStock = Math.max(0, prevStock - consumed);
+          const rounded = Math.round(newStock * 10) / 10;
+          // v1.29.8 — Un produit UTILISATEUR (pas standard) qui vient d'atteindre
+          // 0% est proposé à la suppression, pour ne pas laisser traîner un
+          // produit épuisé dans la liste. Les produits standard, eux, restent
+          // toujours en base à 0% (masqués), jamais supprimés.
+          if (!prod.isDefault && prevStock > 0 && rounded <= 0) {
+            justEmptied.push(prod.id);
+          }
+          return { ...prod, stockPercent: rounded };
         }));
+        if (justEmptied.length > 0) {
+          setTimeout(() => {
+            justEmptied.forEach((id) => {
+              setProducts((prev) => {
+                const p = prev.find((x) => x.id === id);
+                if (!p) return prev;
+                const ok = window.confirm(t("product_empty_delete_confirm", { name: p.name }));
+                return ok ? prev.filter((x) => x.id !== id) : prev;
+              });
+            });
+          }, 300);
+        }
       }
     }
     setApplications((prev) => {
@@ -6061,6 +6097,20 @@ function PoolApp() {
             track("upgrade_activated");
             setIsPremium(true);
             setApiKey("https://poolgenai-proxy.support-poolgenai.workers.dev");
+            // v1.29.7 — À l'activation du mode illimité (test), la gestion de stock
+            // s'active par défaut sur le bassin actif, mais la liste des produits EN
+            // STOCK part vide : on garde les produits (nom, dosage — nécessaires au
+            // calcul des quantités du plan de traitement), on remet juste leur
+            // pourcentage de stock à 0. Force une saisie réelle du stock au lieu de
+            // partir sur les 100% par défaut des produits pré-remplis.
+            if (activePool) {
+              updatePool(activePool.id, { manageStock: true });
+              setProducts((prev) =>
+                prev.map((p) =>
+                  (p.poolId || "default") === activePool.id ? { ...p, stockPercent: 0 } : p
+                )
+              );
+            }
             setShowPaywall(false);
           }}
         />
@@ -6799,9 +6849,19 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   // Traduit le nom d'un produit : utilise nameKey si disponible, sinon le nom brut
   const prodName = (prod, fallbackKey) =>
     prod ? (prod.nameKey ? _(prod.nameKey) : prod.name) || _(fallbackKey) : _(fallbackKey);
+  // v1.29.8 — Remplacement automatique : si l'utilisateur a saisi son propre
+  // produit pour une action donnée (ex. "ph+"), il prend le pas sur le produit
+  // standard pré-rempli pour la même action, sans action manuelle. Le produit
+  // standard reste utilisé pour le calcul de dose tant qu'aucun remplacement
+  // n'existe — jamais affiché dans la liste (masqué à 0% de stock), mais
+  // "présent" pour que le plan de traitement continue de fonctionner.
+  const findProduct = (action) => {
+    const candidates = products.filter((p) => p.action === action);
+    return candidates.find((p) => !p.isDefault) || candidates.find((p) => p.isDefault) || null;
+  };
   const tac = parseFloat(latestLower.tac);
   if (has("tac") && !Number.isNaN(tac) && targetsLower.tac && tac < targetsLower.tac.min) {
-    const prod = products.find((p) => p.action === "tac+");
+    const prod = findProduct("tac+");
     steps.push({
       action: "tac+",
       title: _("reco_tac_low", { val: tac }),
@@ -6825,7 +6885,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     const targetMid = (phTargets.min + phTargets.max) / 2;
     if (phVal > phTargets.max) {
       const diff = phVal - targetMid;
-      const prod = products.find((p) => p.action === "ph-");
+      const prod = findProduct("ph-");
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "ph-",
@@ -6843,7 +6903,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       });
     } else if (phVal < phTargets.min) {
       const diff = targetMid - phVal;
-      const prod = products.find((p) => p.action === "ph+");
+      const prod = findProduct("ph+");
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "ph+",
@@ -6871,7 +6931,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     const fclT = targetsLower.fcl;
     if (combined !== null && combined > 0.5) {
       const targetFcl = Math.max(fclT.max, combined * 3);
-      const prod = products.find((p) => p.action === "chlore");
+      const prod = findProduct("chlore");
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (targetFcl / prod.effectAmount)) : null;
       steps.push({
         action: "chlore",
@@ -6890,7 +6950,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     } else if (fCl < fclT.min) {
       const targetFcl = (fclT.min + fclT.max) / 2;
       const diff = targetFcl - fCl;
-      const prod = products.find((p) => p.action === "chlore");
+      const prod = findProduct("chlore");
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
         action: "chlore",
@@ -6925,7 +6985,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   if (has("brome") && !Number.isNaN(bromeVal) && targetsLower.brome) {
     const brT = targetsLower.brome;
     if (bromeVal < brT.min) {
-      const prod = products.find((p) => p.action === "brome");
+      const prod = findProduct("brome");
       const diff = ((brT.min + brT.max) / 2) - bromeVal;
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
@@ -6950,7 +7010,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   if (has("o2") && !Number.isNaN(o2Val) && targets.o2) {
     const o2T = targets.o2;
     if (o2Val < o2T.min) {
-      const prod = products.find((p) => p.action === "o2");
+      const prod = findProduct("o2");
       const diff = ((o2T.min + o2T.max) / 2) - o2Val;
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : null;
       steps.push({
@@ -6998,7 +7058,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     const hardT = targetsLower.hard;
     if (hardVal < hardT.min) {
       const diff = ((hardT.min + hardT.max) / 2) - hardVal;
-      const prod = products.find((p) => p.action === "hard+");
+      const prod = findProduct("hard+");
       const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (diff / prod.effectAmount)) : Math.round(160 * (volume / 10) * (diff / 10));
       steps.push({
         action: "hard+",
@@ -7030,7 +7090,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   // Phosphates
   const phosVal = parseFloat(latestLower.phos);
   if (has("phos") && !Number.isNaN(phosVal) && targetsLower.phos && phosVal > targetsLower.phos.max) {
-    const prod = products.find((p) => p.action === "phos-");
+    const prod = findProduct("phos-");
     const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer) * (phosVal / prod.effectAmount)) : Math.round(50 * (volume / 10) * (phosVal / 100));
     steps.push({
       action: "phos-",
@@ -7049,7 +7109,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   // Cuivre (informatif + séquestrant)
   const copperVal = parseFloat(latestLower.copper);
   if (has("copper") && !Number.isNaN(copperVal) && targetsLower.copper && copperVal > targetsLower.copper.max) {
-    const prod = products.find((p) => p.action === "sequestrant");
+    const prod = findProduct("sequestrant");
     const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer)) : Math.round(100 * (volume / 10));
     steps.push({
       action: "sequestrant",
@@ -7068,7 +7128,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
   // Fer (informatif + séquestrant)
   const ironVal = parseFloat(latestLower.iron);
   if (has("iron") && !Number.isNaN(ironVal) && targetsLower.iron && ironVal > targetsLower.iron.max) {
-    const prod = products.find((p) => p.action === "sequestrant");
+    const prod = findProduct("sequestrant");
     const computedDose = prod ? Math.round(prod.doseAmount * (volume / prod.effectPer)) : Math.round(100 * (volume / 10));
     steps.push({
       action: "sequestrant",
@@ -9018,7 +9078,9 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
           <p style={styles.helpText}>{t("products_formula")}</p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {products.map((p) => (
+            {products
+              .filter((p) => !(p.isDefault && (p.stockPercent ?? 100) <= 0))
+              .map((p) => (
               <button key={p.id} style={styles.productRow} onClick={() => onEdit(p)}>
                 {p.photo ? (
                   <img src={p.photo} alt="" style={styles.productThumb} />
@@ -9112,7 +9174,14 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
     setAiNote(null);
     try {
       const dataUrl = await fileToDataUrl(file);
-      const compressed = await compressImageDataUrl(dataUrl);
+      // v1.29.9 — Fix : config/main (pools + products + réglages, tout dans le
+      // même document Firestore) a une limite de 1 Mo. Chaque photo produit,
+      // compressée à 1280px/qualité 0.72 par défaut, pèse encore plusieurs
+      // centaines de Ko — après 3-4 produits photographiés, le document dépasse
+      // la limite et TOUTE synchro échoue (pas seulement les photos). La
+      // miniature produit ne fait que 40x40px à l'affichage : 300px/qualité 0.5
+      // suffit largement et réduit le poids d'un facteur ~10.
+      const compressed = await compressImageDataUrl(dataUrl, 300, 0.5);
       setPhoto(compressed);
     } catch (err) {
       // silencieux
@@ -9147,6 +9216,18 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
 
   function handleSave() {
     if (!name.trim()) return;
+    const newStock = stockPercent ?? 100;
+    // v1.29.9 — Même logique que la baisse de stock automatique après un plan
+    // de traitement : si l'utilisateur descend lui-même le curseur à 0% sur un
+    // produit qu'il a saisi (pas un produit standard), on propose la
+    // suppression plutôt que de sauvegarder silencieusement à 0%.
+    if (product && !product.isDefault && (product.stockPercent ?? 100) > 0 && newStock <= 0) {
+      const ok = window.confirm(t("product_empty_delete_confirm", { name: name.trim() }));
+      if (ok) {
+        onSave({ ...product, __delete: true });
+        return;
+      }
+    }
     onSave({
       id: product?.id,
       name: name.trim(),
@@ -9158,7 +9239,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       waitHours: parseFloat(waitHours) || 0,
       note,
       photo,
-      stockPercent: stockPercent ?? 100,
+      stockPercent: newStock,
       containerAmount: parseFloat(containerAmount) || 1,
       containerUnit: containerUnit || "kg",
     });
@@ -10163,7 +10244,10 @@ function AddPoolModal({ onClose, onSave, lang, existingPool, forced }) {
     setPhotoBusy(true);
     try {
       const dataUrl = await fileToDataUrl(file);
-      const compressed = await compressImageDataUrl(dataUrl);
+      // v1.29.9 — Même fix que pour les photos produit : icône de bassin
+      // affichée en 38x38px, 1280px par défaut était surdimensionné et
+      // contribuait au dépassement de la limite 1 Mo de config/main.
+      const compressed = await compressImageDataUrl(dataUrl, 300, 0.5);
       setPhoto(compressed);
     } catch (err) {}
     finally { setPhotoBusy(false); }
