@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.28.1";
+const APP_VERSION = "1.29.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -188,6 +188,9 @@ const TRANSLATIONS = {
     account_deleted_title: "Compte supprimé",
     account_deleted_desc: "Ce compte a été supprimé et l'accès à l'application n'est plus disponible.",
     account_deleted_request_btn: "Demander la récupération ou la suppression de mes données",
+    reactivate_btn: "Recommencer avec cette adresse",
+    reactivate_confirm: "Repartir de zéro avec cette adresse ? Tes bassins actuels seront masqués (jamais affichés, mais pas supprimés). Tu devras créer un nouveau bassin.",
+    reset_password_hint: "Réinitialiser mon mot de passe",
     data_request_title: "Récupération ou suppression des données",
     data_request_desc: "Choisis l'action souhaitée. Une demande sera envoyée au support, qui te recontactera par email.",
     data_request_option_erase: "Effacer toutes mes données",
@@ -699,6 +702,9 @@ const TRANSLATIONS = {
     account_deleted_title: "Account deleted",
     account_deleted_desc: "This account has been deleted and access to the app is no longer available.",
     account_deleted_request_btn: "Request data recovery or deletion",
+    reactivate_btn: "Start fresh with this address",
+    reactivate_confirm: "Start fresh with this address? Your current pools will be hidden (never shown again, but not deleted). You'll need to create a new pool.",
+    reset_password_hint: "Reset my password",
     data_request_title: "Data recovery or deletion",
     data_request_desc: "Choose the action you want. A request will be sent to support, who will contact you by email.",
     data_request_option_erase: "Erase all my data",
@@ -1201,6 +1207,9 @@ const TRANSLATIONS = {
     account_deleted_title: "Konto gelöscht",
     account_deleted_desc: "Dieses Konto wurde gelöscht und der Zugriff auf die App ist nicht mehr möglich.",
     account_deleted_request_btn: "Datenwiederherstellung oder -löschung beantragen",
+    reactivate_btn: "Mit dieser Adresse neu beginnen",
+    reactivate_confirm: "Mit dieser Adresse neu beginnen? Deine aktuellen Becken werden ausgeblendet (nie wieder angezeigt, aber nicht gelöscht). Du musst ein neues Becken anlegen.",
+    reset_password_hint: "Passwort zurücksetzen",
     data_request_title: "Datenwiederherstellung oder -löschung",
     data_request_desc: "Wähle die gewünschte Aktion. Eine Anfrage wird an den Support gesendet, der sich per E-Mail bei dir meldet.",
     data_request_option_erase: "Alle meine Daten löschen",
@@ -1705,6 +1714,9 @@ const TRANSLATIONS = {
     account_deleted_title: "Account eliminato",
     account_deleted_desc: "Questo account è stato eliminato e l'accesso all'app non è più disponibile.",
     account_deleted_request_btn: "Richiedi il recupero o l'eliminazione dei miei dati",
+    reactivate_btn: "Ricomincia con questo indirizzo",
+    reactivate_confirm: "Ricominciare da zero con questo indirizzo? Le tue piscine attuali saranno nascoste (mai più mostrate, ma non eliminate). Dovrai creare una nuova piscina.",
+    reset_password_hint: "Reimposta la mia password",
     data_request_title: "Recupero o eliminazione dei dati",
     data_request_desc: "Scegli l'azione desiderata. Una richiesta sarà inviata al supporto, che ti contatterà via email.",
     data_request_option_erase: "Elimina tutti i miei dati",
@@ -2206,6 +2218,9 @@ const TRANSLATIONS = {
     account_deleted_title: "Cuenta eliminada",
     account_deleted_desc: "Esta cuenta ha sido eliminada y el acceso a la aplicación ya no está disponible.",
     account_deleted_request_btn: "Solicitar la recuperación o eliminación de mis datos",
+    reactivate_btn: "Empezar de nuevo con esta dirección",
+    reactivate_confirm: "¿Empezar de cero con esta dirección? Tus piscinas actuales se ocultarán (no se mostrarán más, pero no se eliminarán). Tendrás que crear una piscina nueva.",
+    reset_password_hint: "Restablecer mi contraseña",
     data_request_title: "Recuperación o eliminación de datos",
     data_request_desc: "Elige la acción que deseas. Se enviará una solicitud al soporte, que te contactará por email.",
     data_request_option_erase: "Eliminar todos mis datos",
@@ -2707,6 +2722,9 @@ const TRANSLATIONS = {
     account_deleted_title: "Conta eliminada",
     account_deleted_desc: "Esta conta foi eliminada e o acesso à aplicação já não está disponível.",
     account_deleted_request_btn: "Pedir a recuperação ou eliminação dos meus dados",
+    reactivate_btn: "Recomeçar com este endereço",
+    reactivate_confirm: "Recomeçar do zero com este endereço? As tuas piscinas atuais ficarão ocultas (nunca mais mostradas, mas não eliminadas). Terás de criar uma nova piscina.",
+    reset_password_hint: "Repor a minha palavra-passe",
     data_request_title: "Recuperação ou eliminação de dados",
     data_request_desc: "Escolhe a ação pretendida. Será enviado um pedido ao suporte, que te contactará por email.",
     data_request_option_erase: "Eliminar todos os meus dados",
@@ -3955,6 +3973,15 @@ const FB = {
       cb(!!data?.deleted);
     }, () => cb(false));
   },
+  // v1.29 — Réactivation en libre-service ("recommencer avec cette adresse").
+  // Ne crée jamais un second compte Auth (Firebase interdit deux comptes avec
+  // le même email) : on lève juste le flag sur le même uid. La règle Firestore
+  // n'autorise que la transition deleted:true → false, rien d'autre.
+  reactivateAccount: async (uid) => {
+    if (!window._fbDb || !window._fbSetDoc) return;
+    const ref = window._fbDoc(window._fbDb, "accountDeletions", uid);
+    await window._fbSetDoc(ref, { deleted: false, reactivatedAt: new Date().toISOString() }, { merge: true });
+  },
   // Envoie une demande de récupération/effacement des données au support, via
   // le Worker (route à créer côté serveur : POST /account-data-request).
   // Authentifié par ID token Firebase, même pattern que /v1/messages.
@@ -4013,6 +4040,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
   const [busy, setBusy] = useState(false);
   const [verifyEmailFailed, setVerifyEmailFailed] = useState(false);
   const [showCreateAccountHint, setShowCreateAccountHint] = useState(false);
+  const [showResetHint, setShowResetHint] = useState(false);
   const [resendBusy, setResendBusy] = useState(false);
   const [resendDone, setResendDone] = useState(false);
   const [cguAccepted, setCguAccepted] = useState(false);
@@ -4032,7 +4060,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
   }
 
   async function handleSubmit() {
-    setError(""); setInfo(""); setBusy(true); setShowCreateAccountHint(false);
+    setError(""); setInfo(""); setBusy(true); setShowCreateAccountHint(false); setShowResetHint(false);
     try {
       if (mode === "reset") {
         await FB.resetPwd(email);
@@ -4076,6 +4104,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
     } catch (e) {
       const isLoginCredentialError = mode === "login" &&
         (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential" || e.code === "auth/user-not-found");
+      const isSignupEmailInUse = mode === "signup" && e.code === "auth/email-already-in-use";
       const msg = isLoginCredentialError ? t("login_failed_unified")
         : e.code === "auth/wrong-password" || e.code === "auth/invalid-credential" ? t("wrong_password")
         : e.code === "auth/user-not-found" ? t("user_not_found")
@@ -4085,6 +4114,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
         : e.code === "auth/invalid-email" ? t("error_email_required")
         : e.message;
       setShowCreateAccountHint(isLoginCredentialError);
+      setShowResetHint(isSignupEmailInUse);
       setError(msg);
     } finally { setBusy(false); }
   }
@@ -4368,6 +4398,15 @@ By creating an account, the user acknowledges having read this document in full 
                     style={{ marginTop: 6, background: "none", border: "none", color: "#0a6ebd", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}
                   >
                     {t("create_account_hint")}
+                  </button>
+                )}
+                {showResetHint && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode("reset"); setError(""); setShowResetHint(false); }}
+                    style={{ marginTop: 6, background: "none", border: "none", color: "#0a6ebd", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                  >
+                    {t("reset_password_hint")}
                   </button>
                 )}
               </div>
@@ -4668,6 +4707,33 @@ function PoolApp() {
     window.storage.set("auth_skipped", "").catch(() => {});
     setAuthUser(null);
     setShowLogin(true);
+  }
+
+  // v1.29 — "Recommencer avec cette adresse" depuis l'écran "Compte supprimé".
+  // Ne touche jamais aux anciennes données : désactive tous les bassins existants
+  // (même mécanisme que deletePool, sans confirmation individuelle) pour que
+  // l'écran forcé "créer un bassin" prenne le relais, remet isPremium/activePlan
+  // à zéro, puis lève le flag de suppression. L'historique reste en base, invisible.
+  const [reactivating, setReactivating] = useState(false);
+  async function reactivateAccount() {
+    const uid = authUser?.uid;
+    if (!uid) return;
+    setReactivating(true);
+    try {
+      const resetPools = pools.map((p) =>
+        p.disabled ? p : { ...p, disabled: true, disabledAt: new Date().toISOString() }
+      );
+      setPools(resetPools);
+      setActivePoolId("");
+      setIsPremium(false);
+      setActivePlan(null);
+      await FB.saveConfig(uid, { pools: resetPools, isPremium: false, activePlan: null });
+      await FB.reactivateAccount(uid);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setReactivating(false);
+    }
   }
 
   async function handleEraseSuspendedData() {
@@ -5660,6 +5726,16 @@ function PoolApp() {
           <div style={{ fontSize: 34, marginBottom: 10 }}>⛔</div>
           <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("account_deleted_title")}</div>
           <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 20, lineHeight: 1.5 }}>{t("account_deleted_desc")}</div>
+          <button
+            onClick={() => {
+              if (window.confirm(t("reactivate_confirm"))) reactivateAccount();
+            }}
+            disabled={reactivating}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: reactivating ? "#7ab8e8" : "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: reactivating ? "default" : "pointer", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+          >
+            {reactivating ? <Loader2 size={16} className="spin" /> : null}
+            {t("reactivate_btn")}
+          </button>
           <button
             onClick={() => setShowDataRequestScreen(true)}
             style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
