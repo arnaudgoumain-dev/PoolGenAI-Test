@@ -9,7 +9,8 @@
  *
  * Ce worker gère aussi l'envoi et la validation des liens de vérification
  * d'email via Resend (système maison, indépendant de Firebase Auth email
- * verification).
+ * verification), ainsi que les demandes de récupération/suppression de
+ * données pour les comptes supprimés (self-service).
  *
  * Déploiement :
  *   1. Va sur https://dash.cloudflare.com → Workers & Pages → Create Worker
@@ -40,6 +41,7 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 const VERIFICATION_LINK_BASE = "https://arnaudgoumain-dev.github.io/PoolApp/";
 const VERIFICATION_TOKEN_TTL_HOURS = 24;
 const RESEND_FROM = "PoolGenAI <noreply@poolgenai.com>";
+const SUPPORT_EMAIL = "support.poolgenai@gmail.com";
 
 // À adapter avec l'origine réelle de ton PWA (github.io et/ou poolgenai.app)
 const ALLOWED_ORIGINS = [
@@ -308,6 +310,55 @@ async function firestorePatchDoc(env, collection, documentId, data) {
   return response.json();
 }
 
+// ---------- Firestore : supprimer un document ----------
+async function firestoreDeleteDoc(env, collection, documentId) {
+  const accessToken = await getGoogleAccessToken(env);
+  const url = `${FIRESTORE_BASE}/${collection}/${documentId}`;
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok && response.status !== 404) {
+    const errText = await response.text();
+    throw new Error(`Échec de suppression Firestore : ${errText}`);
+  }
+}
+
+// ---------- Firestore : liste des IDs de documents expirés (structured query) ----------
+async function firestoreQueryExpiredTokenIds(env, nowIso, limit) {
+  const accessToken = await getGoogleAccessToken(env);
+  const url = `${FIRESTORE_BASE}:runQuery`;
+  const body = {
+    structuredQuery: {
+      from: [{ collectionId: "verificationTokens" }],
+      where: {
+        fieldFilter: {
+          field: { fieldPath: "expiresAt" },
+          op: "LESS_THAN",
+          value: { timestampValue: nowIso },
+        },
+      },
+      limit,
+    },
+  };
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Échec de la requête Firestore : ${errText}`);
+  }
+  const rows = await response.json();
+  return rows
+    .filter((r) => r.document)
+    .map((r) => r.document.name.split("/").pop());
+}
+
 // ---------- Identity Toolkit : marquer un compte comme vérifié ----------
 async function markFirebaseAccountVerified(env, uid) {
   const accessToken = await getGoogleAccessToken(env);
@@ -367,7 +418,30 @@ function generateVerificationToken() {
   return base64UrlEncode(bytes);
 }
 
-// ---------- Route : POST /send-verification-email ----------
+// ---------- Nettoyage automatique des tokens de vérification expirés ----------
+// Déclenché par un Cron Trigger (voir export default → scheduled). Supprime
+// tous les documents verificationTokens dont expiresAt est dépassé — qu'ils
+// aient été utilisés ou non. Boucle par lots de 500 (limite raisonnable pour
+// le volume de PoolGenAI) jusqu'à ce qu'il n'y en ait plus.
+async function cleanupExpiredVerificationTokens(env) {
+  const nowIso = new Date().toISOString();
+  let totalDeleted = 0;
+  for (let i = 0; i < 20; i++) {
+    const ids = await firestoreQueryExpiredTokenIds(env, nowIso, 500);
+    if (ids.length === 0) break;
+    for (const id of ids) {
+      try {
+        await firestoreDeleteDoc(env, "verificationTokens", id);
+        totalDeleted++;
+      } catch (e) {
+        console.error(`Échec suppression token ${id} : ${e.message}`);
+      }
+    }
+    if (ids.length < 500) break;
+  }
+  console.log(`Nettoyage verificationTokens : ${totalDeleted} document(s) supprimé(s)`);
+  return totalDeleted;
+}
 async function handleSendVerificationEmail(request, env, origin) {
   const authHeader = request.headers.get("Authorization") || "";
   const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
@@ -443,6 +517,85 @@ async function handleVerifyEmail(request, env, origin) {
   return jsonResponse({ status: "verified" }, 200, origin);
 }
 
+// ---------- Resend : email de demande (récupération/suppression) envoyé au support ----------
+async function sendAccountDataRequestEmail(env, action, uid, email) {
+  const actionLabels = {
+    erase: "Effacer toutes les données",
+    recover: "Récupérer toutes les données, ne pas les effacer",
+    recover_and_erase: "Récupérer puis effacer toutes les données",
+  };
+  const label = actionLabels[action] || action;
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Demande liée à un compte supprimé</h2>
+      <table style="border-collapse: collapse; font-size: 14px;">
+        <tr><td style="padding:4px 12px 4px 0;color:#888;">Action demandée</td><td><strong>${label}</strong></td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#888;">Email du compte</td><td>${email || "inconnu"}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#888;">UID Firebase</td><td>${uid}</td></tr>
+      </table>
+    </div>
+  `;
+
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: RESEND_FROM,
+      to: SUPPORT_EMAIL,
+      subject: `PoolGenAI — Demande données compte supprimé (${label})`,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Échec d'envoi Resend : ${errText}`);
+  }
+  return response.json();
+}
+
+// ---------- Route : POST /account-data-request ----------
+// Appelée depuis l'écran "Compte supprimé" (bouton "Demander la récupération
+// ou la suppression de mes données"). L'uid et l'email sont dérivés du token
+// Firebase vérifié, jamais du corps de la requête, pour empêcher un client de
+// se faire passer pour un autre compte.
+async function handleAccountDataRequest(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let payload;
+  try {
+    payload = await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const allowedActions = ["erase", "recover", "recover_and_erase"];
+  if (!allowedActions.includes(body.action)) {
+    return jsonError("Action invalide", 400, origin);
+  }
+
+  try {
+    await sendAccountDataRequestEmail(env, body.action, payload.sub, payload.email);
+  } catch (e) {
+    return jsonError(`Échec de l'envoi : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse({ success: true }, 200, origin);
+}
+
 // ---------- Route existante : POST /v1/messages (proxy Anthropic) ----------
 async function handleAnthropicProxy(request, env, origin) {
   const authHeader = request.headers.get("Authorization") || "";
@@ -511,7 +664,22 @@ export default {
     if (url.pathname === "/verify-email") {
       return handleVerifyEmail(request, env, origin);
     }
+    if (url.pathname === "/account-data-request") {
+      return handleAccountDataRequest(request, env, origin);
+    }
 
     return new Response("Not found", { status: 404 });
+  },
+
+  // Cron Trigger — à activer dans le dashboard Cloudflare :
+  // Workers & Pages → ce Worker → Settings → Triggers → Cron Triggers → Add.
+  // Fréquence : "1 0 1 * *" (le 1er de chaque mois à 00h01 UTC). Aucune config
+  // wrangler.toml nécessaire pour un déploiement fait depuis le dashboard.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(
+      cleanupExpiredVerificationTokens(env).catch((e) =>
+        console.error(`Échec du nettoyage planifié : ${e.message}`)
+      )
+    );
   },
 };
