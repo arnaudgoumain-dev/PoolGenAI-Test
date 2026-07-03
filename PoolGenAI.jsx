@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.29.2";
+const APP_VERSION = "1.29.3";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -5256,7 +5256,16 @@ function PoolApp() {
     [poolMeasures]
   );
   const latest = sortedMeasures[0] || null;
-  const blockedByLimit = !isPremium && hasMeasureToday(measures);
+  // v1.29.3 — Fix : blockedByLimit comptait TOUTES les mesures, y compris celles
+  // des bassins désactivés (deletePool, ou réactivation de compte). Une mesure
+  // loggée aujourd'hui sur un ancien bassin bloquait le quota gratuit même après
+  // "Recommencer avec cette adresse". Le quota ne doit porter que sur les
+  // bassins visibles.
+  const visibleMeasuresForLimit = useMemo(() => {
+    const activeIds = new Set(activePools.map((p) => p.id));
+    return measures.filter((m) => activeIds.has(m.poolId || "default"));
+  }, [measures, activePools]);
+  const blockedByLimit = !isPremium && hasMeasureToday(visibleMeasuresForLimit);
 
   const tFn = (key, vars) => {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
@@ -5591,13 +5600,24 @@ function PoolApp() {
     syncConfig({ apiProvider });
   }, [apiProvider]);
 
+  // v1.29.3 — Fix : le plan de traitement n'affichait plus les quantités.
+  // Cause : quand aucun bassin actif valide n'existe au moment de la création
+  // (écran forcé après réactivation de compte ou désactivation du dernier
+  // bassin, activePoolId vide), le nouveau bassin ne récupérait aucun produit
+  // par duplication. computeRecommendations ne trouvait alors jamais de
+  // produit correspondant et retombait sur "produit manquant" au lieu de la
+  // quantité — quel que soit le statut premium ou la gestion de stock.
   function addPool(pool) {
     const id = uid();
     setPools((prev) => [...prev, { id, ...pool }]);
     setProducts((prev) => {
       const toDuplicate = prev.filter((p) => (p.poolId || "default") === activePoolId);
-      const duplicated = toDuplicate.map((p) => ({ ...p, id: uid(), poolId: id }));
-      return [...prev, ...duplicated];
+      if (toDuplicate.length > 0) {
+        const duplicated = toDuplicate.map((p) => ({ ...p, id: uid(), poolId: id }));
+        return [...prev, ...duplicated];
+      }
+      const seeded = DEFAULT_PRODUCTS.map((p) => ({ ...p, id: uid(), poolId: id }));
+      return [...prev, ...seeded];
     });
     setActivePoolId(id);
     setShowAddPool(false);
