@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.27.4";
+const APP_VERSION = "1.27.5";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -4598,14 +4598,14 @@ function PoolApp() {
     const unsubMeasures = FB.onMeasures(uid, (cloudMeasures) => {
       if (cloudMeasures.length > 0) {
         setMeasures((prev) => (deepEqual(prev, cloudMeasures) ? prev : cloudMeasures));
-        window.storage.set("measures", JSON.stringify(cloudMeasures)).catch(() => {});
+        window.storage.set(STORAGE_KEYS.measures, JSON.stringify(cloudMeasures)).catch(() => {});
       }
     });
 
     const unsubApplications = FB.onApplications(uid, (cloudApps) => {
       if (cloudApps.length > 0) {
         setApplications((prev) => (deepEqual(prev, cloudApps) ? prev : cloudApps));
-        window.storage.set("applications", JSON.stringify(cloudApps)).catch(() => {});
+        window.storage.set(STORAGE_KEYS.applications, JSON.stringify(cloudApps)).catch(() => {});
       }
     });
 
