@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.28.0";
+const APP_VERSION = "1.28.1";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -391,7 +391,7 @@ const TRANSLATIONS = {
     start_app: "Démarrer l'app",
     sign_out: "Se déconnecter",
     delete_account: "Supprimer mon compte",
-    delete_account_confirm: "Supprimer définitivement ton compte et toutes tes données ? Cette action est irréversible.",
+    delete_account_confirm: "Supprimer ton compte ? Tu ne pourras plus te connecter. Tes données sont conservées — tu pourras demander leur récupération ou leur effacement définitif.",
     reauth_required: "Reconnecte-toi d'abord pour pouvoir supprimer ton compte.",
     not_signed_in: "Non connecté — mode hors-ligne",
     create_account: "Créer un compte",
@@ -893,7 +893,7 @@ const TRANSLATIONS = {
     start_app: "Start the app",
     sign_out: "Sign out",
     delete_account: "Delete my account",
-    delete_account_confirm: "Permanently delete your account and all your data? This action cannot be undone.",
+    delete_account_confirm: "Delete your account? You won't be able to log in anymore. Your data is kept — you can request its recovery or permanent deletion.",
     reauth_required: "Please sign in again before deleting your account.",
     not_signed_in: "Not signed in — offline mode",
     create_account: "Create account",
@@ -1397,7 +1397,7 @@ const TRANSLATIONS = {
     start_app: "App starten",
     sign_out: "Abmelden",
     delete_account: "Konto löschen",
-    delete_account_confirm: "Konto und alle Daten dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    delete_account_confirm: "Konto löschen? Du kannst dich danach nicht mehr anmelden. Deine Daten bleiben erhalten — du kannst ihre Wiederherstellung oder endgültige Löschung beantragen.",
     reauth_required: "Bitte melde dich erneut an, bevor du dein Konto löschst.",
     not_signed_in: "Nicht angemeldet — Offline-Modus",
     create_account: "Konto erstellen",
@@ -1898,7 +1898,7 @@ const TRANSLATIONS = {
     start_app: "Avvia l'app",
     sign_out: "Disconnetti",
     delete_account: "Elimina account",
-    delete_account_confirm: "Eliminare definitivamente l'account e tutti i dati? Questa azione è irreversibile.",
+    delete_account_confirm: "Eliminare il tuo account? Non potrai più accedere. I tuoi dati restano conservati — potrai richiederne il recupero o l'eliminazione definitiva.",
     reauth_required: "Accedi di nuovo prima di eliminare il tuo account.",
     not_signed_in: "Non connesso — modalità offline",
     create_account: "Crea account",
@@ -2399,7 +2399,7 @@ const TRANSLATIONS = {
     start_app: "Iniciar la app",
     sign_out: "Cerrar sesión",
     delete_account: "Eliminar mi cuenta",
-    delete_account_confirm: "¿Eliminar permanentemente tu cuenta y todos tus datos? Esta acción es irreversible.",
+    delete_account_confirm: "¿Eliminar tu cuenta? Ya no podrás iniciar sesión. Tus datos se conservan — podrás solicitar su recuperación o eliminación definitiva.",
     reauth_required: "Vuelve a iniciar sesión antes de eliminar tu cuenta.",
     not_signed_in: "No conectado — modo offline",
     create_account: "Crear cuenta",
@@ -2897,7 +2897,7 @@ const TRANSLATIONS = {
     start_app: "Iniciar a app",
     sign_out: "Sair",
     delete_account: "Eliminar minha conta",
-    delete_account_confirm: "Eliminar permanentemente a tua conta e todos os dados? Esta ação é irreversível.",
+    delete_account_confirm: "Eliminar a tua conta? Deixarás de conseguir iniciar sessão. Os teus dados são mantidos — poderás pedir a sua recuperação ou eliminação definitiva.",
     reauth_required: "Faz login novamente antes de eliminar a tua conta.",
     not_signed_in: "Não conectado — modo offline",
     create_account: "Criar conta",
@@ -4651,8 +4651,15 @@ function PoolApp() {
   // Auth. Marque juste le compte comme supprimé (accountDeletions/{uid}), ce qui
   // bloque l'accès applicatif via l'écran "Compte supprimé". Les données restent
   // en base jusqu'à purge manuelle (ex. réponse à une demande RGPD).
+  // v1.28.1 — Fix : un syncConfig en attente (debounce 800ms) capture l'uid au
+  // moment de l'appel. S'il se déclenche après signOut(), l'écriture Firestore
+  // échoue (permission refusée) et l'erreur apparaît sur l'écran de connexion,
+  // juste après la suppression — trompeur, alors que la suppression a réussi.
+  // On annule tout debounce en attente avant de se déconnecter.
   async function performDeleteAccount() {
     const uid = authUser?.uid;
+    if (syncDebounceRef.current) { clearTimeout(syncDebounceRef.current); syncDebounceRef.current = null; }
+    syncPendingRef.current = {};
     if (uid) {
       await FB.markAccountDeleted(uid).catch(() => {});
     }
@@ -4669,6 +4676,8 @@ function PoolApp() {
     if (!ok) return;
     setErasingData(true);
     try {
+      if (syncDebounceRef.current) { clearTimeout(syncDebounceRef.current); syncDebounceRef.current = null; }
+      syncPendingRef.current = {};
       await eraseAllUserData(authUser.uid);
       await resetLocalAppState();
       window.storage.set("auth_skipped", "").catch(() => {});
@@ -5781,6 +5790,8 @@ function PoolApp() {
             onRepairOrphanedData={repairOrphanedData}
             authUser={authUser}
             onSignOut={async () => {
+              if (syncDebounceRef.current) { clearTimeout(syncDebounceRef.current); syncDebounceRef.current = null; }
+              syncPendingRef.current = {};
               await FB.signOut().catch(() => {});
               await resetLocalAppState();
               window.storage.set("auth_skipped", "").catch(() => {});
