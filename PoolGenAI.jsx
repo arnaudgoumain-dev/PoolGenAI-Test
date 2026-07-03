@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.27.5";
+const APP_VERSION = "1.28.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -184,6 +184,19 @@ const TRANSLATIONS = {
     repair_orphaned_desc: "Des mesures, applications ou produits ne sont rattachés à aucun bassin existant (souvent après un bug de synchro). Elles seront rattachées à ton bassin actif.",
     repair_orphaned_btn: "Réparer maintenant",
     repair_orphaned_confirm: "Rattacher {count} entrée(s) orpheline(s) au bassin actif ?",
+    delete_pool_confirm: "Désactiver ce bassin ? Il ne sera plus visible dans l'application, mais son historique est conservé.",
+    account_deleted_title: "Compte supprimé",
+    account_deleted_desc: "Ce compte a été supprimé et l'accès à l'application n'est plus disponible.",
+    account_deleted_request_btn: "Demander la récupération ou la suppression de mes données",
+    data_request_title: "Récupération ou suppression des données",
+    data_request_desc: "Choisis l'action souhaitée. Une demande sera envoyée au support, qui te recontactera par email.",
+    data_request_option_erase: "Effacer toutes mes données",
+    data_request_option_recover: "Récupérer toutes mes données, ne pas les effacer",
+    data_request_option_recover_erase: "Récupérer et effacer toutes mes données",
+    data_request_submit: "Envoyer la demande",
+    data_request_sending: "Envoi en cours...",
+    data_request_sent: "Demande envoyée. Le support te recontactera par email.",
+    data_request_error: "Échec de l'envoi. Réessaie ou écris directement à support.poolgenai@gmail.com.",
     note_optional: "Note (optionnel)",
     note_placeholder: "Eau trouble, fort ensoleillement, baignade prévue...",
     save_measure: "Enregistrer la mesure",
@@ -682,6 +695,19 @@ const TRANSLATIONS = {
     repair_orphaned_desc: "Some measures, treatments or products aren't linked to any existing pool (often after a sync bug). They'll be reattached to your active pool.",
     repair_orphaned_btn: "Repair now",
     repair_orphaned_confirm: "Reattach {count} orphaned entrie(s) to the active pool?",
+    delete_pool_confirm: "Disable this pool? It will no longer appear in the app, but its history is kept.",
+    account_deleted_title: "Account deleted",
+    account_deleted_desc: "This account has been deleted and access to the app is no longer available.",
+    account_deleted_request_btn: "Request data recovery or deletion",
+    data_request_title: "Data recovery or deletion",
+    data_request_desc: "Choose the action you want. A request will be sent to support, who will contact you by email.",
+    data_request_option_erase: "Erase all my data",
+    data_request_option_recover: "Recover all my data, don't erase it",
+    data_request_option_recover_erase: "Recover and erase all my data",
+    data_request_submit: "Send request",
+    data_request_sending: "Sending...",
+    data_request_sent: "Request sent. Support will contact you by email.",
+    data_request_error: "Failed to send. Try again or email support.poolgenai@gmail.com directly.",
     note_optional: "Note (optional)",
     note_placeholder: "Cloudy water, strong sun, swimming planned...",
     save_measure: "Save reading",
@@ -1171,6 +1197,19 @@ const TRANSLATIONS = {
     repair_orphaned_desc: "Einige Messungen, Behandlungen oder Produkte sind keinem bestehenden Becken zugeordnet (oft nach einem Synchronisierungsfehler). Sie werden deinem aktiven Becken zugeordnet.",
     repair_orphaned_btn: "Jetzt reparieren",
     repair_orphaned_confirm: "{count} verwaiste Einträge dem aktiven Becken zuordnen?",
+    delete_pool_confirm: "Dieses Becken deaktivieren? Es wird in der App nicht mehr angezeigt, der Verlauf bleibt jedoch erhalten.",
+    account_deleted_title: "Konto gelöscht",
+    account_deleted_desc: "Dieses Konto wurde gelöscht und der Zugriff auf die App ist nicht mehr möglich.",
+    account_deleted_request_btn: "Datenwiederherstellung oder -löschung beantragen",
+    data_request_title: "Datenwiederherstellung oder -löschung",
+    data_request_desc: "Wähle die gewünschte Aktion. Eine Anfrage wird an den Support gesendet, der sich per E-Mail bei dir meldet.",
+    data_request_option_erase: "Alle meine Daten löschen",
+    data_request_option_recover: "Alle meine Daten wiederherstellen, nicht löschen",
+    data_request_option_recover_erase: "Alle meine Daten wiederherstellen und löschen",
+    data_request_submit: "Anfrage senden",
+    data_request_sending: "Wird gesendet...",
+    data_request_sent: "Anfrage gesendet. Der Support meldet sich per E-Mail.",
+    data_request_error: "Senden fehlgeschlagen. Versuche es erneut oder schreibe direkt an support.poolgenai@gmail.com.",
     note_optional: "Notiz (optional)",
     note_placeholder: "Trübes Wasser, starke Sonne, Schwimmen geplant...",
     save_measure: "Messung speichern",
@@ -1662,6 +1701,19 @@ const TRANSLATIONS = {
     repair_orphaned_desc: "Alcune misure, trattamenti o prodotti non sono collegati a nessuna piscina esistente (spesso dopo un bug di sincronizzazione). Verranno ricollegati alla tua piscina attiva.",
     repair_orphaned_btn: "Ripara ora",
     repair_orphaned_confirm: "Ricollegare {count} voce/i orfana/e alla piscina attiva?",
+    delete_pool_confirm: "Disattivare questa piscina? Non sarà più visibile nell'app, ma lo storico viene conservato.",
+    account_deleted_title: "Account eliminato",
+    account_deleted_desc: "Questo account è stato eliminato e l'accesso all'app non è più disponibile.",
+    account_deleted_request_btn: "Richiedi il recupero o l'eliminazione dei miei dati",
+    data_request_title: "Recupero o eliminazione dei dati",
+    data_request_desc: "Scegli l'azione desiderata. Una richiesta sarà inviata al supporto, che ti contatterà via email.",
+    data_request_option_erase: "Elimina tutti i miei dati",
+    data_request_option_recover: "Recupera tutti i miei dati, non eliminarli",
+    data_request_option_recover_erase: "Recupera ed elimina tutti i miei dati",
+    data_request_submit: "Invia richiesta",
+    data_request_sending: "Invio in corso...",
+    data_request_sent: "Richiesta inviata. Il supporto ti contatterà via email.",
+    data_request_error: "Invio non riuscito. Riprova o scrivi direttamente a support.poolgenai@gmail.com.",
     note_optional: "Nota (opzionale)",
     note_placeholder: "Acqua torbida, sole forte, nuoto previsto...",
     save_measure: "Salva misurazione",
@@ -2150,6 +2202,19 @@ const TRANSLATIONS = {
     repair_orphaned_desc: "Algunas mediciones, tratamientos o productos no están vinculados a ninguna piscina existente (a menudo tras un error de sincronización). Se vincularán a tu piscina activa.",
     repair_orphaned_btn: "Reparar ahora",
     repair_orphaned_confirm: "¿Vincular {count} entrada(s) huérfana(s) a la piscina activa?",
+    delete_pool_confirm: "¿Desactivar esta piscina? Ya no aparecerá en la aplicación, pero su historial se conserva.",
+    account_deleted_title: "Cuenta eliminada",
+    account_deleted_desc: "Esta cuenta ha sido eliminada y el acceso a la aplicación ya no está disponible.",
+    account_deleted_request_btn: "Solicitar la recuperación o eliminación de mis datos",
+    data_request_title: "Recuperación o eliminación de datos",
+    data_request_desc: "Elige la acción que deseas. Se enviará una solicitud al soporte, que te contactará por email.",
+    data_request_option_erase: "Eliminar todos mis datos",
+    data_request_option_recover: "Recuperar todos mis datos, no eliminarlos",
+    data_request_option_recover_erase: "Recuperar y eliminar todos mis datos",
+    data_request_submit: "Enviar solicitud",
+    data_request_sending: "Enviando...",
+    data_request_sent: "Solicitud enviada. El soporte te contactará por email.",
+    data_request_error: "Error al enviar. Inténtalo de nuevo o escribe directamente a support.poolgenai@gmail.com.",
     note_optional: "Nota (opcional)",
     note_placeholder: "Agua turbia, sol fuerte, natación prevista...",
     save_measure: "Guardar medición",
@@ -2638,6 +2703,19 @@ const TRANSLATIONS = {
     repair_orphaned_desc: "Algumas medições, tratamentos ou produtos não estão associados a nenhuma piscina existente (geralmente após um erro de sincronização). Serão associados à tua piscina ativa.",
     repair_orphaned_btn: "Reparar agora",
     repair_orphaned_confirm: "Associar {count} entrada(s) órfã(s) à piscina ativa?",
+    delete_pool_confirm: "Desativar esta piscina? Deixará de aparecer na aplicação, mas o histórico é mantido.",
+    account_deleted_title: "Conta eliminada",
+    account_deleted_desc: "Esta conta foi eliminada e o acesso à aplicação já não está disponível.",
+    account_deleted_request_btn: "Pedir a recuperação ou eliminação dos meus dados",
+    data_request_title: "Recuperação ou eliminação de dados",
+    data_request_desc: "Escolhe a ação pretendida. Será enviado um pedido ao suporte, que te contactará por email.",
+    data_request_option_erase: "Eliminar todos os meus dados",
+    data_request_option_recover: "Recuperar todos os meus dados, não eliminar",
+    data_request_option_recover_erase: "Recuperar e eliminar todos os meus dados",
+    data_request_submit: "Enviar pedido",
+    data_request_sending: "A enviar...",
+    data_request_sent: "Pedido enviado. O suporte vai contactar-te por email.",
+    data_request_error: "Falha ao enviar. Tenta novamente ou escreve diretamente para support.poolgenai@gmail.com.",
     note_optional: "Nota (opcional)",
     note_placeholder: "Água turva, sol forte, natação prevista...",
     save_measure: "Salvar medição",
@@ -3858,6 +3936,47 @@ const FB = {
       cb(!!data?.suspended, data?.reason || "");
     }, () => cb(false, ""));
   },
+  // ── Suppression de compte en libre-service (soft delete) ──
+  // Contrairement à "suspended" (admin-only), ce doc EST écrit par le client
+  // lui-même au moment où il clique sur "Supprimer mon compte". Le compte Auth
+  // Firebase n'est pas supprimé : seul ce flag bloque l'accès applicatif. Les
+  // données Firestore (measures, applications, config, diagnostics) ne sont pas
+  // effacées — conservées jusqu'à purge manuelle (ex. suite à une demande RGPD).
+  markAccountDeleted: async (uid) => {
+    if (!window._fbDb || !window._fbSetDoc) return;
+    const ref = window._fbDoc(window._fbDb, "accountDeletions", uid);
+    await window._fbSetDoc(ref, { deleted: true, deletedAt: new Date().toISOString() });
+  },
+  onAccountDeleted: (uid, cb) => {
+    if (!window._fbDb || !window._fbOnSnapshot) return () => {};
+    const ref = window._fbDoc(window._fbDb, "accountDeletions", uid);
+    return window._fbOnSnapshot(ref, (snap) => {
+      const data = snap.exists() ? snap.data() : null;
+      cb(!!data?.deleted);
+    }, () => cb(false));
+  },
+  // Envoie une demande de récupération/effacement des données au support, via
+  // le Worker (route à créer côté serveur : POST /account-data-request).
+  // Authentifié par ID token Firebase, même pattern que /v1/messages.
+  sendAccountDataRequest: async (action, uid, email) => {
+    const idToken = window._fbAuth?.currentUser
+      ? await window._fbAuth.currentUser.getIdToken()
+      : null;
+    if (!idToken) throw new Error("Non authentifié");
+    const res = await fetch("https://poolgenai-proxy.support-poolgenai.workers.dev/account-data-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ action, uid, email }),
+    });
+    if (!res.ok) {
+      let msg = `Erreur ${res.status}`;
+      try {
+        const data = await res.json();
+        if (data?.error) msg = data.error;
+      } catch (e) {}
+      throw new Error(msg);
+    }
+  },
   // ── Config sync (pools, products, activePlan, settings) ──
   saveConfig: async (uid, config) => {
     if (!window._fbDb || !window._fbSetDoc) return;
@@ -4453,6 +4572,19 @@ function PoolApp() {
     return () => unsub();
   }, [authUser?.uid]);
 
+  // ── Statut de suppression de compte (soft delete self-service) — écoute temps réel ──
+  // Distinct de "suspended" (géré par l'admin) : ici c'est l'utilisateur lui-même qui a
+  // demandé la suppression. Le compte Auth reste actif, seul ce flag bloque l'app.
+  const [accountDeleted, setAccountDeleted] = useState(false);
+  const [showDataRequestScreen, setShowDataRequestScreen] = useState(false);
+  useEffect(() => {
+    if (!authUser?.uid) { setAccountDeleted(false); setShowDataRequestScreen(false); return; }
+    const unsub = FB.onAccountDeleted(authUser.uid, (isDeleted) => {
+      setAccountDeleted(isDeleted);
+    });
+    return () => unsub();
+  }, [authUser?.uid]);
+
   // Efface toutes les données Firestore du compte (users doc + mesures + applications +
   // diagnostics + config) — utilisée par le flux "compte suspendu" et par la suppression
   // de compte classique, qui ne supprimait jusqu'ici que le document racine.
@@ -4515,15 +4647,17 @@ function PoolApp() {
     setCguAcceptedDate(null);
   }
 
+  // v1.28.0 — Soft delete : ne supprime plus les données Firestore ni le compte
+  // Auth. Marque juste le compte comme supprimé (accountDeletions/{uid}), ce qui
+  // bloque l'accès applicatif via l'écran "Compte supprimé". Les données restent
+  // en base jusqu'à purge manuelle (ex. réponse à une demande RGPD).
   async function performDeleteAccount() {
     const uid = authUser?.uid;
-    // Supprimer toutes les données Firestore AVANT de supprimer le compte Auth
-    // (une fois le compte Auth supprimé, le token n'est plus valide pour écrire)
     if (uid) {
-      await eraseAllUserData(uid).catch(() => {});
+      await FB.markAccountDeleted(uid).catch(() => {});
     }
-    await FB.deleteAccount();
     await resetLocalAppState();
+    try { await FB.signOut?.(); } catch (e) {}
     window.storage.set("auth_skipped", "").catch(() => {});
     setAuthUser(null);
     setShowLogin(true);
@@ -4978,9 +5112,14 @@ function PoolApp() {
     window.storage.set(STORAGE_KEYS.aiEnabled, String(aiEnabled)).catch(() => {});
   }, [aiEnabled, loaded]);
 
+  // Bassins non désactivés — utilisé pour l'affichage (switcher, réglages, écran
+  // "créer un bassin"). Le tableau brut `pools` (avec les désactivés) reste la
+  // source de vérité pour la synchro Firestore et la détection d'orphelins.
+  const activePools = useMemo(() => pools.filter((p) => !p.disabled), [pools]);
+
   const activePool = useMemo(
-    () => pools.find((p) => p.id === activePoolId) || pools[0],
-    [pools, activePoolId]
+    () => activePools.find((p) => p.id === activePoolId) || activePools[0],
+    [activePools, activePoolId]
   );
 
   const effectiveTargets = useMemo(
@@ -5364,13 +5503,21 @@ function PoolApp() {
     setPools((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   }
 
+  // v1.28.0 — Soft delete : le bassin n'est plus retiré, il est marqué désactivé.
+  // Measures/applications/products restent rattachées à son poolId, intactes en
+  // base (exploitables pour des stats), et ne redeviennent jamais orphelines
+  // puisque l'id du bassin reste présent dans `pools`. Seul l'affichage (via
+  // `activePools`) le masque à l'utilisateur. Si c'était le dernier bassin actif,
+  // aucune recréation automatique : l'écran "créer un bassin" (forced) prend le relais.
   function deletePool(id) {
-    setPools((prev) => prev.filter((p) => p.id !== id));
-    setMeasures((prev) => prev.filter((m) => (m.poolId || "default") !== id));
-    setProducts((prev) => prev.filter((p) => (p.poolId || "default") !== id));
+    const ok = window.confirm(t("delete_pool_confirm"));
+    if (!ok) return;
+    setPools((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, disabled: true, disabledAt: new Date().toISOString() } : p))
+    );
     if (activePoolId === id) {
-      const remaining = pools.filter((p) => p.id !== id);
-      setActivePoolId(remaining[0]?.id || "");
+      const remainingActive = pools.filter((p) => p.id !== id && !p.disabled);
+      setActivePoolId(remainingActive[0]?.id || "");
     }
   }
 
@@ -5498,7 +5645,30 @@ function PoolApp() {
         </div>
       </div>
     )}
-    {loaded && authUser && !suspended && !forceUpdate && !needsEmailVerification && pools.length === 0 && cloudConfigReceived && (
+    {accountDeleted && !showDataRequestScreen && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 3100, background: "rgba(60,20,20,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
+          <div style={{ fontSize: 34, marginBottom: 10 }}>⛔</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("account_deleted_title")}</div>
+          <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 20, lineHeight: 1.5 }}>{t("account_deleted_desc")}</div>
+          <button
+            onClick={() => setShowDataRequestScreen(true)}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+          >
+            {t("account_deleted_request_btn")}
+          </button>
+        </div>
+      </div>
+    )}
+    {accountDeleted && showDataRequestScreen && (
+      <AccountDataRequestScreen
+        lang={lang}
+        authUser={authUser}
+        onClose={() => setShowDataRequestScreen(false)}
+        onSubmit={(action) => FB.sendAccountDataRequest(action, authUser?.uid, authUser?.email)}
+      />
+    )}
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && (
       <AddPoolModal forced onSave={addPool} lang={lang} />
     )}
     {showLogin && (
@@ -5522,7 +5692,7 @@ function PoolApp() {
         location={activePool?.location}
         poolPhoto={activePool?.photo}
         isPremium={isPremium}
-        pools={pools}
+        pools={activePools}
         activePoolId={activePoolId}
         onSwitchPool={setActivePoolId}
         onAddPool={handleWantAddPool}
@@ -5600,7 +5770,7 @@ function PoolApp() {
         )}
         {tab === "settings" && (
           <SettingsView
-            pools={pools}
+            pools={activePools}
             activePoolId={activePoolId}
             onUpdatePool={updatePool}
             onDeletePool={deletePool}
@@ -9005,6 +9175,96 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
 }
 
 // ---------- Réglages ----------
+// ---------- Écran de demande de récupération/suppression des données (compte supprimé) ----------
+function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
+  const t = useT(lang);
+  const [action, setAction] = useState("erase");
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+
+  const options = [
+    { value: "erase", label: t("data_request_option_erase") },
+    { value: "recover", label: t("data_request_option_recover") },
+    { value: "recover_and_erase", label: t("data_request_option_recover_erase") },
+  ];
+
+  async function handleSubmit() {
+    setStatus("sending");
+    try {
+      await onSubmit(action);
+      setStatus("sent");
+    } catch (e) {
+      setStatus("error");
+    }
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 3150, background: "rgba(60,20,20,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", boxShadow: "0 8px 32px #00000033" }}>
+        <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8, textAlign: "center" }}>{t("data_request_title")}</div>
+        <div style={{ fontSize: 13, color: "#4a6480", marginBottom: 18, lineHeight: 1.5, textAlign: "center" }}>{t("data_request_desc")}</div>
+
+        {status !== "sent" && (
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+              {options.map((opt) => (
+                <label
+                  key={opt.value}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10, padding: "12px 14px",
+                    borderRadius: 12, border: action === opt.value ? "1.5px solid #0a6ebd" : "1.5px solid #e6ebe9",
+                    background: action === opt.value ? "#eaf4fc" : "#fff", cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="account_data_request_action"
+                    value={opt.value}
+                    checked={action === opt.value}
+                    onChange={() => setAction(opt.value)}
+                  />
+                  <span style={{ fontSize: 13.5, color: "#0d2b4e", fontWeight: 600 }}>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+
+            {status === "error" && (
+              <div style={{ fontSize: 12.5, color: "#c0392b", marginBottom: 14, textAlign: "center" }}>{t("data_request_error")}</div>
+            )}
+
+            <button
+              onClick={handleSubmit}
+              disabled={status === "sending"}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: status === "sending" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}
+            >
+              {status === "sending" ? <Loader2 size={16} className="spin" /> : null}
+              {status === "sending" ? t("data_request_sending") : t("data_request_submit")}
+            </button>
+            <button
+              onClick={onClose}
+              disabled={status === "sending"}
+              style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "none", background: "none", color: "#6a7d90", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
+            >
+              {t("cancel")}
+            </button>
+          </>
+        )}
+
+        {status === "sent" && (
+          <>
+            <div style={{ fontSize: 13.5, color: "#0d2b4e", marginBottom: 20, textAlign: "center", lineHeight: 1.5 }}>{t("data_request_sent")}</div>
+            <button
+              onClick={onClose}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+            >
+              {t("close")}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, onDeleteAllMeasures: onDeleteAllMeasuresRaw, orphanedCount, onRepairOrphanedData, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, apiKey, setApiKey, apiProvider, setApiProvider, aiEnabled, setAiEnabled, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount, dataConsent, onRevokeDataConsent, cguAcceptedDate }) {
   const [showAiConfig, setShowAiConfig] = useState(false);
   const [editingPool, setEditingPool] = useState(null);
@@ -9214,11 +9474,9 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
             >
               <Settings2 size={14} />
             </button>
-            {pools.length > 1 && (
-              <button style={styles.poolListDeleteBtn} onClick={() => onDeletePool(p.id)}>
-                <Trash2 size={14} />
-              </button>
-            )}
+            <button style={styles.poolListDeleteBtn} onClick={() => onDeletePool(p.id)}>
+              <Trash2 size={14} />
+            </button>
           </div>
         ))}
       </div>
