@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.29.10";
+const APP_VERSION = "1.30.0";
 const CGU_VERSION = "1.1"; // v1.4 : clause IA, avertissement photos, mentions LCEN, limitation responsabilité révisée
 
 const TRANSLATIONS = {
@@ -3877,6 +3877,19 @@ function deepEqual(a, b) {
   }
 }
 
+// v1.30.0 — Reconstitue le champ photo (inline, base64) sur chaque produit à
+// partir de la map { productId: photo } issue de la collection Firestore
+// users/{uid}/productPhotos. Ne touche pas aux produits dont l'id n'a pas
+// d'entrée dans la map (photo pas encore migrée, ou produit sans photo) :
+// dans ce cas le champ photo local (potentiellement encore inline dans
+// config/main pour les anciens comptes) est conservé tel quel.
+function mergeProductPhotos(products, photosMap) {
+  if (!products || !products.length || !photosMap) return products;
+  return products.map((p) =>
+    Object.prototype.hasOwnProperty.call(photosMap, p.id) ? { ...p, photo: photosMap[p.id] } : p
+  );
+}
+
 const FB = {
   ready: () => !!window._fbAuth,
   onAuth: (cb) => window._fbOnAuth ? window._fbOnAuth(window._fbAuth, cb) : (() => {}),
@@ -4047,6 +4060,39 @@ const FB = {
       } catch (e) {}
       throw new Error(msg);
     }
+  },
+  // ── Product photos sync (v1.30.0) ──
+  // Photos produits stockées à part de config/main (un doc par photo) pour ne
+  // plus jamais dépasser la limite Firestore de 1 Mio par document. Bug
+  // constaté avec plusieurs dizaines de photos encore en 1280px (avant la
+  // compression 300px/qualité 0.5 introduite en v1.29.9) accumulées dans le
+  // même document config/main.
+  saveProductPhoto: async (uid, productId, photo) => {
+    if (!window._fbDb || !window._fbSetDoc) return;
+    const ref = window._fbDoc(window._fbDb, "users", uid, "productPhotos", productId);
+    await window._fbSetDoc(ref, { photo, updatedAt: new Date().toISOString() });
+  },
+  deleteProductPhoto: async (uid, productId) => {
+    if (!window._fbDb || !window._fbDeleteDoc) return;
+    const ref = window._fbDoc(window._fbDb, "users", uid, "productPhotos", productId);
+    await window._fbDeleteDoc(ref);
+  },
+  getProductPhotos: async (uid) => {
+    if (!window._fbDb || !window._fbGetDocs) return {};
+    const col = window._fbCollection(window._fbDb, "users", uid, "productPhotos");
+    const snap = await window._fbGetDocs(col);
+    const map = {};
+    snap.docs.forEach((d) => { map[d.id] = d.data().photo; });
+    return map;
+  },
+  onProductPhotos: (uid, cb) => {
+    if (!window._fbDb || !window._fbOnSnapshot) return () => {};
+    const col = window._fbCollection(window._fbDb, "users", uid, "productPhotos");
+    return window._fbOnSnapshot(col, (snap) => {
+      const map = {};
+      snap.docs.forEach((d) => { map[d.id] = d.data().photo; });
+      cb(map);
+    });
   },
   // ── Config sync (pools, products, activePlan, settings) ──
   saveConfig: async (uid, config) => {
@@ -4673,15 +4719,17 @@ function PoolApp() {
   // de compte classique, qui ne supprimait jusqu'ici que le document racine.
   async function eraseAllUserData(uid) {
     if (!uid || !window._fbDb) return;
-    const [ms, apps, diags] = await Promise.all([
+    const [ms, apps, diags, photos] = await Promise.all([
       FB.getMeasures(uid).catch(() => []),
       FB.getApplications(uid).catch(() => []),
       FB.getDiagnostics(uid).catch(() => []),
+      FB.getProductPhotos(uid).catch(() => ({})),
     ]);
     await Promise.all([
       ...ms.map((m) => FB.deleteMeasure(uid, m.id).catch(() => {})),
       ...apps.map((a) => FB.deleteApplication(uid, a.measureId).catch(() => {})),
       ...diags.map((d) => FB.deleteDiagnostic(uid, d.id).catch(() => {})),
+      ...Object.keys(photos).map((id) => FB.deleteProductPhoto(uid, id).catch(() => {})),
     ]);
     if (window._fbDoc && window._fbDeleteDoc) {
       await window._fbDeleteDoc(window._fbDoc(window._fbDb, "users", uid, "config", "main")).catch(() => {});
@@ -4849,6 +4897,13 @@ function PoolApp() {
   const syncDebounceRef = useRef(null);
   const syncPendingRef = useRef({});
   const teardownRef = useRef(false);
+  // v1.30.0 — Suivi des photos produits déjà envoyées/confirmées dans la
+  // collection productPhotos, pour ne jamais ré-uploader une photo inchangée
+  // et pour savoir quand il est sûr de retirer le champ photo inline de
+  // config/main (uniquement une fois l'upload confirmé par l'écho Firestore).
+  const lastSyncedPhotosRef = useRef({});
+  const productPhotosRef = useRef({});
+  const [photoMapVersion, setPhotoMapVersion] = useState(0);
   function syncConfig(partial, errorKey) {
     if (!authUser?.uid || !FB.ready() || teardownRef.current) return;
     syncPendingRef.current = { ...syncPendingRef.current, ...partial };
@@ -4912,8 +4967,9 @@ function PoolApp() {
         window.storage.set(STORAGE_KEYS.pools, JSON.stringify(config.pools)).catch(() => {});
       }
       if (config.products?.length) {
-        setProducts((prev) => (deepEqual(prev, config.products) ? prev : config.products));
-        window.storage.set(STORAGE_KEYS.products, JSON.stringify(config.products)).catch(() => {});
+        const merged = mergeProductPhotos(config.products, productPhotosRef.current);
+        setProducts((prev) => (deepEqual(prev, merged) ? prev : merged));
+        window.storage.set(STORAGE_KEYS.products, JSON.stringify(merged)).catch(() => {});
       }
       if (config.activePlan !== undefined) {
         setActivePlan((prev) => (deepEqual(prev, config.activePlan) ? prev : config.activePlan));
@@ -4936,11 +4992,26 @@ function PoolApp() {
       }
     });
 
-    firestoreUnsubRef.current = [unsubMeasures, unsubApplications, unsubConfig];
+    // v1.30.0 — Écoute temps réel de productPhotos. Alimente productPhotosRef
+    // (consommé par le merge ci-dessus et par l'effet de synchro config→cloud)
+    // et réattache les photos aux produits déjà en state, pour les autres
+    // appareils connectés au même compte.
+    const unsubProductPhotos = FB.onProductPhotos(uid, (photosMap) => {
+      productPhotosRef.current = photosMap;
+      Object.keys(photosMap).forEach((id) => { lastSyncedPhotosRef.current[id] = photosMap[id]; });
+      setPhotoMapVersion((v) => v + 1);
+      setProducts((prev) => {
+        const merged = mergeProductPhotos(prev, photosMap);
+        return deepEqual(prev, merged) ? prev : merged;
+      });
+    });
+
+    firestoreUnsubRef.current = [unsubMeasures, unsubApplications, unsubConfig, unsubProductPhotos];
     return () => {
       unsubMeasures();
       unsubApplications();
       unsubConfig();
+      unsubProductPhotos();
     };
   }, [authUser?.uid]);
 
@@ -5185,9 +5256,17 @@ function PoolApp() {
         FB.getConfig(authUser.uid).then(cloudConfig => {
           // N'upload que si pas encore de config cloud
           if (!cloudConfig) {
+            // v1.30.0 — Photos exclues de ce premier envoi : elles seront
+            // uploadées séparément vers productPhotos par l'effet de synchro
+            // dédié, dès que products/loaded sont en state. Évite de recréer
+            // un config/main trop volumineux si des photos locales existent
+            // déjà avant la toute première connexion cloud.
             FB.saveConfig(authUser.uid, {
               pools: loadedPools,
-              products: loadedProducts || [],
+              products: (loadedProducts || []).map((p) => {
+                const { photo, ...rest } = p;
+                return { ...rest, hasPhoto: !!photo };
+              }),
             }).catch(() => {});
           }
         }).catch(() => {});
@@ -5644,12 +5723,49 @@ function PoolApp() {
     syncConfig({ pools });
   }, [pools]);
 
+  // v1.30.0 — Fix bug production (doc config/main > 1 Mio, sync bloquée) :
+  // les photos produits ne sont plus jamais envoyées dans config/main. Elles
+  // sont poussées séparément vers users/{uid}/productPhotos/{productId}, un
+  // doc par photo. Deux effets distincts :
+  // 1) upload/suppression de la photo elle-même, dès qu'elle change ;
+  // 2) synchro de la métadonnée (hasPhoto) vers config/main, en ne retirant
+  //    le champ photo inline que pour les produits dont l'upload est confirmé
+  //    (productPhotosRef à jour, alimenté par l'écho temps réel du listener
+  //    onProductPhotos) — jamais avant, pour ne perdre aucune photo si
+  //    l'upload échoue ou si l'app se ferme en cours de migration.
+  useEffect(() => {
+    if (!loaded || !authUser?.uid || !FB.ready()) return;
+    const uid = authUser.uid;
+    products.forEach((p) => {
+      const prevPhoto = lastSyncedPhotosRef.current[p.id];
+      if (prevPhoto === p.photo) return;
+      lastSyncedPhotosRef.current[p.id] = p.photo;
+      if (p.photo) {
+        FB.saveProductPhoto(uid, p.id, p.photo).catch(() => {
+          lastSyncedPhotosRef.current[p.id] = prevPhoto; // réessaiera au prochain changement de products
+        });
+      } else if (prevPhoto) {
+        FB.deleteProductPhoto(uid, p.id).catch(() => {});
+      }
+    });
+  }, [products]);
+
   useEffect(() => {
     if (!loaded || !authUser?.uid) return;
     if (!FB.ready()) return;
     if (products.length === 0 && !cloudConfigReceivedRef.current) return;
-    syncConfig({ products }, "product_sync_error");
-  }, [products]);
+    const confirmedPhotos = productPhotosRef.current;
+    const metaOnly = products.map((p) => {
+      const hasPhoto = !!p.photo;
+      const isConfirmed = hasPhoto && confirmedPhotos[p.id] === p.photo;
+      if (!hasPhoto || isConfirmed) {
+        const { photo, ...rest } = p;
+        return { ...rest, hasPhoto };
+      }
+      return { ...p, hasPhoto }; // upload pas encore confirmé : on garde l'inline pour ne rien perdre
+    });
+    syncConfig({ products: metaOnly }, "product_sync_error");
+  }, [products, photoMapVersion]);
 
   useEffect(() => {
     if (!loaded || !authUser?.uid) return;
