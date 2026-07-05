@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.41.0";
+const APP_VERSION = "1.42.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -3894,7 +3894,7 @@ async function callAIWithImage({ apiKey, apiProvider, prompt, imageDataUrl, uid:
     });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err?.error?.message || `Erreur Anthropic ${response.status}`);
+      throw new Error(err?.error?.message || err?.error || `Erreur Anthropic ${response.status}`);
     }
     const data = await response.json();
     return (data.content || []).find((b) => b.type === "text")?.text || "";
@@ -3947,7 +3947,7 @@ async function callAIText({ apiKey, apiProvider, prompt, uid: callerUid }) {
     });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err?.error?.message || `Erreur Anthropic ${response.status}`);
+      throw new Error(err?.error?.message || err?.error || `Erreur Anthropic ${response.status}`);
     }
     const data = await response.json();
     return (data.content || []).find((b) => b.type === "text")?.text || "";
