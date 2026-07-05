@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.39.1";
+const APP_VERSION = "1.40.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -6959,6 +6959,36 @@ function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEdit
   const [aiError, setAiError] = useState(null);
   const [selectedRecs, setSelectedRecs] = useState({});
 
+  // v1.40.0 — Vignettes de toutes les photos (analyse + bassin) de la dernière
+  // mesure, chargées depuis la sous-collection measures/{id}/photos (voir
+  // MeasureRow pour le même pattern en historique). Une mesure tout juste
+  // ajoutée dans cette session garde encore latest.photos/photo en mémoire
+  // locale (pas encore écrasé par le snapshot cloud) : dans ce cas pas besoin
+  // de fetch, on les utilise directement.
+  const [latestPhotos, setLatestPhotos] = useState(null);
+  useEffect(() => {
+    setLatestPhotos(null);
+    if (!latest) return;
+    const hasAnyPhotos = !!(latest.photoCount || latest.poolPhotoCount || latest.photo || latest.photos?.length || latest.poolPhotos?.length);
+    if (!hasAnyPhotos) return;
+    if (latest.photos?.length || latest.photo || latest.poolPhotos?.length) {
+      setLatestPhotos([
+        ...(latest.photos?.length ? latest.photos : (latest.photo ? [latest.photo] : [])),
+        ...(latest.poolPhotos || []),
+      ]);
+      return;
+    }
+    if (!authUid) return;
+    let cancelled = false;
+    FB.getMeasurePhotos(authUid, latest.id)
+      .then(({ photos, poolPhotos }) => {
+        if (cancelled) return;
+        setLatestPhotos([...photos, ...poolPhotos]);
+      })
+      .catch(() => { if (!cancelled) setLatestPhotos([]); });
+    return () => { cancelled = true; };
+  }, [latest?.id, authUid]);
+
   async function handleAiAnalysis() {
     if (!apiKey || !latest) return;
     setAiLoading(true);
@@ -7047,14 +7077,17 @@ Réponds directement en français, sans titre ni introduction.`;
         </div>
       </div>
 
-      {(latest.thumbnail || latest.photo) && (
-        <div style={styles.measurePhotoWrap}>
-          <img
-            src={latest.thumbnail || latest.photo}
-            alt="Photo de la mesure"
-            style={{ ...styles.measurePhoto, cursor: "zoom-in" }}
-            onClick={() => window._openLightbox?.(latest.photo || latest.thumbnail)}
-          />
+      {latestPhotos?.length > 0 && (
+        <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 12 }}>
+          {latestPhotos.map((src, idx) => (
+            <img
+              key={idx}
+              src={src}
+              alt=""
+              style={{ height: 90, borderRadius: 8, objectFit: "cover", flexShrink: 0, border: "1px solid #d0e4f5", cursor: "zoom-in" }}
+              onClick={() => window._openLightbox?.(src)}
+            />
+          ))}
         </div>
       )}
 
