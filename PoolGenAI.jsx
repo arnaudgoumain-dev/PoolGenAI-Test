@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.42.0";
+const APP_VERSION = "1.43.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -340,6 +340,12 @@ const TRANSLATIONS = {
     // Paywall
     paywall_title: "Passer à la version illimitée",
     paywall_desc: "Mesures sans limite · Analyse IA des bandelettes · Rapport PDF · Gestion du stock",
+    paywall_context_measure_limit: "Tu as atteint la limite d'1 mesure gratuite par jour.",
+    paywall_context_start_plan: "Le suivi de traitement pas à pas est réservé à la version illimitée.",
+    paywall_context_products: "La gestion des produits et du stock est réservée à la version illimitée.",
+    paywall_context_report: "Le rapport PDF est réservé à la version illimitée.",
+    paywall_context_photos: "L'analyse photo par IA est réservée à la version illimitée.",
+    paywall_context_stock: "La gestion du stock est réservée à la version illimitée.",
     paywall_btn: "Activer la version illimitée",
     paywall_close: "Plus tard",
     // Pool
@@ -865,6 +871,12 @@ const TRANSLATIONS = {
     see_dosage: "See dosage",
     paywall_title: "Go unlimited",
     paywall_desc: "Unlimited readings · AI strip analysis · PDF report · Stock management",
+    paywall_context_measure_limit: "You've reached the limit of 1 free reading per day.",
+    paywall_context_start_plan: "Step-by-step treatment tracking is reserved for the unlimited version.",
+    paywall_context_products: "Product and stock management is reserved for the unlimited version.",
+    paywall_context_report: "The PDF report is reserved for the unlimited version.",
+    paywall_context_photos: "AI photo analysis is reserved for the unlimited version.",
+    paywall_context_stock: "Stock management is reserved for the unlimited version.",
     paywall_btn: "Activate unlimited version",
     paywall_close: "Later",
     add_pool_title: "New pool",
@@ -1387,6 +1399,12 @@ const TRANSLATIONS = {
     see_dosage: "Dosierung anzeigen",
     paywall_title: "Auf unbegrenzt wechseln",
     paywall_desc: "Unbegrenzte Messungen · KI-Streifenanalyse · PDF-Bericht · Lagerverwaltung",
+    paywall_context_measure_limit: "Du hast das Limit von 1 kostenlosen Messung pro Tag erreicht.",
+    paywall_context_start_plan: "Die schrittweise Behandlungsverfolgung ist der unbegrenzten Version vorbehalten.",
+    paywall_context_products: "Die Produkt- und Lagerverwaltung ist der unbegrenzten Version vorbehalten.",
+    paywall_context_report: "Der PDF-Bericht ist der unbegrenzten Version vorbehalten.",
+    paywall_context_photos: "Die KI-Fotoanalyse ist der unbegrenzten Version vorbehalten.",
+    paywall_context_stock: "Die Lagerverwaltung ist der unbegrenzten Version vorbehalten.",
     paywall_btn: "Unbegrenzte Version aktivieren",
     paywall_close: "Später",
     add_pool_title: "Neues Becken",
@@ -1912,6 +1930,12 @@ const TRANSLATIONS = {
     see_dosage: "Vedi dosaggio",
     paywall_title: "Passa all'illimitato",
     paywall_desc: "Misurazioni illimitate · Analisi IA strisce · Rapporto PDF · Gestione stock",
+    paywall_context_measure_limit: "Hai raggiunto il limite di 1 misurazione gratuita al giorno.",
+    paywall_context_start_plan: "Il monitoraggio del trattamento passo passo è riservato alla versione illimitata.",
+    paywall_context_products: "La gestione di prodotti e stock è riservata alla versione illimitata.",
+    paywall_context_report: "Il rapporto PDF è riservato alla versione illimitata.",
+    paywall_context_photos: "L'analisi foto IA è riservata alla versione illimitata.",
+    paywall_context_stock: "La gestione dello stock è riservata alla versione illimitata.",
     ai_timer_hint: "El análisis puede tardar hasta 30 segundos.",
     ai_reliability: "Fiabilidad del análisis",
     ai_no_values: "Ningún valor legible en esta foto. Verifica la calidad y orientación de la imagen.",
@@ -2437,6 +2461,12 @@ const TRANSLATIONS = {
     ai_reliability: "Confiabilidade da análise",
     ai_no_values: "Nenhum valor legível nesta foto. Verifique a qualidade e orientação da imagem.",
     paywall_desc: "Mediciones ilimitadas · Análisis IA de tiras · Informe PDF · Gestión de stock",
+    paywall_context_measure_limit: "Has alcanzado el límite de 1 medición gratuita al día.",
+    paywall_context_start_plan: "El seguimiento del tratamiento paso a paso está reservado a la versión ilimitada.",
+    paywall_context_products: "La gestión de productos y stock está reservada a la versión ilimitada.",
+    paywall_context_report: "El informe PDF está reservado a la versión ilimitada.",
+    paywall_context_photos: "El análisis de fotos con IA está reservado a la versión ilimitada.",
+    paywall_context_stock: "La gestión de stock está reservada a la versión ilimitada.",
     paywall_btn: "Activar versión ilimitada",
     paywall_close: "Más tarde",
     add_pool_title: "Nueva piscina",
@@ -2956,6 +2986,12 @@ const TRANSLATIONS = {
     see_dosage: "Ver dosagem",
     paywall_title: "Passar para ilimitado",
     paywall_desc: "Medições ilimitadas · Análise IA de tiras · Relatório PDF · Gestão de estoque",
+    paywall_context_measure_limit: "Você atingiu o limite de 1 medição gratuita por dia.",
+    paywall_context_start_plan: "O acompanhamento passo a passo do tratamento é reservado à versão ilimitada.",
+    paywall_context_products: "A gestão de produtos e estoque é reservada à versão ilimitada.",
+    paywall_context_report: "O relatório PDF é reservado à versão ilimitada.",
+    paywall_context_photos: "A análise de fotos por IA é reservada à versão ilimitada.",
+    paywall_context_stock: "A gestão de estoque é reservada à versão ilimitada.",
     paywall_btn: "Ativar versão ilimitada",
     paywall_close: "Mais tarde",
     add_pool_title: "Nova piscina",
@@ -4884,8 +4920,10 @@ function PoolApp() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingMeasure, setEditingMeasure] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallSource, setPaywallSource] = useState(null);
   function openPaywall(source) {
     track("paywall_shown", { source: source || "unknown" });
+    setPaywallSource(source || null);
     setShowPaywall(true);
   }
   const [showAddPool, setShowAddPool] = useState(false);
@@ -5990,7 +6028,7 @@ function PoolApp() {
 
   function handleOpenAddMeasure() {
     if (blockedByLimit) {
-      openPaywall();
+      openPaywall("measure_limit");
     } else {
       setShowAddMeasure(true);
     }
@@ -6391,7 +6429,7 @@ function PoolApp() {
             isPremium={isPremium}
             poolName={activePool?.name}
             onGenerateReport={() => setShowReport(true)}
-            onWantPremiumForReport={() => openPaywall()}
+            onWantPremiumForReport={() => openPaywall("report")}
             lang={lang}
             apiKey={aiEnabled && isPremium ? apiKey : ""}
             apiProvider={apiProvider}
@@ -6416,7 +6454,7 @@ function PoolApp() {
             isPremium={isPremium}
             poolName={activePool?.name}
             manageStock={!!activePool?.manageStock}
-            onWantPremium={() => openPaywall()}
+            onWantPremium={() => openPaywall("products")}
             onWantSettings={() => setTab("settings")}
             lang={lang}
           />
@@ -6457,7 +6495,7 @@ function PoolApp() {
             }}
             poolMeasureCount={poolMeasures.length}
             onGenerateReport={() => setShowReport(true)}
-            onWantPremiumForReport={() => openPaywall()}
+            onWantPremiumForReport={() => openPaywall("report")}
             onWantPremium={() => openPaywall()}
             isPremium={isPremium}
             setIsPremium={setIsPremium}
@@ -6498,10 +6536,10 @@ function PoolApp() {
             setPhotoWarningCallback(() => cb);
             setShowPhotoWarning(true);
           }}
-          onWantPremium={() => {
+          onWantPremium={(source) => {
             setShowAddMeasure(false);
             setEditingMeasure(null);
-            openPaywall();
+            openPaywall(source || "photos");
           }}
           apiKey={aiEnabled && isPremium ? apiKey : ""}
           apiProvider={apiProvider}
@@ -6523,10 +6561,10 @@ function PoolApp() {
           }}
           onSave={saveProduct}
           isPremium={isPremium}
-          onWantPremium={() => {
+          onWantPremium={(source) => {
             setShowAddProduct(false);
             setEditingProduct(null);
-            openPaywall();
+            openPaywall(source || "products");
           }}
           applications={poolApplications}
           manageStock={!!activePool?.manageStock}
@@ -6546,6 +6584,7 @@ function PoolApp() {
       {showPaywall && (
         <PaywallModal
           lang={lang}
+          source={paywallSource}
           onClose={() => setShowPaywall(false)}
           onActivate={() => {
             track("upgrade_activated");
@@ -10083,7 +10122,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       )}
 
       {action === "outil-mesure" ? null : !isPremium ? (
-        <button style={styles.photoLockedBtn} onClick={onWantPremium}>
+        <button style={styles.photoLockedBtn} onClick={() => onWantPremium("stock")}>
           <Lock size={16} />
           <span>{t("stock_locked")}</span>
         </button>
@@ -10784,7 +10823,7 @@ function DeleteReauthModal({ onClose, onConfirm, busy, error, lang }) {
   );
 }
 
-function PaywallModal({ onClose, onActivate, lang }) {
+function PaywallModal({ onClose, onActivate, lang, source }) {
   const t = useT(lang || "fr");
   const perks = [
     t("paywall_perk1"),
@@ -10795,8 +10834,21 @@ function PaywallModal({ onClose, onActivate, lang }) {
     t("paywall_perk6"),
     t("paywall_perk7"),
   ];
+  // v1.42.0 — Sous-titre contextuel selon ce qui a déclenché le paywall
+  // (mesure du jour atteinte, plan de traitement, rapport PDF, produits,
+  // photos IA, gestion du stock) au lieu du même mur générique à chaque fois.
+  // Les clés paywall_context_* existaient déjà dans les traductions mais
+  // n'étaient jamais lues nulle part avant ce fix.
+  const contextKey = source ? `paywall_context_${source}` : null;
+  const contextText = contextKey ? t(contextKey) : null;
+  const hasContext = contextText && contextText !== contextKey;
   return (
     <ModalShell onClose={onClose} title={t("paywall_title")}>
+      {hasContext && (
+        <p style={{ fontSize: 13.5, color: "#4a6480", margin: "0 0 4px", lineHeight: 1.4 }}>
+          {contextText}
+        </p>
+      )}
       <div style={styles.paywallHero}>
         <Crown size={30} color="#a8721a" />
         <div style={styles.paywallPrice}>2,99 € / mois</div>
