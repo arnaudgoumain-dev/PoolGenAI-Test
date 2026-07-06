@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.49.0";
+const APP_VERSION = "1.50.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -80,9 +80,11 @@ const TRANSLATIONS = {
     note_calcium: "Diluer avant ajout. Ne pas mélanger avec d'autres produits. Filtration en marche.",
     note_anti_phos: "Verser devant la buse de refoulement, filtration en marche 24h.",
     note_sequestrant: "Traitement cuivre/fer. Verser en périphérie du bassin, filtration en marche.",
+    note_floculant: "Traitement ponctuel eau trouble, pas de suivi automatique par l'appli. Verser devant les buses de refoulement, filtration en marche, puis arrêter 24h pour décantation.",
     action_hard_plus: "Monte la dureté (TH)",
     action_phos_minus: "Réduit les phosphates",
     action_sequestrant: "Séquestrant métaux (cuivre/fer)",
+    action_floculant: "Floculant / clarifiant",
     action_outil_mesure: "Outil de mesure (bandelettes, etc.)",
     legal_notices: "Mentions légales",
     lcen_title: "Mentions légales (LCEN)",
@@ -468,6 +470,8 @@ const TRANSLATIONS = {
     prod_name_calcium: "Chlorure de calcium (dureté +)",
     prod_name_anti_phos: "Anti-phosphates (PHOSfree type)",
     prod_name_sequestrant: "Séquestrant métaux (Metal Free type)",
+    prod_name_floculant: "Floculant clarifiant liquide (type Reva-Flock)",
+    prod_name_sel: "Sel de piscine (NaCl pur ≥ 99%, sac 25 kg)",
     action_ph_plus: "Monte le pH",
     action_chlore: "Chlore non stabilisé (choc)",
     action_chlore_stabilise: "Chlore stabilisé (CYA +)",
@@ -651,9 +655,11 @@ const TRANSLATIONS = {
     note_calcium: "Dilute before adding. Do not mix with other products. Filtration running.",
     note_anti_phos: "Pour in front of return jet, filtration running 24h.",
     note_sequestrant: "Copper/iron treatment. Pour around pool perimeter, filtration running.",
+    note_floculant: "One-off treatment for cloudy water, not tracked automatically by the app. Pour in front of the return jets, filtration running, then stop for 24h to let it settle.",
     action_hard_plus: "Increase hardness (TH)",
     action_phos_minus: "Reduce phosphates",
     action_sequestrant: "Metal sequestrant (copper/iron)",
+    action_floculant: "Flocculant / clarifier",
     action_outil_mesure: "Measuring tool (test strips, etc.)",
     legal_notices: "Legal notices",
     lcen_title: "Legal notices",
@@ -1029,6 +1035,8 @@ const TRANSLATIONS = {
     prod_name_calcium: "Calcium chloride (hardness +)",
     prod_name_anti_phos: "Anti-phosphates (PHOSfree type)",
     prod_name_sequestrant: "Metal sequestrant (Metal Free type)",
+    prod_name_floculant: "Liquid clarifying flocculant (Reva-Flock type)",
+    prod_name_sel: "Pool salt (pure NaCl ≥ 99%, 25 kg bag)",
     action_ph_plus: "Raises pH",
     action_chlore: "Unstabilised chlorine (shock)",
     action_chlore_stabilise: "Stabilised chlorine (CYA +)",
@@ -1212,9 +1220,11 @@ const TRANSLATIONS = {
     note_calcium: "Vor der Zugabe verdünnen. Filtration läuft.",
     note_anti_phos: "Vor der Rückflussdüse eingießen, Filtration 24h laufen lassen.",
     note_sequestrant: "Kupfer/Eisen-Behandlung. Am Beckenrand eingießen.",
+    note_floculant: "Einmalbehandlung bei trübem Wasser, wird von der App nicht automatisch verfolgt. Vor den Einlaufdüsen eingießen, Filtration laufen lassen, dann 24h stoppen zum Absetzen.",
     action_hard_plus: "Härte erhöhen (TH)",
     action_phos_minus: "Phosphate reduzieren",
     action_sequestrant: "Metallsequestriermittel (Kupfer/Eisen)",
+    action_floculant: "Flockungsmittel / Klärer",
     action_outil_mesure: "Messwerkzeug (Teststreifen usw.)",
     legal_notices: "Rechtliche Hinweise",
     lcen_title: "Rechtliche Hinweise",
@@ -1592,6 +1602,8 @@ const TRANSLATIONS = {
     prod_name_calcium: "Calciumchlorid (Härte +)",
     prod_name_anti_phos: "Anti-Phosphat (PHOSfree Typ)",
     prod_name_sequestrant: "Metallsequestriermittel (Metal Free Typ)",
+    prod_name_floculant: "Flüssiges Flockungsmittel (Typ Reva-Flock)",
+    prod_name_sel: "Poolsalz (reines NaCl ≥ 99%, 25-kg-Sack)",
     action_ph_plus: "pH erhöhen",
     action_chlore: "Nicht stabilisiertes Chlor (Schock)",
     action_chlore_stabilise: "Stabilisiertes Chlor (CYA +)",
@@ -1775,9 +1787,11 @@ const TRANSLATIONS = {
     note_calcium: "Diluire prima dell'aggiunta. Filtrazione in funzione.",
     note_anti_phos: "Versare davanti all'ugello di ritorno, filtrazione 24h.",
     note_sequestrant: "Trattamento rame/ferro. Versare intorno alla vasca.",
+    note_floculant: "Trattamento puntuale per acqua torbida, non monitorato automaticamente dall'app. Versare davanti agli ugelli di mandata, filtrazione in funzione, poi fermare per 24h per la decantazione.",
     action_hard_plus: "Aumenta la durezza (TH)",
     action_phos_minus: "Riduce i fosfati",
     action_sequestrant: "Sequestrante metalli (rame/ferro)",
+    action_floculant: "Flocculante / chiarificante",
     action_outil_mesure: "Strumento di misura (strisce reattive, ecc.)",
     legal_notices: "Note legali",
     lcen_title: "Note legali",
@@ -2152,6 +2166,8 @@ const TRANSLATIONS = {
     prod_name_calcium: "Cloruro di calcio (durezza +)",
     prod_name_anti_phos: "Anti-fosfati (tipo PHOSfree)",
     prod_name_sequestrant: "Sequestrante metalli (tipo Metal Free)",
+    prod_name_floculant: "Flocculante chiarificante liquido (tipo Reva-Flock)",
+    prod_name_sel: "Sale da piscina (NaCl puro ≥ 99%, sacco 25 kg)",
     action_ph_plus: "Alza il pH",
     action_chlore: "Cloro non stabilizzato (shock)",
     action_chlore_stabilise: "Cloro stabilizzato (CYA +)",
@@ -2335,9 +2351,11 @@ const TRANSLATIONS = {
     note_calcium: "Diluir antes de añadir. Filtración en marcha.",
     note_anti_phos: "Verter delante del inyector de retorno, filtración 24h.",
     note_sequestrant: "Tratamiento cobre/hierro. Verter alrededor de la piscina.",
+    note_floculant: "Tratamiento puntual para agua turbia, no monitorizado automáticamente por la app. Verter delante de las boquillas de impulsión, filtración en marcha, luego detener 24h para la decantación.",
     action_hard_plus: "Aumentar dureza (TH)",
     action_phos_minus: "Reducir fosfatos",
     action_sequestrant: "Secuestrante de metales (cobre/hierro)",
+    action_floculant: "Floculante / clarificante",
     action_outil_mesure: "Herramienta de medición (tiras reactivas, etc.)",
     legal_notices: "Avisos legales",
     lcen_title: "Avisos legales",
@@ -2712,6 +2730,8 @@ const TRANSLATIONS = {
     prod_name_calcium: "Cloruro de calcio (dureza +)",
     prod_name_anti_phos: "Anti-fosfatos (tipo PHOSfree)",
     prod_name_sequestrant: "Secuestrante de metales (tipo Metal Free)",
+    prod_name_floculant: "Floculante clarificante líquido (tipo Reva-Flock)",
+    prod_name_sel: "Sal de piscina (NaCl puro ≥ 99%, saco 25 kg)",
     action_ph_plus: "Sube el pH",
     action_chlore: "Cloro no estabilizado (choque)",
     action_chlore_stabilise: "Cloro estabilizado (CYA +)",
@@ -2895,9 +2915,11 @@ const TRANSLATIONS = {
     note_calcium: "Diluir antes de adicionar. Filtração ligada.",
     note_anti_phos: "Despejar na frente do injetor de retorno, filtração 24h.",
     note_sequestrant: "Tratamento cobre/ferro. Despejar ao redor da piscina.",
+    note_floculant: "Tratamento pontual para água turva, não monitorizado automaticamente pela app. Despejar em frente aos bocais de retorno, filtração em funcionamento, depois parar 24h para decantação.",
     action_hard_plus: "Aumentar dureza (TH)",
     action_phos_minus: "Reduzir fosfatos",
     action_sequestrant: "Sequestrante de metais (cobre/ferro)",
+    action_floculant: "Floculante / clarificante",
     action_outil_mesure: "Ferramenta de medição (tiras de teste, etc.)",
     legal_notices: "Avisos legais",
     lcen_title: "Avisos legais",
@@ -3269,6 +3291,8 @@ const TRANSLATIONS = {
     prod_name_calcium: "Cloreto de cálcio (dureza +)",
     prod_name_anti_phos: "Anti-fosfatos (tipo PHOSfree)",
     prod_name_sequestrant: "Sequestrador de metais (tipo Metal Free)",
+    prod_name_floculant: "Floculante clarificante líquido (tipo Reva-Flock)",
+    prod_name_sel: "Sal de piscina (NaCl puro ≥ 99%, saco 25 kg)",
     action_ph_plus: "Sobe o pH",
     action_chlore: "Cloro não estabilizado (choque)",
     action_chlore_stabilise: "Cloro estabilizado (CYA +)",
@@ -3638,6 +3662,40 @@ const DEFAULT_PRODUCTS = [
     stockPercent: 100,
     isDefault: true,
   },
+  {
+    id: "floculant",
+    name: "Floculant clarifiant liquide (type Reva-Flock)",
+    nameKey: "prod_name_floculant",
+    action: "floculant",
+    doseAmount: 150,
+    doseUnit: "mL",
+    effectAmount: 0,
+    effectPer: 10,
+    waitHours: 24,
+    noteKey: "note_floculant",
+    note: "Traitement ponctuel eau trouble, pas de suivi automatique par l'appli. Verser devant les buses de refoulement, filtration en marche, puis arrêter 24h pour décantation.",
+    containerAmount: 1,
+    containerUnit: "L",
+    stockPercent: 100,
+    isDefault: true,
+  },
+  {
+    id: "sel-piscine",
+    name: "Sel de piscine (NaCl pur ≥ 99%, sac 25 kg)",
+    nameKey: "prod_name_sel",
+    action: "sel",
+    doseAmount: 25,
+    doseUnit: "kg",
+    effectAmount: 0,
+    effectPer: 0,
+    waitHours: 24,
+    noteKey: "reco_note_sel",
+    note: "Utiliser du sel spécial piscine (NaCl pur ≥ 99%). Dissoudre avant l'ajout ou verser directement près du skimmer, filtration en marche 24h.",
+    containerAmount: 25,
+    containerUnit: "kg",
+    stockPercent: 100,
+    isDefault: true,
+  },
 ];
 
 function getProductActions(lang) {
@@ -3655,6 +3713,10 @@ function getProductActions(lang) {
     { value: "hard+",            label: dict.action_hard_plus || "Monte la dureté (TH)" },
     { value: "phos-",            label: dict.action_phos_minus || "Réduit les phosphates" },
     { value: "sequestrant",      label: dict.action_sequestrant || "Séquestrant métaux (cuivre/fer)" },
+    // v1.50.0 — Traitement ponctuel sans paramètre mesuré associé (eau
+    // trouble) : jamais proposé automatiquement par computeRecommendations,
+    // ajout manuel uniquement au stock/plan.
+    { value: "floculant",        label: dict.action_floculant || "Floculant / clarifiant" },
     // Lot B (v1.32.0) — catégorie sans dose ni type de traitement : ne sert
     // jamais de candidat dans findProduct() (qui filtre par action de
     // traitement réelle), donc aucun risque qu'un outil de mesure soit
@@ -3678,7 +3740,24 @@ const DEFAULT_WAIT_HOURS = {
   "hard+": 4,
   "phos-": 24,
   "sequestrant": 12,
+  "floculant": 24,
+  "sel": 24,
 };
+
+// v1.50.0 — Actions dont la dose ne varie pas en fonction d'un écart mesuré
+// (contrairement à ph-, chlore, tac+... qui utilisent effectAmount/effectPer
+// dans une règle de trois). Le formulaire produit masque le champ "Effet"
+// pour ces actions : la dose est soit une recommandation fixe du fabricant
+// par volume (séquestrant, floculant), soit calculée par un ratio physique
+// indépendant du produit (sel — voir PHYSICS_DOSE_ACTIONS ci-dessous).
+const FIXED_DOSE_ACTIONS = new Set(["sequestrant", "floculant"]);
+
+// v1.50.0 — Actions où même la dose du produit ne sert pas au calcul : le
+// sel se calcule uniquement via un ratio physique fixe (1 kg/m³ = +1000
+// mg/L, voir computeRecommendations). Le formulaire masque Quantité, Effet
+// et Pour X m³ ; seuls le nom et le suivi de stock (taille de contenant)
+// restent pertinents.
+const PHYSICS_DOSE_ACTIONS = new Set(["sel"]);
 
 // Ordre de base (utilisé quand aucune règle contextuelle ne s'applique)
 const ACTION_PRIORITY = {
@@ -7988,17 +8067,26 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     if (selVal < selT.min) {
       const diff = ((selT.min + selT.max) / 2) - selVal;
       const selKg = Math.round((diff * volume) / 1000);
+      // v1.50.0 — Le sel se calcule par un ratio physique fixe (1 kg/m³ =
+      // +1000 mg/L, indépendant de la marque), donc computedDoseAmount ne
+      // dépend jamais du produit. On relie quand même le produit "sel" en
+      // stock pour que le nom réel, la photo et surtout la déduction de
+      // stock (générique dans saveApplication, basée sur productName +
+      // containerAmount) fonctionnent comme pour les autres actions — avant
+      // cette version, aucun produit sel n'était jamais recherché ici.
+      const prod = findProduct("sel");
       steps.push({
         action: "sel",
         title: _("reco_sel_low", { val: selVal }),
-        productName: _("reco_fallback_sel"),
-        productAvailable: true,
+        productName: prodName(prod, "reco_fallback_sel"),
+        productAvailable: !!prod,
+        productPhoto: prod?.photo || null,
         doseText: _("reco_water_renewal_text", { pct: selKg }).replace("{pct}", selKg) ||
           `${_("reco_dose_prefix")} ${selKg} kg ${_("reco_target")} ${Math.round((selT.min + selT.max) / 2)} mg/L`,
         computedDoseAmount: selKg,
         doseUnit: "kg",
-        note: _("reco_note_sel"),
-        waitHours: 24,
+        note: prodNote(prod, "reco_note_sel"),
+        waitHours: prod?.waitHours ?? 24,
       });
     }
   }
@@ -10316,8 +10404,19 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                 <div style={{ flex: 1, textAlign: "left" }}>
                   <div style={styles.productName}>{p.name}</div>
                   <div style={styles.productMeta}>
-                    {p.action === "outil-mesure"
+                    {/* v1.50.0 — outil-mesure et sel n'ont pas de ratio dose/effet
+                        pertinent à afficher (bandelette : pas de dose ; sel :
+                        dose calculée par physique, pas par le produit). */}
+                    {(p.action === "outil-mesure" || PHYSICS_DOSE_ACTIONS.has(p.action))
                       ? getProductActions(lang).find((a) => a.value === p.action)?.label
+                      : FIXED_DOSE_ACTIONS.has(p.action)
+                      ? (
+                        <>
+                          {p.doseAmount} {p.doseUnit} / {p.effectPer} m³ ·{" "}
+                          {getProductActions(lang).find((a) => a.value === p.action)?.label}
+                          {!!p.waitHours && ` · ${p.waitHours}h`}
+                        </>
+                      )
                       : (
                         <>
                           {p.doseAmount} {p.doseUnit} → {p.effectAmount} / {p.effectPer} m³ ·{" "}
@@ -10384,6 +10483,12 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
   const [effectAmount, setEffectAmount] = useState(product?.effectAmount ?? "");
   const [effectPer, setEffectPer] = useState(product?.effectPer ?? "");
   const [waitHours, setWaitHours] = useState(product?.waitHours ?? DEFAULT_WAIT_HOURS[product?.action || "ph-"] ?? 2);
+  // v1.50.0 — Catégories de dosage sans effet mesuré à faire varier (voir
+  // FIXED_DOSE_ACTIONS/PHYSICS_DOSE_ACTIONS) : dérivées de `action`, donc
+  // valables que le produit vienne d'une analyse IA ou d'une saisie 100%
+  // manuelle — le masquage de champs ne dépend que de l'action choisie.
+  const isFixedDose = FIXED_DOSE_ACTIONS.has(action);
+  const isPhysicsDose = PHYSICS_DOSE_ACTIONS.has(action);
   const [note, setNote] = useState(product?.note || "");
   // v1.49.0 — Remplace l'ancien état "photo" unique par un tableau : capture
   // multi-photos (face / code-barre / notice), un seul bouton, envoyées
@@ -10518,10 +10623,10 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
     // jamais être enregistrés vides ou par défaut silencieux : c'est
     // exactement ce qui a produit un surdosage x19 sur un produit réel
     // (valeurs par défaut 30/0.1/10 jamais modifiées par l'utilisateur).
-    if (!isTool) {
+    if (!isTool && !isPhysicsDose) {
       const missing = [];
       if (doseAmount === "" || doseAmount === null || Number.isNaN(parseFloat(doseAmount))) missing.push(t("quantity"));
-      if (effectAmount === "" || effectAmount === null || Number.isNaN(parseFloat(effectAmount))) missing.push(t("effect_variation"));
+      if (!isFixedDose && (effectAmount === "" || effectAmount === null || Number.isNaN(parseFloat(effectAmount)))) missing.push(t("effect_variation"));
       if (effectPer === "" || effectPer === null || Number.isNaN(parseFloat(effectPer))) missing.push(t("for_x_m3"));
       if (missing.length > 0) {
         setFormError(t("product_missing_values", { fields: missing.join(", ") }));
@@ -10552,10 +10657,10 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       id: product?.id,
       name: name.trim(),
       action,
-      doseAmount: isTool ? 0 : parseFloat(doseAmount),
+      doseAmount: (isTool || isPhysicsDose) ? 0 : parseFloat(doseAmount),
       doseUnit,
-      effectAmount: isTool ? 0 : parseFloat(effectAmount),
-      effectPer: isTool ? 0 : parseFloat(effectPer),
+      effectAmount: (isTool || isFixedDose || isPhysicsDose) ? 0 : parseFloat(effectAmount),
+      effectPer: (isTool || isPhysicsDose) ? 0 : parseFloat(effectPer),
       waitHours: isTool ? 0 : (parseFloat(waitHours) || 0),
       note,
       photo,
@@ -10743,46 +10848,57 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
 
       {action !== "outil-mesure" && (
         <>
-          <div style={styles.fieldGrid}>
-            <div>
-              <label style={styles.fieldLabel}>{t("quantity")}</label>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {/* v1.50.0 — Sel : ni Quantité, ni Effet, ni Pour X m³ ne servent au
+              calcul (ratio physique fixe indépendant du produit) — seuls le
+              nom et le stock/contenant plus bas restent pertinents. */}
+          {!isPhysicsDose && (
+            <div style={styles.fieldGrid}>
+              <div>
+                <label style={styles.fieldLabel}>{t("quantity")}</label>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <input
+                    type="number"
+                    style={{ ...styles.input, flex: 1 }}
+                    value={doseAmount}
+                    onChange={(e) => setDoseAmount(e.target.value)}
+                    placeholder={aiSuggestion?.doseAmount != null ? String(aiSuggestion.doseAmount) : ""}
+                  />
+                  <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 20 }}>{doseUnit}</span>
+                </div>
+              </div>
+              {/* v1.50.0 — Séquestrant/floculant : dose fixe recommandée par
+                  le fabricant, pas de delta mesuré à atteindre — le champ
+                  Effet ne sert à rien dans le calcul (voir DEFAULT_PRODUCTS
+                  / computeRecommendations), on ne le demande donc plus. */}
+              {!isFixedDose && (
+                <div>
+                  <label style={styles.fieldLabel}>{t("effect_variation")}</label>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <input
+                      type="number"
+                      style={{ ...styles.input, flex: 1 }}
+                      value={effectAmount}
+                      onChange={(e) => setEffectAmount(e.target.value)}
+                      placeholder={aiSuggestion?.effectAmount != null ? String(aiSuggestion.effectAmount) : ""}
+                    />
+                    <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 30 }}>
+                      {action === "ph-" || action === "ph+" ? "pH" : "mg/L"}
+                    </span>
+                  </div>
+                </div>
+              )}
+              <div>
+                <label style={styles.fieldLabel}>{t("for_x_m3")}</label>
                 <input
                   type="number"
-                  style={{ ...styles.input, flex: 1 }}
-                  value={doseAmount}
-                  onChange={(e) => setDoseAmount(e.target.value)}
-                  placeholder={aiSuggestion?.doseAmount != null ? String(aiSuggestion.doseAmount) : ""}
+                  style={styles.input}
+                  value={effectPer}
+                  onChange={(e) => setEffectPer(e.target.value)}
+                  placeholder={aiSuggestion?.effectPer != null ? String(aiSuggestion.effectPer) : ""}
                 />
-                <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 20 }}>{doseUnit}</span>
               </div>
             </div>
-            <div>
-              <label style={styles.fieldLabel}>{t("effect_variation")}</label>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <input
-                  type="number"
-                  style={{ ...styles.input, flex: 1 }}
-                  value={effectAmount}
-                  onChange={(e) => setEffectAmount(e.target.value)}
-                  placeholder={aiSuggestion?.effectAmount != null ? String(aiSuggestion.effectAmount) : ""}
-                />
-                <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 30 }}>
-                  {action === "ph-" || action === "ph+" ? "pH" : "mg/L"}
-                </span>
-              </div>
-            </div>
-            <div>
-              <label style={styles.fieldLabel}>{t("for_x_m3")}</label>
-              <input
-                type="number"
-                style={styles.input}
-                value={effectPer}
-                onChange={(e) => setEffectPer(e.target.value)}
-                placeholder={aiSuggestion?.effectPer != null ? String(aiSuggestion.effectPer) : ""}
-              />
-            </div>
-          </div>
+          )}
           {formError && <div ref={formErrorRef} style={{ ...styles.analyzeNoteError, marginTop: 8 }}>{formError}</div>}
 
           <label style={styles.fieldLabel}>{t("wait_hours")}</label>
