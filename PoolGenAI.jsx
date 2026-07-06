@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.51.0";
+const APP_VERSION = "1.52.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -4409,6 +4409,20 @@ async function markCommonProductUsed({ idToken, productId }) {
     body: JSON.stringify({ productId }),
   });
   if (!res.ok) throw new Error(`Échec d'incrément base commune (${res.status})`);
+  return res.json();
+}
+
+// v1.51.0 — Upload photo utilisateur vers R2 pour illustrer une fiche
+// commonProducts. Le Worker déduplique côté serveur (ne remplace jamais un
+// photoUrl déjà présent) : premier arrivé, premier servi. photoBase64 est le
+// contenu base64 seul (sans le préfixe "data:image/jpeg;base64,").
+async function uploadCommonProductPhoto({ idToken, productId, photoBase64 }) {
+  const res = await fetch(`${PROXY_BASE_URL}/product-photo-upload`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify({ productId, photoBase64 }),
+  });
+  if (!res.ok) throw new Error(`Échec d'upload photo base commune (${res.status})`);
   return res.json();
 }
 
@@ -10684,10 +10698,12 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       (async () => {
         try {
           const idToken = await window._fbAuth.currentUser.getIdToken();
+          let sharedProductId = null;
           if (commonMatch?.matchType === "alias" || commonMatch?.matchType === "fuzzy_pending_merge") {
             await markCommonProductUsed({ idToken, productId: commonMatch.productId });
+            sharedProductId = commonMatch.productId;
           } else if (!commonMatch || commonMatch.matchType === "none") {
-            await createCommonProduct({
+            const created = await createCommonProduct({
               idToken,
               payload: {
                 barcode: detectedBarcode || null,
@@ -10701,13 +10717,26 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
                 delay: parseFloat(waitHours) || null,
                 container: `${containerAmount}${containerUnit}`,
                 // v1.49.0 — URL de la photo officielle trouvée par l'IA
-                // pendant sa recherche web, si disponible. Reste null sinon
-                // (pas d'upload de photo utilisateur vers un stockage public
-                // — chantier séparé, voir Bloc 5).
+                // pendant sa recherche web, si disponible.
                 photoUrl: aiSuggestion?.productImageUrl || null,
                 source: aiSuggestion?.source || "etiquette",
               },
             });
+            sharedProductId = created?.productId || null;
+          }
+          // v1.51.0 — Upload de la photo utilisateur vers R2 (route Worker
+          // /product-photo-upload), uniquement si l'utilisateur a pris une
+          // photo. Pas de vérification côté client d'une photo déjà
+          // existante : le Worker déduplique lui-même (ne remplace jamais
+          // un photoUrl déjà présent sur la fiche partagée), donc premier
+          // arrivé, premier servi, sans risque d'écrasement concurrent.
+          if (sharedProductId && photo) {
+            try {
+              const base64 = photo.split(",")[1] || photo;
+              await uploadCommonProductPhoto({ idToken, productId: sharedProductId, photoBase64: base64 });
+            } catch (e) {
+              console.warn("Upload photo base commune échoué :", e.message);
+            }
           }
           // v1.49.0 — Point 4 : matchType "fuzzy_candidates" non résolu par
           // l'utilisateur (aucun bouton Oui/Non cliqué) : on n'écrit rien

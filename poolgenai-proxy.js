@@ -909,6 +909,116 @@ async function handleProductCreate(request, env, origin) {
   return jsonResponse({ success: true, productId }, 200, origin);
 }
 
+// ---------- Route : POST /product-photo-upload ----------
+// v1.51.0 — Upload de la photo utilisateur vers R2 (binding PRODUCT_PHOTOS),
+// pour illustrer une fiche commonProducts qui n'a pas encore de photo.
+// Dédupliqué côté serveur : si le document a déjà un photoUrl (contribution
+// antérieure, peu importe l'utilisateur), l'upload est un no-op — jamais
+// d'écrasement, jamais de double stockage pour le même produit partagé.
+async function handleProductPhotoUpload(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+  try {
+    await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const productId = body.productId ? String(body.productId) : null;
+  const photoBase64 = body.photoBase64 ? String(body.photoBase64) : null;
+  if (!productId || !photoBase64) {
+    return jsonError("productId et photoBase64 requis", 400, origin);
+  }
+  // Seuls les vrais produits (gen_...) ont une photo, pas les alias bc_...
+  if (!productId.startsWith("gen_")) {
+    return jsonError("productId invalide", 400, origin);
+  }
+
+  let existing;
+  try {
+    existing = await firestoreGetDoc(env, "commonProducts", productId);
+  } catch (e) {
+    return jsonError(`Erreur de lecture : ${e.message}`, 500, origin);
+  }
+  if (!existing) {
+    return jsonError("Produit introuvable", 404, origin);
+  }
+  if (existing.photoUrl) {
+    // Déjà une photo (contribution antérieure) : pas d'upload, pas d'erreur.
+    return jsonResponse({ success: true, skipped: true, photoUrl: existing.photoUrl }, 200, origin);
+  }
+
+  // Limite défensive : la photo vient déjà compressée côté client (300px /
+  // qualité 0.5, quelques dizaines de Ko attendues). 2 Mo de marge large
+  // avant de rejeter, pour parer un bug client ou un appel direct abusif.
+  const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+  let bytes;
+  try {
+    const binary = atob(photoBase64);
+    bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  } catch (e) {
+    return jsonError("photoBase64 invalide", 400, origin);
+  }
+  if (bytes.length > MAX_PHOTO_BYTES) {
+    return jsonError("Photo trop volumineuse", 413, origin);
+  }
+
+  try {
+    await env.PRODUCT_PHOTOS.put(productId, bytes, {
+      httpMetadata: { contentType: "image/jpeg" },
+    });
+  } catch (e) {
+    return jsonError(`Échec d'upload R2 : ${e.message}`, 500, origin);
+  }
+
+  const reqUrl = new URL(request.url);
+  const photoUrl = `${reqUrl.origin}/product-photo?id=${productId}`;
+  try {
+    await firestorePatchDoc(env, "commonProducts", productId, { photoUrl });
+  } catch (e) {
+    return jsonError(`Échec de mise à jour Firestore : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse({ success: true, photoUrl }, 200, origin);
+}
+
+// ---------- Route : GET /product-photo?id=... ----------
+// v1.51.0 — Sert les photos produit uploadées par les utilisateurs (R2,
+// binding PRODUCT_PHOTOS). Route publique, sans auth : un <img src> ne peut
+// pas envoyer de header Authorization, et la photo d'un produit partagé
+// n'est pas une donnée sensible. Cache long car le contenu est immuable une
+// fois écrit (jamais remplacé, voir dédup dans handleProductPhotoUpload).
+async function handleProductPhotoServe(request, env, origin) {
+  const url = new URL(request.url);
+  const productId = url.searchParams.get("id");
+  if (!productId) return new Response("Missing id", { status: 400 });
+
+  let object;
+  try {
+    object = await env.PRODUCT_PHOTOS.get(productId);
+  } catch (e) {
+    return new Response("R2 error", { status: 500 });
+  }
+  if (!object) return new Response("Not found", { status: 404 });
+
+  return new Response(object.body, {
+    headers: {
+      "Content-Type": object.httpMetadata?.contentType || "image/jpeg",
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
 // ---------- Route : POST /product-use ----------
 // Incrément atomique de callCount à chaque confirmation d'usage d'un produit
 // de la base commune. Au multiple de 50, déclenche une re-vérification web
@@ -1350,11 +1460,21 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
+    const url = new URL(request.url);
+
+    // v1.51.0 — Seule route GET du Worker : sert les photos produit stockées
+    // dans R2, appelée par un <img src> qui ne peut pas faire de POST. Toutes
+    // les autres routes restent POST-only comme avant cette version.
+    if (request.method === "GET") {
+      if (url.pathname === "/product-photo") {
+        return handleProductPhotoServe(request, env, origin);
+      }
+      return new Response("Not found", { status: 404 });
+    }
+
     if (request.method !== "POST") {
       return new Response("Method not allowed", { status: 405 });
     }
-
-    const url = new URL(request.url);
 
     if (url.pathname === "/v1/messages") {
       return handleAnthropicProxy(request, env, origin);
@@ -1379,6 +1499,9 @@ export default {
     }
     if (url.pathname === "/confirm-merge") {
       return handleConfirmMerge(request, env, origin);
+    }
+    if (url.pathname === "/product-photo-upload") {
+      return handleProductPhotoUpload(request, env, origin);
     }
 
     return new Response("Not found", { status: 404 });
