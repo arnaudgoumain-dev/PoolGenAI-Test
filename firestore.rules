@@ -14,6 +14,30 @@ service cloud.firestore {
     function isActiveOwner(uid) {
       return isOwner(uid) && !isSuspended(uid);
     }
+    // v1.53.0 — Utilisateurs secondaires (spec du 04/07, cloisonnée à un seul
+    // bassin par invitation, décidée le 260706). Le lien vit dans
+    // users/{primaryUid}/secondaryUsers/{secondaryUid} : { email, status:
+    // "active"|"revoked", poolId, addedAt }. Écrit uniquement par le Worker
+    // (routes /invite-secondary-user, /respond-invitation,
+    // /revoke-secondary-access), jamais par le client — voir plus bas.
+    // isActiveSecondary : lien actif, sans regarder quel bassin (utilisé pour
+    // config/main, dont pools/products ne sont pas cloisonnables par bassin
+    // au niveau des règles — voir note sur ce match plus bas).
+    // isActiveSecondaryForPool : en plus, vérifie que le bassin concerné est
+    // bien celui assigné à l'invitation (measures/applications/photos).
+    function secondaryLink(primaryUid) {
+      return get(/databases/$(database)/documents/users/$(primaryUid)/secondaryUsers/$(request.auth.uid));
+    }
+    function isActiveSecondary(primaryUid) {
+      return request.auth != null &&
+        !isSuspended(request.auth.uid) &&
+        !isSuspended(primaryUid) &&
+        exists(/databases/$(database)/documents/users/$(primaryUid)/secondaryUsers/$(request.auth.uid)) &&
+        secondaryLink(primaryUid).data.status == 'active';
+    }
+    function isActiveSecondaryForPool(primaryUid, poolId) {
+      return isActiveSecondary(primaryUid) && secondaryLink(primaryUid).data.poolId == poolId;
+    }
     // Statut de suspension : lecture par le propriétaire uniquement (pour afficher
     // l'écran "Compte suspendu"), écriture strictement interdite au client.
     match /suspended/{uid} {
@@ -33,8 +57,15 @@ service cloud.firestore {
     // propriétaire actif ; suppression toujours permise (même suspendu, pour
     // l'effacement volontaire des données).
     match /users/{uid}/measures/{docId} {
-      allow read, create, update: if isActiveOwner(uid);
-      allow delete: if isOwner(uid);
+      allow read, update: if isActiveOwner(uid) || isActiveSecondaryForPool(uid, resource.data.poolId);
+      allow create: if isActiveOwner(uid) || isActiveSecondaryForPool(uid, request.resource.data.poolId);
+      // v1.53.0 — Le propriétaire peut toujours tout supprimer. Un secondaire
+      // ne peut supprimer que ce qu'il a lui-même créé (champ createdBy,
+      // ajouté à cette version — absent sur les mesures antérieures, donc
+      // .get(...,'') renvoie une chaîne vide qui ne matche jamais un uid réel :
+      // les anciennes mesures restent protégées contre un secondaire par défaut).
+      allow delete: if isOwner(uid) ||
+        (isActiveSecondaryForPool(uid, resource.data.poolId) && resource.data.get('createdBy', '') == request.auth.uid);
     }
     // v1.39.0 — Photos de mesure (photomètre/bandelette/bassin, jusqu'à 10 par
     // mesure) migrées hors du document measures/{id} vers un document par
@@ -42,23 +73,58 @@ service cloud.firestore {
     // document (même panne que productPhotos en v1.30.0, mais measures peut
     // contenir jusqu'à 10 photos alors qu'un produit n'en a qu'une seule).
     match /users/{uid}/measures/{measureId}/photos/{photoId} {
-      allow read, create, update: if isActiveOwner(uid);
-      allow delete: if isOwner(uid);
+      allow read, create, update: if isActiveOwner(uid) ||
+        isActiveSecondaryForPool(uid, get(/databases/$(database)/documents/users/$(uid)/measures/$(measureId)).data.poolId);
+      allow delete: if isOwner(uid) ||
+        isActiveSecondaryForPool(uid, get(/databases/$(database)/documents/users/$(uid)/measures/$(measureId)).data.poolId);
     }
     match /users/{uid}/applications/{docId} {
-      allow read, create, update: if isActiveOwner(uid);
-      allow delete: if isOwner(uid);
+      allow read, update: if isActiveOwner(uid) || isActiveSecondaryForPool(uid, resource.data.poolId);
+      allow create: if isActiveOwner(uid) || isActiveSecondaryForPool(uid, request.resource.data.poolId);
+      allow delete: if isOwner(uid) ||
+        (isActiveSecondaryForPool(uid, resource.data.poolId) && resource.data.get('createdBy', '') == request.auth.uid);
     }
     match /users/{uid}/diagnostics/{docId} {
+      // v1.53.0 — Pas de poolId sur les diagnostics (historique global au
+      // compte, pas par bassin) : exclu de l'accès secondaire, incohérent
+      // avec le cloisonnement à un seul bassin décidé le 260706.
       allow read, create, update: if isActiveOwner(uid);
       allow delete: if isOwner(uid);
     }
     // v1.30.0 — Photos produits (migrées hors de config/main pour la limite
     // 1 Mio). Même logique que measures/applications/diagnostics.
     match /users/{uid}/productPhotos/{productId} {
-      allow read, create, update: if isActiveOwner(uid);
-      allow delete: if isOwner(uid);
+      // v1.53.0 — Pas de poolId sur les photos produit (rattachées à un
+      // productId, pas un bassin) : accès large à tout secondaire actif,
+      // même logique que config/main.products ci-dessous (Option A, 260706).
+      allow read, create, update: if isActiveOwner(uid) || isActiveSecondary(uid);
+      allow delete: if isOwner(uid) || isActiveSecondary(uid);
     }
+    // v1.53.0 — Utilisateurs secondaires : les 3 collections qui portent la
+    // relation elle-même. Écriture strictement réservée au Worker (compte de
+    // service, hors périmètre de ces règles, même logique que
+    // calibrationModels/commonProducts) — le client ne fait jamais un
+    // setDoc direct dessus, toujours via /invite-secondary-user,
+    // /respond-invitation, /revoke-secondary-access.
+    // Lecture : le principal peut lister ses secondaires (réglages), le
+    // secondaire peut lire son propre lien miroir pour savoir à quels
+    // comptes il a accès.
+    match /users/{primaryUid}/secondaryUsers/{secondaryUid} {
+      allow read: if isOwner(primaryUid) || isOwner(secondaryUid);
+      allow write: if false;
+    }
+    match /users/{secondaryUid}/linkedAccounts/{primaryUid} {
+      allow read: if isOwner(secondaryUid);
+      allow write: if false;
+    }
+    // Contient un token/lien d'invitation : jamais lisible par le client,
+    // même authentifié (même raison que pendingMerges) — la réponse à une
+    // invitation passe par /respond-invitation avec le token en paramètre,
+    // pas par une lecture directe du document.
+    match /invitations/{token} {
+      allow read, write: if false;
+    }
+
     // Config (pools, products, lang, aiEnabled, apiProvider, activePlan, isPremium)
     // Le client peut tout modifier SAUF isPremium, réservé au backend (Admin SDK / webhook Stripe)
     // NOTE : on utilise .get(clé, défaut) plutôt que l'accès direct (.isPremium) car
@@ -69,11 +135,25 @@ service cloud.firestore {
     // → refus silencieux "Missing or insufficient permissions", même pour un
     // utilisateur légitime.
     match /users/{uid}/config/main {
-      allow read: if isOwner(uid);
+      allow read: if isOwner(uid) || isActiveSecondary(uid);
       allow create: if isActiveOwner(uid) &&
         request.resource.data.get('isPremium', false) == false;
-      allow update: if isActiveOwner(uid) &&
-        request.resource.data.get('isPremium', false) == resource.data.get('isPremium', false);
+      // v1.53.0 — Un secondaire actif peut modifier le champ "products"
+      // (stock partagé) mais rien d'autre : ni "pools" (pas de création/
+      // suppression de bassin), ni "isPremium", "lang", "aiEnabled",
+      // "apiProvider", "activePlan". Note (260706) : products/pools restent
+      // des tableaux dans ce même document, pas des sous-collections par
+      // bassin — un secondaire avec accès à un seul bassin voit donc
+      // techniquement l'ensemble du tableau products de tous les bassins du
+      // compte, pas juste le sien (l'app ne montre/n'édite que son bassin,
+      // mais les règles ne peuvent pas le garantir sans migrer products en
+      // sous-collection — accepté comme compromis, cohérent avec le fait que
+      // le propriétaire lui-même n'a aucun cloisonnement par bassin sur ce
+      // champ non plus).
+      allow update: if (isActiveOwner(uid) &&
+          request.resource.data.get('isPremium', false) == resource.data.get('isPremium', false)) ||
+        (isActiveSecondary(uid) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['products', 'updatedAt']));
       allow delete: if isOwner(uid);
     }
     // Lot B — Calibration bandelette/photomètre (v1.32.0, champ renommé

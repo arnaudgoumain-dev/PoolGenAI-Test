@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.52.0";
+const APP_VERSION = "1.53.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -5335,7 +5335,30 @@ function PoolApp() {
   const [isPremium, setIsPremium] = useState(false);
   const [applications, setApplications] = useState([]);
   const [validatingMeasure, setValidatingMeasure] = useState(null);
-  const [activePlan, setActivePlan] = useState(null); // { measureId, steps: [{...rec, appliedAt, skipped, scheduledAt}], currentStepIdx }
+  // v1.53.0 — Plan actif stocké par bassin (poolId -> plan), plus un objet
+  // unique partagé entre tous les bassins. Avant ce fix, lancer un plan sur
+  // le bassin B pendant qu'un plan était en cours sur le bassin A écrasait
+  // silencieusement celui de A. `activePlan` et `setActivePlan` restent
+  // utilisables partout ailleurs dans le fichier exactement comme avant
+  // (dérivé/scopé sur activePoolId sous le capot) — aucun autre site d'appel
+  // n'a besoin d'être modifié.
+  const [activePlanByPool, setActivePlanByPool] = useState({});
+  const activePlan = activePlanByPool[activePoolId] || null;
+  function setActivePlan(value) {
+    setActivePlanByPool((prev) => ({ ...prev, [activePoolId]: value }));
+  }
+  // v1.53.0 — Migration silencieuse ancien format (objet unique partagé
+  // entre tous les bassins) -> nouvelle map { poolId: plan }. Range l'ancien
+  // plan dans le bassin de la mesure qu'il concerne si elle existe encore,
+  // sinon dans le bassin de repli fourni (mieux que le perdre silencieusement).
+  function migrateActivePlan(raw, measuresList, fallbackPoolId) {
+    if (!raw || typeof raw !== "object") return {};
+    if (raw.measureId) {
+      const owningMeasure = (measuresList || []).find((m) => m.id === raw.measureId);
+      return { [owningMeasure?.poolId || fallbackPoolId || "default"]: raw };
+    }
+    return raw; // déjà au nouveau format (map)
+  }
   const [showWizard, setShowWizard] = useState(false);
   const [showPhotoWarning, setShowPhotoWarning] = useState(false);
   const [photoWarningCallback, setPhotoWarningCallback] = useState(null);
@@ -5499,7 +5522,7 @@ function PoolApp() {
     setPools([{ id: "default", name: "Ma piscine", location: "Valbonne (06)", volume: 72, treatmentType: "chlore", filtration: "sable" }]);
     setActivePoolId("default");
     setApplications([]);
-    setActivePlan(null);
+    setActivePlanByPool({});
     setIsPremium(false);
     setAiEnabled(false);
     setGdprConsent(false);
@@ -5559,8 +5582,8 @@ function PoolApp() {
       setPools(resetPools);
       setActivePoolId("");
       setIsPremium(false);
-      setActivePlan(null);
-      await FB.saveConfig(uid, { pools: resetPools, isPremium: false, activePlan: null });
+      setActivePlanByPool({});
+      await FB.saveConfig(uid, { pools: resetPools, isPremium: false, activePlan: {} });
       await FB.reactivateAccount(uid);
     } catch (e) {
       alert(e.message);
@@ -5701,9 +5724,10 @@ function PoolApp() {
         setProducts((prev) => (deepEqual(prev, merged) ? prev : merged));
         window.storage.set(STORAGE_KEYS.products, JSON.stringify(merged)).catch(() => {});
       }
-      if (config.activePlan !== undefined) {
-        setActivePlan((prev) => (deepEqual(prev, config.activePlan) ? prev : config.activePlan));
-        window.storage.set(STORAGE_KEYS.activePlan, JSON.stringify(config.activePlan)).catch(() => {});
+      if (config.activePlan !== undefined && config.activePlan !== null) {
+        const migrated = migrateActivePlan(config.activePlan, measures, activePoolId);
+        setActivePlanByPool((prev) => (deepEqual(prev, migrated) ? prev : migrated));
+        window.storage.set(STORAGE_KEYS.activePlan, JSON.stringify(migrated)).catch(() => {});
       }
       if (config.isPremium !== undefined) {
         setIsPremium((prev) => (prev === config.isPremium ? prev : config.isPremium));
@@ -5944,7 +5968,9 @@ function PoolApp() {
 
       try {
         const pl2 = await window.storage.get(STORAGE_KEYS.activePlan);
-        if (pl2?.value) { try { setActivePlan(JSON.parse(pl2.value)); } catch(e){} }
+        if (pl2?.value) {
+          try { setActivePlanByPool(migrateActivePlan(JSON.parse(pl2.value), loadedMeasures, loadedActiveId)); } catch(e){}
+        }
         const gc = await window.storage.get(STORAGE_KEYS.gdprConsent);
         if (gc?.value === "true") setGdprConsent(true);
         const dc = await window.storage.get(STORAGE_KEYS.dataConsent);
@@ -6041,8 +6067,8 @@ function PoolApp() {
 
   useEffect(() => {
     if (!loaded) return;
-    window.storage.set(STORAGE_KEYS.activePlan, JSON.stringify(activePlan)).catch(() => {});
-  }, [activePlan, loaded]);
+    window.storage.set(STORAGE_KEYS.activePlan, JSON.stringify(activePlanByPool)).catch(() => {});
+  }, [activePlanByPool, loaded]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -6180,7 +6206,7 @@ function PoolApp() {
       });
       track("measure_edit");
     } else {
-      const newMeasure = { id: uid(), poolId: activePoolId, ...entry };
+      const newMeasure = { id: uid(), poolId: activePoolId, ...entry, createdBy: authUser?.uid || null };
       setMeasures((prev) => [...prev, newMeasure]);
       if (authUser?.uid) saveMeasureWithThumbnail(authUser.uid, newMeasure);
       track("measure_add", { has_photos: !!(entry.photos?.length || entry.photo), has_pool_photos: !!(entry.poolPhotos?.length) });
@@ -6290,6 +6316,7 @@ function PoolApp() {
         appliedAt: new Date().toISOString(),
         allApplied: !!allApplied,
         steps,
+        createdBy: authUser?.uid || null,
       };
       if (authUser?.uid) FB.saveApplication(authUser.uid, newApp).catch(() => {});
       return [...withoutThisMeasure, newApp];
@@ -6527,8 +6554,8 @@ function PoolApp() {
 
   useEffect(() => {
     if (!loaded || !authUser?.uid) return;
-    syncConfig({ activePlan });
-  }, [activePlan]);
+    syncConfig({ activePlan: activePlanByPool });
+  }, [activePlanByPool]);
 
   useEffect(() => {
     if (!loaded || !authUser?.uid) return;
