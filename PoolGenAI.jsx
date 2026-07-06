@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.45.1";
+const APP_VERSION = "1.46.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -453,11 +453,13 @@ const TRANSLATIONS = {
     action_chlore: "Chlore non stabilisé (choc)",
     action_chlore_stabilise: "Chlore stabilisé (CYA +)",
     action_tac_plus: "Monte le TAC",
+    action_tac_minus: "Baisse le TAC",
     action_brome: "Brome",
     action_o2: "Oxygène actif",
     action_sel: "Sel (salinité)",
     axis_legend_d: "ᴅ échelle dizaines (TAC, CYA, température) — droite",
     reco_tac_low: "TAC trop bas ({val} mg/L)",
+    reco_tac_high: "TAC trop haut ({val} mg/L)",
     reco_ph_high: "pH trop haut ({val})",
     reco_ph_low: "pH trop bas ({val})",
     reco_cl_combined: "Chlore combiné élevé ({val} mg/L)",
@@ -475,8 +477,10 @@ const TRANSLATIONS = {
     reco_cl_excess_text: "Laisser le chlore se dégrader naturellement au soleil, ne pas se baigner en attendant.",
     reco_cl_shock_text: "ce soir (choc renforcé)",
     reco_note_tac: "Un TAC bas rend le pH instable.",
+    reco_note_tac_minus: "Même acide que le pH-, mais effet à calibrer séparément sur le TAC. Corriger avant le pH, par petites doses.",
     reco_no_product_note: "Aucun produit configuré pour cette action. Ajoute-en un dans l'onglet Produits.",
     product_empty_delete_confirm: "{name} est à 0% de stock. Le supprimer de la liste ?",
+    product_missing_values: "Renseigne ces champs avant d'enregistrer : {fields}.",
     reco_note_ph_before_tac: "pH corrigé avant le TAC : à ce pH le chlore serait peu efficace, et le TAC n'est pas assez bas pour être urgent.",
     reco_order_intro_default: "Cet ordre suit la logique de traitement : les paramètres qui empêchent l'efficacité des autres sont corrigés en premier.",
     reco_order_reason_metals: "Le séquestrant passe avant tout désinfectant car des métaux dissous ont été détectés — sinon le chlore les précipite et tache le bassin.",
@@ -492,6 +496,7 @@ const TRANSLATIONS = {
     reco_cya_block_shock: "Stabilisant trop élevé pour un choc efficace ({val} mg/L)",
     reco_note_cya_block_shock: "Au-delà de 75 mg/L de CYA, un choc chlore classique n'atteint plus le point de rupture. Seule la dilution (renouvellement d'eau) fonctionne — pas de chlore choc tant que ce n'est pas fait.",
     reco_fallback_tac: "Produit TAC+ (bicarbonate de sodium)",
+    reco_fallback_tac_minus: "Produit TAC- (acide chlorhydrique ou bisulfate de sodium)",
     reco_fallback_ph_minus: "pH moins",
     reco_fallback_ph_plus: "pH plus",
     reco_fallback_chlore: "Chlore choc non stabilisé",
@@ -990,11 +995,13 @@ const TRANSLATIONS = {
     action_chlore: "Unstabilised chlorine (shock)",
     action_chlore_stabilise: "Stabilised chlorine (CYA +)",
     action_tac_plus: "Raises alkalinity",
+    action_tac_minus: "Lowers alkalinity",
     action_brome: "Bromine",
     action_o2: "Active oxygen",
     action_sel: "Salt (salinity)",
     axis_legend_d: "ᴅ tens scale (TAC, CYA, temperature) — right",
     reco_tac_low: "TAC too low ({val} mg/L)",
+    reco_tac_high: "TAC too high ({val} mg/L)",
     reco_ph_high: "pH too high ({val})",
     reco_ph_low: "pH too low ({val})",
     reco_cl_combined: "High combined chlorine ({val} mg/L)",
@@ -1012,8 +1019,10 @@ const TRANSLATIONS = {
     reco_cl_excess_text: "Let chlorine degrade naturally in sunlight, avoid swimming in the meantime.",
     reco_cl_shock_text: "tonight (shock treatment)",
     reco_note_tac: "Low TAC makes pH unstable.",
+    reco_note_tac_minus: "Same acid as pH-, but its TAC effect must be calibrated separately. Correct before pH, in small doses.",
     reco_no_product_note: "No product configured for this action. Add one in the Products tab.",
     product_empty_delete_confirm: "{name} is at 0% stock. Remove it from the list?",
+    product_missing_values: "Fill in these fields before saving: {fields}.",
     reco_note_ph_before_tac: "pH corrected before TAC: chlorine would be inefficient at this pH, and TAC isn't low enough to be urgent.",
     reco_order_intro_default: "This order follows the treatment logic: parameters that hinder the effectiveness of the others are corrected first.",
     reco_order_reason_metals: "Sequestrant comes before any disinfectant because dissolved metals were detected — otherwise chlorine precipitates them and stains the pool.",
@@ -1029,6 +1038,7 @@ const TRANSLATIONS = {
     reco_cya_block_shock: "Stabiliser too high for an effective shock ({val} mg/L)",
     reco_note_cya_block_shock: "Above 75 mg/L CYA, a standard chlorine shock can no longer reach breakpoint. Only dilution (partial water renewal) works — no chlorine shock until that's done.",
     reco_fallback_tac: "TAC+ product (sodium bicarbonate)",
+    reco_fallback_tac_minus: "TAC- product (hydrochloric acid or sodium bisulfate)",
     reco_fallback_ph_minus: "pH minus",
     reco_fallback_ph_plus: "pH plus",
     reco_fallback_chlore: "Unstabilised shock chlorine",
@@ -1529,11 +1539,13 @@ const TRANSLATIONS = {
     action_chlore: "Nicht stabilisiertes Chlor (Schock)",
     action_chlore_stabilise: "Stabilisiertes Chlor (CYA +)",
     action_tac_plus: "KH erhöhen",
+    action_tac_minus: "KH senken",
     action_brome: "Brom",
     action_o2: "Aktivsauerstoff",
     action_sel: "Salz (Salzgehalt)",
     axis_legend_d: "ᴅ Zehnerskala (TAC, CYA, Temperatur) — rechts",
     reco_tac_low: "KH zu niedrig ({val} mg/L)",
+    reco_tac_high: "KH zu hoch ({val} mg/L)",
     reco_ph_high: "pH zu hoch ({val})",
     reco_ph_low: "pH zu niedrig ({val})",
     reco_cl_combined: "Hoher gebundener Chlorgehalt ({val} mg/L)",
@@ -1551,8 +1563,10 @@ const TRANSLATIONS = {
     reco_cl_excess_text: "Chlor natürlich in der Sonne abbauen lassen, zwischenzeitlich nicht schwimmen.",
     reco_cl_shock_text: "heute Abend (Schockbehandlung)",
     reco_note_tac: "Niedriger KH macht den pH instabil.",
+    reco_note_tac_minus: "Gleiche Säure wie pH-, aber die KH-Wirkung muss separat kalibriert werden. Vor dem pH korrigieren, in kleinen Dosen.",
     reco_no_product_note: "Kein Produkt für diese Aktion konfiguriert. Füge eines im Tab Produkte hinzu.",
     product_empty_delete_confirm: "{name} hat 0% Bestand. Aus der Liste entfernen?",
+    product_missing_values: "Fülle diese Felder vor dem Speichern aus: {fields}.",
     reco_note_ph_before_tac: "pH vor KH korrigiert: Chlor wäre bei diesem pH-Wert wenig wirksam, und der KH ist nicht niedrig genug, um dringend zu sein.",
     reco_order_intro_default: "Diese Reihenfolge folgt der Behandlungslogik: Parameter, die die Wirksamkeit der anderen beeinträchtigen, werden zuerst korrigiert.",
     reco_order_reason_metals: "Der Sequestrierer kommt vor jedem Desinfektionsmittel, da gelöste Metalle festgestellt wurden — sonst fällt das Chlor sie aus und färbt das Becken.",
@@ -1568,6 +1582,7 @@ const TRANSLATIONS = {
     reco_cya_block_shock: "Stabilisator zu hoch für eine wirksame Schockbehandlung ({val} mg/L)",
     reco_note_cya_block_shock: "Über 75 mg/L CYA erreicht eine klassische Chlorschockbehandlung den Breakpoint nicht mehr. Nur Verdünnung (teilweiser Wasseraustausch) wirkt — keine Chlorschockbehandlung, bevor das erledigt ist.",
     reco_fallback_tac: "KH+-Produkt (Natriumbicarbonat)",
+    reco_fallback_tac_minus: "KH--Produkt (Salzsäure oder Natriumbisulfat)",
     reco_fallback_ph_minus: "pH-Senker",
     reco_fallback_ph_plus: "pH-Heber",
     reco_fallback_chlore: "Nicht stabilisiertes Schockchlor",
@@ -2065,11 +2080,13 @@ const TRANSLATIONS = {
     action_chlore: "Cloro non stabilizzato (shock)",
     action_chlore_stabilise: "Cloro stabilizzato (CYA +)",
     action_tac_plus: "Alza il TAC",
+    action_tac_minus: "Abbassa il TAC",
     action_brome: "Bromo",
     action_o2: "Ossigeno attivo",
     action_sel: "Sale (salinità)",
     axis_legend_d: "ᴅ scala decine (TAC, CYA, temperatura) — destra",
     reco_tac_low: "TAC troppo basso ({val} mg/L)",
+    reco_tac_high: "TAC troppo alto ({val} mg/L)",
     reco_ph_high: "pH troppo alto ({val})",
     reco_ph_low: "pH troppo basso ({val})",
     reco_cl_combined: "Cloro combinato elevato ({val} mg/L)",
@@ -2087,8 +2104,10 @@ const TRANSLATIONS = {
     reco_cl_excess_text: "Lasciare che il cloro si degradi naturalmente al sole, evitare di nuotare nel frattempo.",
     reco_cl_shock_text: "stasera (trattamento shock)",
     reco_note_tac: "Un TAC basso rende il pH instabile.",
+    reco_note_tac_minus: "Stesso acido del pH-, ma l'effetto sul TAC va calibrato separatamente. Correggere prima del pH, a piccole dosi.",
     reco_no_product_note: "Nessun prodotto configurato per questa azione. Aggiungine uno nella scheda Prodotti.",
     product_empty_delete_confirm: "{name} è allo 0% di scorta. Rimuoverlo dalla lista?",
+    product_missing_values: "Compila questi campi prima di salvare: {fields}.",
     reco_note_ph_before_tac: "pH corretto prima del TAC: a questo pH il cloro sarebbe poco efficace, e il TAC non è abbastanza basso da essere urgente.",
     reco_order_intro_default: "Quest'ordine segue la logica di trattamento: i parametri che ostacolano l'efficacia degli altri vengono corretti per primi.",
     reco_order_reason_metals: "Il sequestrante passa prima di ogni disinfettante perché sono stati rilevati metalli disciolti — altrimenti il cloro li precipita e macchia la piscina.",
@@ -2104,6 +2123,7 @@ const TRANSLATIONS = {
     reco_cya_block_shock: "Stabilizzante troppo alto per uno shock efficace ({val} mg/L)",
     reco_note_cya_block_shock: "Oltre 75 mg/L di CYA, uno shock a cloro classico non raggiunge più il punto di rottura. Funziona solo la diluizione (rinnovo parziale dell'acqua) — niente shock a cloro finché non è fatto.",
     reco_fallback_tac: "Prodotto TAC+ (bicarbonato di sodio)",
+    reco_fallback_tac_minus: "Prodotto TAC- (acido cloridrico o bisolfato di sodio)",
     reco_fallback_ph_minus: "pH meno",
     reco_fallback_ph_plus: "pH più",
     reco_fallback_chlore: "Cloro shock non stabilizzato",
@@ -2601,11 +2621,13 @@ const TRANSLATIONS = {
     action_chlore: "Cloro no estabilizado (choque)",
     action_chlore_stabilise: "Cloro estabilizado (CYA +)",
     action_tac_plus: "Sube el TAC",
+    action_tac_minus: "Baja el TAC",
     action_brome: "Bromo",
     action_o2: "Oxígeno activo",
     action_sel: "Sal (salinidad)",
     axis_legend_d: "ᴅ escala decenas (TAC, CYA, temperatura) — derecha",
     reco_tac_low: "TAC demasiado bajo ({val} mg/L)",
+    reco_tac_high: "TAC demasiado alto ({val} mg/L)",
     reco_ph_high: "pH demasiado alto ({val})",
     reco_ph_low: "pH demasiado bajo ({val})",
     reco_cl_combined: "Cloro combinado elevado ({val} mg/L)",
@@ -2623,8 +2645,10 @@ const TRANSLATIONS = {
     reco_cl_excess_text: "Dejar que el cloro se degrade naturalmente al sol, evitar bañarse mientras tanto.",
     reco_cl_shock_text: "esta noche (tratamiento de choque)",
     reco_note_tac: "Un TAC bajo hace el pH inestable.",
+    reco_note_tac_minus: "Mismo ácido que el pH-, pero su efecto sobre el TAC debe calibrarse por separado. Corregir antes que el pH, en dosis pequeñas.",
     reco_no_product_note: "No hay ningún producto configurado para esta acción. Añade uno en la pestaña Productos.",
     product_empty_delete_confirm: "{name} está al 0% de stock. ¿Eliminarlo de la lista?",
+    product_missing_values: "Completa estos campos antes de guardar: {fields}.",
     reco_note_ph_before_tac: "pH corregido antes que el TAC: a este pH el cloro sería poco eficaz, y el TAC no está lo bastante bajo para ser urgente.",
     reco_order_intro_default: "Este orden sigue la lógica de tratamiento: los parámetros que impiden la eficacia de los demás se corrigen primero.",
     reco_order_reason_metals: "El secuestrante pasa antes que cualquier desinfectante porque se detectaron metales disueltos — si no, el cloro los precipita y mancha la piscina.",
@@ -2640,6 +2664,7 @@ const TRANSLATIONS = {
     reco_cya_block_shock: "Estabilizador demasiado alto para un choque eficaz ({val} mg/L)",
     reco_note_cya_block_shock: "Por encima de 75 mg/L de CYA, un choque de cloro clásico ya no alcanza el punto de ruptura. Solo la dilución (renovación parcial del agua) funciona — nada de choque de cloro hasta que esté hecho.",
     reco_fallback_tac: "Producto TAC+ (bicarbonato de sodio)",
+    reco_fallback_tac_minus: "Producto TAC- (ácido clorhídrico o bisulfato de sodio)",
     reco_fallback_ph_minus: "pH menos",
     reco_fallback_ph_plus: "pH más",
     reco_fallback_chlore: "Cloro shock no estabilizado",
@@ -3134,11 +3159,13 @@ const TRANSLATIONS = {
     action_chlore: "Cloro não estabilizado (choque)",
     action_chlore_stabilise: "Cloro estabilizado (CYA +)",
     action_tac_plus: "Sobe o TAC",
+    action_tac_minus: "Desce o TAC",
     action_brome: "Bromo",
     action_o2: "Oxigênio ativo",
     action_sel: "Sal (salinidade)",
     axis_legend_d: "ᴅ escala dezenas (TAC, CYA, temperatura) — direita",
     reco_tac_low: "TAC muito baixo ({val} mg/L)",
+    reco_tac_high: "TAC muito alto ({val} mg/L)",
     reco_ph_high: "pH muito alto ({val})",
     reco_ph_low: "pH muito baixo ({val})",
     reco_cl_combined: "Cloro combinado elevado ({val} mg/L)",
@@ -3156,8 +3183,10 @@ const TRANSLATIONS = {
     reco_cl_excess_text: "Deixar o cloro degradar naturalmente ao sol, evitar nadar enquanto isso.",
     reco_cl_shock_text: "esta noite (tratamento de choque)",
     reco_note_tac: "Um TAC baixo torna o pH instável.",
+    reco_note_tac_minus: "Mesmo ácido do pH-, mas o efeito no TAC deve ser calibrado à parte. Corrigir antes do pH, em pequenas doses.",
     reco_no_product_note: "Nenhum produto configurado para esta ação. Adiciona um no separador Produtos.",
     product_empty_delete_confirm: "{name} está a 0% de stock. Remover da lista?",
+    product_missing_values: "Preenche estes campos antes de guardar: {fields}.",
     reco_note_ph_before_tac: "pH corrigido antes do TAC: a este pH o cloro seria pouco eficaz, e o TAC não está baixo o suficiente para ser urgente.",
     reco_order_intro_default: "Esta ordem segue a lógica de tratamento: os parâmetros que impedem a eficácia dos outros são corrigidos primeiro.",
     reco_order_reason_metals: "O sequestrante passa antes de qualquer desinfetante porque foram detetados metais dissolvidos — caso contrário, o cloro precipita-os e mancha a piscina.",
@@ -3173,6 +3202,7 @@ const TRANSLATIONS = {
     reco_cya_block_shock: "Estabilizador muito alto para um choque eficaz ({val} mg/L)",
     reco_note_cya_block_shock: "Acima de 75 mg/L de CYA, um choque de cloro clássico já não atinge o ponto de ruptura. Só a diluição (renovação parcial da água) funciona — nada de choque de cloro até isso ser feito.",
     reco_fallback_tac: "Produto TAC+ (bicarbonato de sódio)",
+    reco_fallback_tac_minus: "Produto TAC- (ácido clorídrico ou bissulfato de sódio)",
     reco_fallback_ph_minus: "pH menos",
     reco_fallback_ph_plus: "pH mais",
     reco_fallback_chlore: "Cloro shock não estabilizado",
@@ -3504,6 +3534,7 @@ function getProductActions(lang) {
     { value: "chlore",           label: dict.action_chlore || "Chlore non stabilisé (choc)" },
     { value: "chlore-stabilise", label: dict.action_chlore_stabilise || "Chlore stabilisé (CYA +)" },
     { value: "tac+",             label: dict.action_tac_plus || "Monte le TAC" },
+    { value: "tac-",             label: dict.action_tac_minus || "Baisse le TAC" },
     { value: "brome",            label: dict.action_brome || "Brome" },
     { value: "o2",               label: dict.action_o2 || "Oxygène actif" },
     { value: "sel",              label: dict.action_sel || "Sel (salinité)" },
@@ -3526,6 +3557,7 @@ const DEFAULT_WAIT_HOURS = {
   "chlore": 12,
   "chlore-stabilise": 24,
   "tac+": 6,
+  "tac-": 6,
   "brome": 6,
   "o2": 4,
   "sel": 24,
@@ -3537,6 +3569,7 @@ const DEFAULT_WAIT_HOURS = {
 // Ordre de base (utilisé quand aucune règle contextuelle ne s'applique)
 const ACTION_PRIORITY = {
   "tac+": 1,
+  "tac-": 1,
   "hard+": 1,
   "ph-": 2,
   "ph+": 2,
@@ -7461,6 +7494,28 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
       waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["tac+"],
     });
   }
+  // v1.46.0 — TAC trop haut : même logique que TAC bas, mais avec le produit
+  // "tac-" (acide dédié, fiche distincte de ph- — même famille chimique mais
+  // effet calibré séparément sur le TAC). La carte s'affiche même si aucun
+  // produit n'est configuré pour cette action (missing_product_tip), pour ne
+  // jamais masquer silencieusement un TAC hors cible.
+  if (has("tac") && !Number.isNaN(tac) && targetsLower.tac && tac > targetsLower.tac.max) {
+    const prod = findProduct("tac-");
+    steps.push({
+      action: "tac-",
+      title: _("reco_tac_high", { val: tac }),
+      productName: prodName(prod, "reco_fallback_tac_minus"),
+      productAvailable: !!prod,
+      productPhoto: prod?.photo || null,
+      doseText: prod
+        ? `${_("reco_dose_prefix")} ${formatDose(prod.doseAmount, prod.doseUnit)} ${_("see_dosage").toLowerCase()}`
+        : _("missing_product_tip", { action: "tac-" }),
+      computedDoseAmount: prod?.doseAmount ?? null,
+      doseUnit: prod?.doseUnit || null,
+      note: prodNote(prod, "reco_note_tac_minus"),
+      waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["tac-"],
+    });
+  }
 
   // pH
   const phVal = parseFloat(latestLower.ph);
@@ -10049,10 +10104,10 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
   const t = useT(lang || "fr");
   const [name, setName] = useState(product?.name || "");
   const [action, setAction] = useState(product?.action || "ph-");
-  const [doseAmount, setDoseAmount] = useState(product?.doseAmount ?? 30);
+  const [doseAmount, setDoseAmount] = useState(product?.doseAmount ?? "");
   const [doseUnit, setDoseUnit] = useState(product?.doseUnit || "g");
-  const [effectAmount, setEffectAmount] = useState(product?.effectAmount ?? 0.1);
-  const [effectPer, setEffectPer] = useState(product?.effectPer ?? 10);
+  const [effectAmount, setEffectAmount] = useState(product?.effectAmount ?? "");
+  const [effectPer, setEffectPer] = useState(product?.effectPer ?? "");
   const [waitHours, setWaitHours] = useState(product?.waitHours ?? DEFAULT_WAIT_HOURS[product?.action || "ph-"] ?? 2);
   const [note, setNote] = useState(product?.note || "");
   const [photo, setPhoto] = useState(product?.photo || null);
@@ -10063,6 +10118,13 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [aiError, setAiError] = useState(null);
   const [aiNote, setAiNote] = useState(null);
+  // v1.46.0 — Valeurs lues par l'IA sur l'étiquette, jamais injectées
+  // directement dans les champs de dosage : un chiffre mal lu et accepté
+  // silencieusement a déjà causé un surdosage x19 sur un produit réel
+  // (CTX-120). Affichées uniquement en placeholder gris ; l'utilisateur doit
+  // retaper la valeur lui-même pour la valider.
+  const [aiSuggestion, setAiSuggestion] = useState(null);
+  const [formError, setFormError] = useState(null);
   const fileInputRef = useRef(null);
   const galleryInputRef = useRef(null);
 
@@ -10095,16 +10157,27 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
     setAiAnalyzing(true);
     setAiError(null);
     setAiNote(null);
+    setAiSuggestion(null);
     try {
       const result = await analyzeProductPhoto({ apiKey, apiProvider, dataUrl: photo, uid: authUid });
       if (result.name) setName(result.name);
       if (result.action) setAction(result.action);
-      if (result.doseAmount != null) setDoseAmount(result.doseAmount);
-      if (result.doseUnit) setDoseUnit(result.doseUnit);
-      if (result.effectAmount != null) setEffectAmount(result.effectAmount);
-      if (result.effectPer != null) setEffectPer(result.effectPer);
-      if (result.waitHours != null) setWaitHours(result.waitHours);
-      if (result.containerAmount != null) setContainerAmount(result.containerAmount);
+      // v1.46.0 — Normalisation : la dose de traitement ne s'exprime jamais en
+      // kg/L (réservés à la taille du contenant), toujours en g/mL. Si l'IA
+      // renvoie kg ou L pour la dose, on convertit avant de suggérer.
+      let suggDoseAmount = result.doseAmount ?? null;
+      let suggDoseUnit = result.doseUnit ?? null;
+      if (suggDoseAmount != null && suggDoseUnit === "kg") { suggDoseAmount *= 1000; suggDoseUnit = "g"; }
+      if (suggDoseAmount != null && suggDoseUnit === "L") { suggDoseAmount *= 1000; suggDoseUnit = "mL"; }
+      if (suggDoseUnit) setDoseUnit(suggDoseUnit);
+      setAiSuggestion({
+        doseAmount: suggDoseAmount,
+        effectAmount: result.effectAmount ?? null,
+        effectPer: result.effectPer ?? null,
+        waitHours: result.waitHours ?? null,
+        containerAmount: result.containerAmount ?? null,
+        containerUnit: result.containerUnit ?? null,
+      });
       if (result.containerUnit) setContainerUnit(result.containerUnit);
       if (result.note) setAiNote(result.note);
     } catch (err) {
@@ -10115,7 +10188,23 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
   }
 
   function handleSave() {
+    setFormError(null);
     if (!name.trim()) return;
+    const isTool = action === "outil-mesure";
+    // v1.46.0 — Les trois champs qui servent au calcul de dose ne doivent
+    // jamais être enregistrés vides ou par défaut silencieux : c'est
+    // exactement ce qui a produit un surdosage x19 sur un produit réel
+    // (valeurs par défaut 30/0.1/10 jamais modifiées par l'utilisateur).
+    if (!isTool) {
+      const missing = [];
+      if (doseAmount === "" || doseAmount === null || Number.isNaN(parseFloat(doseAmount))) missing.push(t("quantity"));
+      if (effectAmount === "" || effectAmount === null || Number.isNaN(parseFloat(effectAmount))) missing.push(t("effect_variation"));
+      if (effectPer === "" || effectPer === null || Number.isNaN(parseFloat(effectPer))) missing.push(t("for_x_m3"));
+      if (missing.length > 0) {
+        setFormError(t("product_missing_values", { fields: missing.join(", ") }));
+        return;
+      }
+    }
     const newStock = stockPercent ?? 100;
     // v1.29.9 — Même logique que la baisse de stock automatique après un plan
     // de traitement : si l'utilisateur descend lui-même le curseur à 0% sur un
@@ -10128,15 +10217,14 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
         return;
       }
     }
-    const isTool = action === "outil-mesure";
     onSave({
       id: product?.id,
       name: name.trim(),
       action,
-      doseAmount: isTool ? 0 : (parseFloat(doseAmount) || 0),
+      doseAmount: isTool ? 0 : parseFloat(doseAmount),
       doseUnit,
-      effectAmount: isTool ? 0 : (parseFloat(effectAmount) || 1),
-      effectPer: isTool ? 0 : (parseFloat(effectPer) || 1),
+      effectAmount: isTool ? 0 : parseFloat(effectAmount),
+      effectPer: isTool ? 0 : parseFloat(effectPer),
       waitHours: isTool ? 0 : (parseFloat(waitHours) || 0),
       note,
       photo,
@@ -10233,20 +10321,48 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
           <div style={styles.fieldGrid}>
             <div>
               <label style={styles.fieldLabel}>{t("quantity")}</label>
-              <input type="number" style={styles.input} value={doseAmount} onChange={(e) => setDoseAmount(e.target.value)} />
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <input
+                  type="number"
+                  style={{ ...styles.input, flex: 1 }}
+                  value={doseAmount}
+                  onChange={(e) => setDoseAmount(e.target.value)}
+                  placeholder={aiSuggestion?.doseAmount != null ? String(aiSuggestion.doseAmount) : ""}
+                />
+                <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 20 }}>{doseUnit}</span>
+              </div>
             </div>
             <div>
               <label style={styles.fieldLabel}>{t("effect_variation")}</label>
-              <input type="number" style={styles.input} value={effectAmount} onChange={(e) => setEffectAmount(e.target.value)} />
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <input
+                  type="number"
+                  style={{ ...styles.input, flex: 1 }}
+                  value={effectAmount}
+                  onChange={(e) => setEffectAmount(e.target.value)}
+                  placeholder={aiSuggestion?.effectAmount != null ? String(aiSuggestion.effectAmount) : ""}
+                />
+                <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 30 }}>
+                  {action === "ph-" || action === "ph+" ? "pH" : "mg/L"}
+                </span>
+              </div>
             </div>
             <div>
               <label style={styles.fieldLabel}>{t("for_x_m3")}</label>
-              <input type="number" style={styles.input} value={effectPer} onChange={(e) => setEffectPer(e.target.value)} />
+              <input
+                type="number"
+                style={styles.input}
+                value={effectPer}
+                onChange={(e) => setEffectPer(e.target.value)}
+                placeholder={aiSuggestion?.effectPer != null ? String(aiSuggestion.effectPer) : ""}
+              />
             </div>
           </div>
+          {formError && <div style={{ ...styles.analyzeNoteError, marginTop: 8 }}>{formError}</div>}
 
           <label style={styles.fieldLabel}>{t("wait_hours")}</label>
-          <input type="number" style={styles.input} value={waitHours} onChange={(e) => setWaitHours(e.target.value)} placeholder="2" />
+          <input type="number" style={styles.input} value={waitHours} onChange={(e) => setWaitHours(e.target.value)}
+            placeholder={aiSuggestion?.waitHours != null ? String(aiSuggestion.waitHours) : "2"} />
         </>
       )}
 
@@ -10274,7 +10390,8 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
             ))}
           </div>
           <input type="number" style={styles.input} value={containerAmount}
-            onChange={(e) => setContainerAmount(e.target.value)} placeholder="1" min="0.01" step="0.1" />
+            onChange={(e) => setContainerAmount(e.target.value)}
+            placeholder={aiSuggestion?.containerAmount != null ? String(aiSuggestion.containerAmount) : "1"} min="0.01" step="0.1" />
 
           <label style={styles.fieldLabel}>{t("current_stock")}</label>
           {stockPercent === null ? (
