@@ -115,5 +115,32 @@ service cloud.firestore {
     match /rateLimits/{docId} {
       allow read, write: if false;
     }
+
+    // Base commune de produits (chantier "base commune", spec du 260706).
+    // Collection RACINE, partagée entre tous les comptes. Deux types de
+    // documents dans la même collection :
+    //   - gen_{autoId} : fiche produit complète, ID stable à vie, jamais
+    //     renommé (même après qu'un code-barre soit découvert après coup)
+    //   - bc_{barcode} : alias léger { aliasOf: "gen_xxx" }, permet un lookup
+    //     direct par code-barre sans recherche floue
+    // Écriture strictement réservée au Worker (compte de service, hors
+    // périmètre de ces règles, même logique que calibrationModels). Lecture
+    // ouverte à tout utilisateur authentifié : aucune donnée sensible dans
+    // cette collection (juste noms produits, dosages, code-barres, URLs
+    // photo publiques), donc pas de raison de faire transiter la lecture
+    // par le Worker — ça doublerait la latence pour rien.
+    match /commonProducts/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Fusions de doublons en attente de confirmation manuelle (email avec
+    // lien → page "Confirmer la fusion ?" côté PWA → POST /confirm-merge).
+    // Contient un token secret : ne doit jamais être lisible par le client,
+    // même authentifié, pour empêcher de deviner/lister les fusions en
+    // attente. Écriture réservée au Worker.
+    match /pendingMerges/{mergeId} {
+      allow read, write: if false;
+    }
   }
 }

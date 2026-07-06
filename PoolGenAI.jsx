@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.47.0";
+const APP_VERSION = "1.48.0";
 const CGU_VERSION = "1.2"; // v1.2 : clause 11 - amélioration collective des analyses photo (Lot B, calibration)
 
 const TRANSLATIONS = {
@@ -400,6 +400,21 @@ const TRANSLATIONS = {
     verify_link_error_title: "Erreur",
     verify_link_error_desc: "Impossible de vérifier ton email pour le moment. Réessaie plus tard.",
     verify_link_continue_btn: "Continuer vers l'app",
+    merge_link_pending_title: "Confirmer la fusion ?",
+    merge_link_pending_desc: "Un code-barre a été détecté pour une fiche produit déjà présente dans la base commune, sans code-barre associé. Confirme pour relier les deux.",
+    merge_link_confirm_btn: "Confirmer la fusion",
+    merge_link_cancel_btn: "Annuler",
+    merge_link_confirming: "Fusion en cours…",
+    merge_link_merged_title: "Fusion confirmée",
+    merge_link_merged_desc: "Le code-barre a été relié à la fiche produit existante.",
+    merge_link_already_merged_title: "Déjà fusionné",
+    merge_link_already_merged_desc: "Cette fusion avait déjà été confirmée.",
+    merge_link_expired_title: "Lien expiré",
+    merge_link_expired_desc: "Ce lien de confirmation a expiré (validité 7 jours).",
+    merge_link_invalid_title: "Lien invalide",
+    merge_link_invalid_desc: "Ce lien de confirmation n'est pas valide.",
+    merge_link_error_title: "Erreur",
+    merge_link_error_desc: "Impossible de confirmer la fusion pour le moment. Réessaie plus tard.",
     verify_gate_checking: "Vérification...",
     verify_gate_still_unverified: "Ton email n'est pas encore confirmé. Vérifie ta boîte de réception (et les spams).",
     verify_gate_resend_btn: "Renvoyer l'email de confirmation",
@@ -942,6 +957,21 @@ const TRANSLATIONS = {
     verify_link_error_title: "Error",
     verify_link_error_desc: "Couldn't verify your email right now. Try again later.",
     verify_link_continue_btn: "Continue to the app",
+    merge_link_pending_title: "Confirm the merge?",
+    merge_link_pending_desc: "A barcode was detected for a product sheet already in the shared database, with no barcode linked yet. Confirm to link the two.",
+    merge_link_confirm_btn: "Confirm merge",
+    merge_link_cancel_btn: "Cancel",
+    merge_link_confirming: "Merging…",
+    merge_link_merged_title: "Merge confirmed",
+    merge_link_merged_desc: "The barcode has been linked to the existing product sheet.",
+    merge_link_already_merged_title: "Already merged",
+    merge_link_already_merged_desc: "This merge had already been confirmed.",
+    merge_link_expired_title: "Link expired",
+    merge_link_expired_desc: "This confirmation link has expired (valid 7 days).",
+    merge_link_invalid_title: "Invalid link",
+    merge_link_invalid_desc: "This confirmation link is not valid.",
+    merge_link_error_title: "Error",
+    merge_link_error_desc: "Couldn't confirm the merge right now. Try again later.",
     verify_gate_checking: "Checking...",
     verify_gate_still_unverified: "Your email isn't confirmed yet. Check your inbox (and spam folder).",
     verify_gate_resend_btn: "Resend confirmation email",
@@ -1486,6 +1516,21 @@ const TRANSLATIONS = {
     verify_link_error_title: "Fehler",
     verify_link_error_desc: "E-Mail konnte gerade nicht überprüft werden. Versuche es später erneut.",
     verify_link_continue_btn: "Weiter zur App",
+    merge_link_pending_title: "Zusammenführung bestätigen?",
+    merge_link_pending_desc: "Für ein Produktdatenblatt, das bereits in der gemeinsamen Datenbank ohne Barcode existiert, wurde ein Barcode erkannt. Bestätige, um beide zu verknüpfen.",
+    merge_link_confirm_btn: "Zusammenführung bestätigen",
+    merge_link_cancel_btn: "Abbrechen",
+    merge_link_confirming: "Zusammenführung läuft…",
+    merge_link_merged_title: "Zusammenführung bestätigt",
+    merge_link_merged_desc: "Der Barcode wurde mit dem bestehenden Produktdatenblatt verknüpft.",
+    merge_link_already_merged_title: "Bereits zusammengeführt",
+    merge_link_already_merged_desc: "Diese Zusammenführung wurde bereits bestätigt.",
+    merge_link_expired_title: "Link abgelaufen",
+    merge_link_expired_desc: "Dieser Bestätigungslink ist abgelaufen (gültig 7 Tage).",
+    merge_link_invalid_title: "Ungültiger Link",
+    merge_link_invalid_desc: "Dieser Bestätigungslink ist ungültig.",
+    merge_link_error_title: "Fehler",
+    merge_link_error_desc: "Die Zusammenführung konnte gerade nicht bestätigt werden. Versuch es später erneut.",
     verify_gate_checking: "Wird geprüft...",
     verify_gate_still_unverified: "Deine E-Mail ist noch nicht bestätigt. Prüfe dein Postfach (auch den Spam-Ordner).",
     verify_gate_resend_btn: "Bestätigungs-E-Mail erneut senden",
@@ -2027,6 +2072,21 @@ const TRANSLATIONS = {
     verify_link_error_title: "Errore",
     verify_link_error_desc: "Impossibile verificare la tua email al momento. Riprova più tardi.",
     verify_link_continue_btn: "Continua verso l'app",
+    merge_link_pending_title: "Confermare la fusione?",
+    merge_link_pending_desc: "È stato rilevato un codice a barre per una scheda prodotto già presente nel database comune, senza codice a barre collegato. Conferma per collegare i due.",
+    merge_link_confirm_btn: "Conferma la fusione",
+    merge_link_cancel_btn: "Annulla",
+    merge_link_confirming: "Fusione in corso…",
+    merge_link_merged_title: "Fusione confermata",
+    merge_link_merged_desc: "Il codice a barre è stato collegato alla scheda prodotto esistente.",
+    merge_link_already_merged_title: "Già fusa",
+    merge_link_already_merged_desc: "Questa fusione era già stata confermata.",
+    merge_link_expired_title: "Link scaduto",
+    merge_link_expired_desc: "Questo link di conferma è scaduto (valido 7 giorni).",
+    merge_link_invalid_title: "Link non valido",
+    merge_link_invalid_desc: "Questo link di conferma non è valido.",
+    merge_link_error_title: "Errore",
+    merge_link_error_desc: "Impossibile confermare la fusione al momento. Riprova più tardi.",
     verify_gate_checking: "Verifica in corso...",
     verify_gate_still_unverified: "La tua email non è ancora confermata. Controlla la posta in arrivo (e lo spam).",
     verify_gate_resend_btn: "Reinvia l'email di conferma",
@@ -2568,6 +2628,21 @@ const TRANSLATIONS = {
     verify_link_error_title: "Error",
     verify_link_error_desc: "No se pudo verificar tu email en este momento. Inténtalo más tarde.",
     verify_link_continue_btn: "Continuar a la app",
+    merge_link_pending_title: "¿Confirmar la fusión?",
+    merge_link_pending_desc: "Se detectó un código de barras para una ficha de producto ya presente en la base común, sin código de barras asociado. Confirma para vincular ambas.",
+    merge_link_confirm_btn: "Confirmar fusión",
+    merge_link_cancel_btn: "Cancelar",
+    merge_link_confirming: "Fusionando…",
+    merge_link_merged_title: "Fusión confirmada",
+    merge_link_merged_desc: "El código de barras se vinculó a la ficha de producto existente.",
+    merge_link_already_merged_title: "Ya fusionado",
+    merge_link_already_merged_desc: "Esta fusión ya había sido confirmada.",
+    merge_link_expired_title: "Enlace caducado",
+    merge_link_expired_desc: "Este enlace de confirmación ha caducado (válido 7 días).",
+    merge_link_invalid_title: "Enlace inválido",
+    merge_link_invalid_desc: "Este enlace de confirmación no es válido.",
+    merge_link_error_title: "Error",
+    merge_link_error_desc: "No se pudo confirmar la fusión en este momento. Inténtalo más tarde.",
     verify_gate_checking: "Comprobando...",
     verify_gate_still_unverified: "Tu email todavía no está confirmado. Revisa tu bandeja de entrada (y spam).",
     verify_gate_resend_btn: "Reenviar email de confirmación",
@@ -3106,6 +3181,21 @@ const TRANSLATIONS = {
     verify_link_error_title: "Erro",
     verify_link_error_desc: "Não foi possível verificar o teu email agora. Tenta mais tarde.",
     verify_link_continue_btn: "Continuar para a app",
+    merge_link_pending_title: "Confirmar a fusão?",
+    merge_link_pending_desc: "Foi detetado um código de barras para uma ficha de produto já presente na base comum, sem código de barras associado. Confirma para ligar as duas.",
+    merge_link_confirm_btn: "Confirmar fusão",
+    merge_link_cancel_btn: "Cancelar",
+    merge_link_confirming: "A fundir…",
+    merge_link_merged_title: "Fusão confirmada",
+    merge_link_merged_desc: "O código de barras foi ligado à ficha de produto existente.",
+    merge_link_already_merged_title: "Já fundido",
+    merge_link_already_merged_desc: "Esta fusão já tinha sido confirmada.",
+    merge_link_expired_title: "Link expirado",
+    merge_link_expired_desc: "Este link de confirmação expirou (válido 7 dias).",
+    merge_link_invalid_title: "Link inválido",
+    merge_link_invalid_desc: "Este link de confirmação não é válido.",
+    merge_link_error_title: "Erro",
+    merge_link_error_desc: "Não foi possível confirmar a fusão neste momento. Tenta mais tarde.",
     verify_gate_checking: "A verificar...",
     verify_gate_still_unverified: "O teu email ainda não está confirmado. Verifica a caixa de entrada (e o spam).",
     verify_gate_resend_btn: "Reenviar email de confirmação",
@@ -4144,7 +4234,7 @@ async function analyzeProductPhoto({ apiKey, apiProvider, dataUrl, uid: callerUi
 
 Procède en deux temps :
 
-1. Identifie sur l'étiquette : le nom commercial exact du produit, la marque, et si visible une référence ou un code-barres.
+1. Identifie sur l'étiquette : le nom commercial exact du produit, la marque, la substance active principale (nom chimique, ex: "hypochlorite de calcium", "acide sulfamique"), et si visible un code-barre (numéro EAN/UPC imprimé sous les barres, PAS le motif de barres lui-même que tu ne peux pas décoder — uniquement le numéro).
 
 2. Cherche sur le web la fiche technique ou la notice officielle de ce produit précis (site du fabricant ou d'un revendeur reconnu), pour trouver la dose de traitement recommandée. Les valeurs trouvées par cette recherche priment sur celles lues sur l'étiquette si les deux sont disponibles — une notice officielle en ligne est plus fiable qu'une lecture visuelle d'étiquette (reflets, angle, texte petit). Si la recherche ne trouve rien d'exploitable pour ce produit précis, utilise uniquement ce qui est lisible sur la photo.
 
@@ -4158,10 +4248,11 @@ Informations à renseigner, dans les deux cas :
 - La taille TOTALE du contenant/emballage tel que vendu (ex : "5 kg", "25 kg", "1 L", "20 L")
 
 Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, sans markdown :
-{"name": "nom du produit ou null", "action": "une des valeurs listées ci-dessus ou null", "doseAmount": nombre ou null, "doseUnit": "g" ou "kg" ou "ml" ou "L" ou null, "effectAmount": nombre ou null, "effectPer": nombre de m³ ou null, "waitHours": nombre ou null, "containerAmount": nombre ou null, "containerUnit": "g" ou "kg" ou "ml" ou "L" ou null, "source": "web" ou "etiquette", "confidence": "haute" ou "moyenne" ou "basse", "note": "une phrase en français sur ce qui a été trouvé, en précisant si ça vient de la recherche web ou de la lecture d'étiquette"}
+{"name": "nom du produit ou null", "barcode": "numéro EAN/UPC en chaîne de caractères ou null", "activeSubstance": "nom chimique ou null", "action": "une des valeurs listées ci-dessus ou null", "doseAmount": nombre ou null, "doseUnit": "g" ou "kg" ou "ml" ou "L" ou null, "effectAmount": nombre ou null, "effectPer": nombre de m³ ou null, "waitHours": nombre ou null, "containerAmount": nombre ou null, "containerUnit": "g" ou "kg" ou "ml" ou "L" ou null, "source": "web" ou "etiquette", "confidence": "haute" ou "moyenne" ou "basse", "note": "une phrase en français sur ce qui a été trouvé, en précisant si ça vient de la recherche web ou de la lecture d'étiquette"}
 
 Règles strictes :
 - null pour toute information absente ou illisible, ne devine jamais une valeur non présente
+- "barcode" doit être le numéro exact lu sous le code-barre, jamais reconstruit ou deviné — null si le numéro n'est pas net
 - "source" doit refléter honnêtement d'où viennent les valeurs de dose/effet renvoyées : "web" seulement si la recherche a effectivement trouvé une notice exploitable pour ce produit précis, "etiquette" sinon
 - Les nombres sont des nombres, jamais des chaînes
 - JSON pur, rien d'autre`;
@@ -4170,6 +4261,52 @@ Règles strictes :
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error("Réponse IA non parseable : " + text.slice(0, 200));
   return JSON.parse(match[0]);
+}
+
+// ---------- Base commune de produits : appels au Worker ----------
+// v1.48.0 — Trois routes ajoutées côté Worker (voir poolgenai-proxy.js) :
+// lookup (par code-barre puis recherche floue), create (nouvelle fiche),
+// use (incrément callCount + re-vérification web au multiple de 50).
+const PROXY_BASE_URL = "https://poolgenai-proxy.support-poolgenai.workers.dev";
+
+async function lookupCommonProduct({ idToken, barcode, name, activeSubstance }) {
+  const res = await fetch(`${PROXY_BASE_URL}/product-lookup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify({ barcode, name, activeSubstance }),
+  });
+  if (!res.ok) throw new Error(`Échec du lookup base commune (${res.status})`);
+  return res.json();
+}
+
+async function createCommonProduct({ idToken, payload }) {
+  const res = await fetch(`${PROXY_BASE_URL}/product-create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`Échec de création base commune (${res.status})`);
+  return res.json();
+}
+
+async function markCommonProductUsed({ idToken, productId }) {
+  const res = await fetch(`${PROXY_BASE_URL}/product-use`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify({ productId }),
+  });
+  if (!res.ok) throw new Error(`Échec d'incrément base commune (${res.status})`);
+  return res.json();
+}
+
+async function confirmCommonProductMerge({ mergeId, token }) {
+  const res = await fetch(`${PROXY_BASE_URL}/confirm-merge`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mergeId, token }),
+  });
+  const data = await res.json().catch(() => ({}));
+  return { status: res.status, ...data };
 }
 
 // ---------- Composant principal ----------
@@ -5012,6 +5149,39 @@ function PoolApp() {
         window.history.replaceState({}, "", cleanUrl);
       });
   }, []);
+
+  // ── Lien de confirmation de fusion base commune entrant (?confirmMerge=xxx&token=yyy) ──
+  // Contrairement au lien de vérification email (auto-confirmé au chargement),
+  // celui-ci affiche un écran "Confirmer la fusion ?" avec un bouton explicite
+  // avant d'agir — décision du 260706 : une fusion touche une fiche partagée
+  // entre utilisateurs, donc un clic seul sur le lien email ne suffit pas.
+  // null | "pending_confirmation" | "confirming" | "merged" | "already_merged" | "expired" | "invalid" | "error"
+  const [mergeLinkStatus, setMergeLinkStatus] = useState(null);
+  const [mergeLinkParams, setMergeLinkParams] = useState(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mergeId = params.get("confirmMerge");
+    const token = params.get("token");
+    if (!mergeId || !token) return;
+    setMergeLinkParams({ mergeId, token });
+    setMergeLinkStatus("pending_confirmation");
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
+  }, []);
+
+  async function handleConfirmMergeClick() {
+    if (!mergeLinkParams) return;
+    setMergeLinkStatus("confirming");
+    try {
+      const result = await confirmCommonProductMerge(mergeLinkParams);
+      if (result.status === 410) { setMergeLinkStatus("expired"); return; }
+      if (result.status === 404) { setMergeLinkStatus("invalid"); return; }
+      if (result.status && result.status >= 400) { setMergeLinkStatus("error"); return; }
+      setMergeLinkStatus(result.status === "already_merged" ? "already_merged" : "merged");
+    } catch (e) {
+      setMergeLinkStatus("error");
+    }
+  }
 
   const [pools, setPools] = useState([
     { id: "default", name: "Ma piscine", location: "Valbonne (06)", volume: 72, treatmentType: "chlore", filtration: "sable" },
@@ -6334,6 +6504,58 @@ function PoolApp() {
               </div>
               <button
                 onClick={() => setVerifyLinkStatus(null)}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+              >
+                {t("verify_link_continue_btn")}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    )}
+    {mergeLinkStatus && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+          {mergeLinkStatus === "pending_confirmation" ? (
+            <>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>🔗</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+                {t("merge_link_pending_title")}
+              </div>
+              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+                {t("merge_link_pending_desc")}
+              </div>
+              <button
+                onClick={handleConfirmMergeClick}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 10 }}
+              >
+                {t("merge_link_confirm_btn")}
+              </button>
+              <button
+                onClick={() => { setMergeLinkStatus(null); setMergeLinkParams(null); }}
+                style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1px solid #d8e2ec", background: "transparent", color: "#4a6480", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
+              >
+                {t("merge_link_cancel_btn")}
+              </button>
+            </>
+          ) : mergeLinkStatus === "confirming" ? (
+            <>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
+              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("merge_link_confirming")}</div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>
+                {mergeLinkStatus === "merged" || mergeLinkStatus === "already_merged" ? "✅" : "⚠️"}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+                {t(`merge_link_${mergeLinkStatus}_title`)}
+              </div>
+              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+                {t(`merge_link_${mergeLinkStatus}_desc`)}
+              </div>
+              <button
+                onClick={() => { setMergeLinkStatus(null); setMergeLinkParams(null); }}
                 style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
               >
                 {t("verify_link_continue_btn")}
@@ -10144,6 +10366,14 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
   // retaper la valeur lui-même pour la valider.
   const [aiSuggestion, setAiSuggestion] = useState(null);
   const [formError, setFormError] = useState(null);
+  // v1.48.0 — Résultat du lookup base commune (voir lookupCommonProduct) :
+  // { matchType: "alias" | "fuzzy_pending_merge" | "fuzzy_candidates" | "none", productId }
+  // Ne préremplit jamais les champs de dosage — sert uniquement à décider,
+  // à la sauvegarde, s'il faut incrémenter une fiche existante (markCommonProductUsed)
+  // ou en créer une nouvelle (createCommonProduct).
+  const [commonMatch, setCommonMatch] = useState(null);
+  const [detectedBarcode, setDetectedBarcode] = useState(null);
+  const [detectedSubstance, setDetectedSubstance] = useState(null);
   const fileInputRef = useRef(null);
   const galleryInputRef = useRef(null);
 
@@ -10200,6 +10430,30 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       });
       if (result.containerUnit) setContainerUnit(result.containerUnit);
       if (result.note) setAiNote(result.note);
+      setDetectedBarcode(result.barcode || null);
+      setDetectedSubstance(result.activeSubstance || null);
+
+      // v1.48.0 — Lookup base commune (indépendant du résultat photo/web
+      // ci-dessus, qui reste la source de vérité pour les valeurs affichées
+      // en placeholder). Sert uniquement à savoir, à la sauvegarde, s'il faut
+      // relier ce produit à une fiche partagée existante ou en créer une
+      // nouvelle. Aucun champ du formulaire n'est modifié ici.
+      try {
+        if (window._fbAuth?.currentUser && (result.barcode || result.name)) {
+          const idToken = await window._fbAuth.currentUser.getIdToken();
+          const lookup = await lookupCommonProduct({
+            idToken,
+            barcode: result.barcode || null,
+            name: result.name || "",
+            activeSubstance: result.activeSubstance || "",
+          });
+          setCommonMatch(lookup);
+        }
+      } catch (e) {
+        // Non bloquant : la base commune est un plus, pas une dépendance dure
+        // pour enregistrer un produit.
+        console.warn("Lookup base commune échoué :", e.message);
+      }
     } catch (err) {
       setAiError(t("error_analyze") + " : " + (err?.message || t("verify_connection")));
     } finally {
@@ -10256,6 +10510,44 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       containerAmount: isTool ? null : (parseFloat(containerAmount) || 1),
       containerUnit: isTool ? null : (containerUnit || "kg"),
     });
+
+    // v1.48.0 — Écriture base commune, en tâche de fond (fire-and-forget) :
+    // ne bloque jamais la sauvegarde locale, qui reste l'action prioritaire.
+    // N'utilise QUE les valeurs confirmées par l'utilisateur dans le
+    // formulaire (name, doseAmount, etc.), jamais les valeurs brutes de
+    // aiSuggestion — cohérent avec la règle v1.46.0 anti-surdosage : une
+    // fiche partagée entre utilisateurs ne doit jamais recevoir un chiffre
+    // qui n'a pas été validé par un humain.
+    if (!isTool && window._fbAuth?.currentUser) {
+      (async () => {
+        try {
+          const idToken = await window._fbAuth.currentUser.getIdToken();
+          if (commonMatch?.matchType === "alias" || commonMatch?.matchType === "fuzzy_pending_merge") {
+            await markCommonProductUsed({ idToken, productId: commonMatch.productId });
+          } else if (!commonMatch || commonMatch.matchType === "none" || commonMatch.matchType === "fuzzy_candidates") {
+            await createCommonProduct({
+              idToken,
+              payload: {
+                barcode: detectedBarcode || null,
+                normalizedName: name.trim(),
+                displayName: name.trim(),
+                activeSubstance: detectedSubstance || null,
+                action,
+                quantity: parseFloat(doseAmount),
+                effect: parseFloat(effectAmount),
+                forXm3: parseFloat(effectPer),
+                delay: parseFloat(waitHours) || null,
+                container: `${containerAmount}${containerUnit}`,
+                photoUrl: null, // v1 : pas d'upload d'URL publique, voir Bloc 5
+                source: aiSuggestion?.source || "etiquette",
+              },
+            });
+          }
+        } catch (e) {
+          console.warn("Écriture base commune échouée :", e.message);
+        }
+      })();
+    }
   }
 
   return (

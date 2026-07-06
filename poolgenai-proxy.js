@@ -425,6 +425,46 @@ async function firestorePatchDoc(env, collection, documentId, data) {
   return response.json();
 }
 
+// ---------- Firestore : incrément atomique d'un champ (fieldTransforms) ----------
+// Contrairement à checkAndIncrementRateLimit (get-puis-set, non atomique),
+// on utilise ici le vrai mécanisme d'incrément côté serveur Firestore via
+// l'endpoint :commit. Nécessaire pour callCount sur commonProducts : deux
+// utilisateurs confirmant le même produit en même temps ne doivent jamais
+// perdre un incrément. Retourne la nouvelle valeur du champ.
+async function firestoreIncrementField(env, collection, documentId, fieldPath, incrementBy) {
+  const accessToken = await getGoogleAccessToken(env);
+  const documentPath = `projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${collection}/${documentId}`;
+  const response = await fetch(`${FIRESTORE_BASE.replace(/\/documents$/, "")}:commit`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      writes: [
+        {
+          transform: {
+            document: documentPath,
+            fieldTransforms: [
+              {
+                fieldPath,
+                increment: { integerValue: String(incrementBy) },
+              },
+            ],
+          },
+        },
+      ],
+    }),
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Échec d'incrément Firestore : ${errText}`);
+  }
+  const data = await response.json();
+  const transformed = data.writeResults?.[0]?.transformResults?.[0];
+  return transformed ? fromFirestoreValue(transformed) : null;
+}
+
 // ---------- Rate-limiting par UID (v1.41.0) ----------
 // Un document par UID+jour (rateLimits/{uid}_{YYYY-MM-DD}), incrémenté à
 // chaque appel accepté. Le comptage repart naturellement à zéro chaque jour
@@ -685,6 +725,406 @@ async function aggregateCalibrationModels(env) {
   return { updated, skipped, totalPoints: points.length };
 }
 
+// ---------- Base commune de produits : normalisation et matching flou ----------
+// Minuscule, sans accents, ponctuation réduite à des espaces simples.
+// Utilisé à la fois côté écriture (normalizedName stocké) et côté lecture
+// (comparaison de la requête entrante contre les documents existants).
+function normalizeProductString(str) {
+  return (str || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // accents
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+// Score de recouvrement simple entre deux chaînes normalisées : proportion
+// de mots de la requête retrouvés dans la cible. Pas de librairie de
+// similarité (Levenshtein, etc.) — le volume de la base commune reste
+// modeste au démarrage, un recouvrement de mots suffit et reste lisible.
+function tokenOverlapScore(query, target) {
+  const queryTokens = query.split(" ").filter(Boolean);
+  if (queryTokens.length === 0) return 0;
+  const targetTokens = new Set(target.split(" ").filter(Boolean));
+  const matched = queryTokens.filter((t) => targetTokens.has(t)).length;
+  return matched / queryTokens.length;
+}
+
+const FUZZY_MATCH_THRESHOLD = 0.6; // seuil pour proposer un candidat de fusion
+const MERGE_TOKEN_TTL_DAYS = 7;
+
+function generateProductId() {
+  return `gen_${crypto.randomUUID().replace(/-/g, "")}`;
+}
+
+// ---------- Route : POST /product-lookup ----------
+// Cherche un produit dans la base commune : d'abord par code-barre (alias
+// bc_{barcode} → doc gen_ réel), sinon par recherche floue sur nom +
+// substance active parmi les fiches sans code-barre. Si un candidat flou
+// suffisamment proche est trouvé ET qu'un code-barre est fourni, déclenche
+// automatiquement une demande de fusion (email + confirmation manuelle) tout
+// en retournant déjà les données du candidat pour un usage immédiat — pas de
+// blocage utilisateur en attendant la confirmation (voir Bloc 5 de la synthèse).
+async function handleProductLookup(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+  try {
+    await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const barcode = body.barcode ? String(body.barcode).trim() : null;
+  const normalizedName = normalizeProductString(body.name);
+  const normalizedSubstance = normalizeProductString(body.activeSubstance);
+
+  // 1. Lookup direct par alias code-barre
+  if (barcode) {
+    try {
+      const alias = await firestoreGetDoc(env, "commonProducts", `bc_${barcode}`);
+      if (alias?.aliasOf) {
+        const product = await firestoreGetDoc(env, "commonProducts", alias.aliasOf);
+        if (product) {
+          return jsonResponse({ matchType: "alias", productId: alias.aliasOf, product }, 200, origin);
+        }
+      }
+    } catch (e) {
+      return jsonError(`Erreur de lookup : ${e.message}`, 500, origin);
+    }
+  }
+
+  // 2. Recherche floue parmi tous les produits (nom + substance active)
+  let candidates = [];
+  try {
+    const allProducts = await firestoreListAllDocs(env, "commonProducts");
+    candidates = allProducts
+      .filter((p) => p.id?.startsWith("gen_")) // exclut les alias bc_
+      .map((p) => {
+        const nameScore = tokenOverlapScore(normalizedName, p.normalizedName || "");
+        const substanceScore = tokenOverlapScore(normalizedSubstance, p.activeSubstance ? normalizeProductString(p.activeSubstance) : "");
+        return { product: p, score: (nameScore + substanceScore) / 2 };
+      })
+      .filter((c) => c.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  } catch (e) {
+    return jsonError(`Erreur de recherche : ${e.message}`, 500, origin);
+  }
+
+  if (candidates.length === 0) {
+    return jsonResponse({ matchType: "none" }, 200, origin);
+  }
+
+  const best = candidates[0];
+  // Match suffisamment fort + code-barre fourni + pas déjà lié à un alias :
+  // déclenche la demande de fusion automatiquement, sans bloquer la réponse.
+  if (barcode && best.score >= FUZZY_MATCH_THRESHOLD && !best.product.barcode) {
+    try {
+      await requestProductMerge(env, best.product.id, barcode);
+    } catch (e) {
+      console.error(`Échec de la demande de fusion automatique : ${e.message}`);
+    }
+    return jsonResponse(
+      { matchType: "fuzzy_pending_merge", productId: best.product.id, product: best.product },
+      200,
+      origin
+    );
+  }
+
+  return jsonResponse(
+    { matchType: "fuzzy_candidates", candidates: candidates.map((c) => ({ productId: c.product.id, product: c.product, score: c.score })) },
+    200,
+    origin
+  );
+}
+
+// ---------- Route : POST /product-create ----------
+// Crée une nouvelle fiche produit dans la base commune (aucun match trouvé
+// par /product-lookup, confirmé par l'utilisateur). Toujours un ID gen_ —
+// le code-barre, s'il est fourni, donne lieu à un alias bc_ séparé, jamais
+// à un ID gen_ basé sur le code-barre (cohérence avec le schéma de fusion).
+async function handleProductCreate(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+  try {
+    await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const required = ["normalizedName", "action", "quantity", "effect", "forXm3"];
+  const missing = required.filter((k) => body[k] === undefined || body[k] === null || body[k] === "");
+  if (missing.length > 0) {
+    return jsonError(`Champs manquants : ${missing.join(", ")}`, 400, origin);
+  }
+
+  const productId = generateProductId();
+  const now = new Date();
+  const productData = {
+    barcode: body.barcode || null,
+    normalizedName: normalizeProductString(body.normalizedName),
+    displayName: body.displayName || body.normalizedName,
+    activeSubstance: body.activeSubstance || null,
+    action: body.action,
+    quantity: body.quantity,
+    effect: body.effect,
+    forXm3: body.forXm3,
+    delay: body.delay ?? null,
+    container: body.container ?? null,
+    photoUrl: body.photoUrl || null,
+    source: body.source === "web" ? "web" : "etiquette",
+    callCount: 0,
+    createdAt: now,
+    lastVerifiedAt: now,
+  };
+
+  try {
+    await firestoreCreateDoc(env, "commonProducts", productId, productData);
+    if (body.barcode) {
+      await firestoreCreateDoc(env, "commonProducts", `bc_${body.barcode}`, {
+        aliasOf: productId,
+        createdAt: now,
+      });
+    }
+    await sendNewProductNotificationEmail(env, productId, productData);
+  } catch (e) {
+    return jsonError(`Échec de création : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse({ success: true, productId }, 200, origin);
+}
+
+// ---------- Route : POST /product-use ----------
+// Incrément atomique de callCount à chaque confirmation d'usage d'un produit
+// de la base commune. Au multiple de 50, déclenche une re-vérification web
+// (texte seul, pas de photo — voir échange du 260706) et notifie le support.
+// Fait en synchrone (pas de ctx.waitUntil, non disponible dans la signature
+// actuelle de fetch()) : un léger surcoût de latence tous les 50 appels,
+// acceptable vu la fréquence.
+async function handleProductUse(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+  try {
+    await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const productId = body.productId;
+  if (!productId) return jsonError("productId manquant", 400, origin);
+
+  let newCount;
+  try {
+    newCount = await firestoreIncrementField(env, "commonProducts", productId, "callCount", 1);
+  } catch (e) {
+    return jsonError(`Échec d'incrément : ${e.message}`, 500, origin);
+  }
+
+  if (typeof newCount === "number" && newCount > 0 && newCount % 50 === 0) {
+    try {
+      await revalidateProductViaWebSearch(env, productId);
+    } catch (e) {
+      // Ne bloque jamais la réponse au client pour un échec de re-vérification
+      console.error(`Échec de re-vérification produit ${productId} : ${e.message}`);
+    }
+  }
+
+  return jsonResponse({ success: true, callCount: newCount }, 200, origin);
+}
+
+// ---------- Re-vérification web au 50e appel (sans photo) ----------
+async function revalidateProductViaWebSearch(env, productId) {
+  const product = await firestoreGetDoc(env, "commonProducts", productId);
+  if (!product) return;
+
+  const prompt = `Cherche la notice officielle du produit "${product.displayName || product.normalizedName}"` +
+    (product.barcode ? ` (code-barre ${product.barcode})` : "") +
+    (product.activeSubstance ? `, substance active : ${product.activeSubstance}` : "") +
+    `. Donne quantité, effet, et pour X m³ recommandés par le fabricant, au format JSON strict ` +
+    `{ "quantity": number, "effect": number, "forXm3": number, "found": boolean }.`;
+
+  const upstream = await fetch(`${ANTHROPIC_API}/v1/messages`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 500,
+      messages: [{ role: "user", content: prompt }],
+      tools: [{ type: "web_search_20250305", name: "web_search" }],
+    }),
+  });
+
+  if (!upstream.ok) throw new Error(`Échec appel Anthropic : ${await upstream.text()}`);
+  const data = await upstream.json();
+  const textBlock = (data.content || []).find((b) => b.type === "text");
+  if (!textBlock) return;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(textBlock.text.replace(/```json|```/g, "").trim());
+  } catch {
+    return; // réponse non structurée, on ne casse rien, on retente au prochain multiple de 50
+  }
+  if (!parsed.found) return;
+
+  const now = new Date();
+  await firestorePatchDoc(env, "commonProducts", productId, {
+    quantity: parsed.quantity,
+    effect: parsed.effect,
+    forXm3: parsed.forXm3,
+    lastVerifiedAt: now,
+  });
+  await sendProductRevalidationEmail(env, productId, product, parsed);
+}
+
+// ---------- Demande de fusion : création + email de confirmation ----------
+async function requestProductMerge(env, existingProductId, barcode) {
+  const mergeId = crypto.randomUUID();
+  const token = generateVerificationToken();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + MERGE_TOKEN_TTL_DAYS * 24 * 3600 * 1000);
+
+  await firestoreCreateDoc(env, "pendingMerges", mergeId, {
+    existingProductId,
+    barcode,
+    token,
+    createdAt: now,
+    expiresAt,
+    used: false,
+  });
+
+  const confirmUrl = `${VERIFICATION_LINK_BASE}?confirmMerge=${mergeId}&token=${token}`;
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Fusion de produit en attente de confirmation</h2>
+      <p>Un code-barre (${barcode}) a été détecté pour une fiche existante sans code-barre (${existingProductId}).</p>
+      <p><a href="${confirmUrl}">Confirmer la fusion</a> (lien valable ${MERGE_TOKEN_TTL_DAYS} jours)</p>
+    </div>
+  `;
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: RESEND_FROM,
+      to: SUPPORT_EMAIL,
+      subject: "PoolGenAI — Fusion de produit à confirmer",
+      html,
+    }),
+  });
+  if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
+}
+
+// ---------- Route : POST /confirm-merge ----------
+// Appelée par la page "Confirmer la fusion ?" côté PWA après clic sur le
+// lien email. Vérifie le token, applique la fusion, marque la demande
+// comme utilisée. Pas d'authentification Firebase requise ici : le clic
+// email est la preuve d'autorisation (usage unique, expiration 7 jours).
+async function handleConfirmMerge(request, env, origin) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const { mergeId, token } = body;
+  if (!mergeId || !token) return jsonError("mergeId ou token manquant", 400, origin);
+
+  let pending;
+  try {
+    pending = await firestoreGetDoc(env, "pendingMerges", mergeId);
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+
+  if (!pending) return jsonResponse({ status: "invalid" }, 404, origin);
+  if (pending.used) return jsonResponse({ status: "already_merged" }, 200, origin);
+  if (pending.token !== token) return jsonError("Token invalide", 403, origin);
+  if (pending.expiresAt && pending.expiresAt.getTime() < Date.now()) {
+    return jsonResponse({ status: "expired" }, 410, origin);
+  }
+
+  try {
+    const now = new Date();
+    await firestorePatchDoc(env, "commonProducts", pending.existingProductId, {
+      barcode: pending.barcode,
+    });
+    await firestoreCreateDoc(env, "commonProducts", `bc_${pending.barcode}`, {
+      aliasOf: pending.existingProductId,
+      createdAt: now,
+    });
+    await firestorePatchDoc(env, "pendingMerges", mergeId, { used: true });
+  } catch (e) {
+    return jsonError(`Échec de la fusion : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse({ status: "merged", productId: pending.existingProductId }, 200, origin);
+}
+
+// ---------- Emails de notification (nouvelle fiche / re-vérification) ----------
+async function sendNewProductNotificationEmail(env, productId, productData) {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Nouvelle fiche produit créée</h2>
+      <p><strong>${productData.displayName}</strong> (${productId})</p>
+      <p>Code-barre : ${productData.barcode || "aucun"} — Source : ${productData.source}</p>
+    </div>
+  `;
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: RESEND_FROM, to: SUPPORT_EMAIL, subject: "PoolGenAI — Nouvelle fiche produit", html }),
+  });
+  if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
+}
+
+async function sendProductRevalidationEmail(env, productId, oldData, newData) {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Fiche produit re-vérifiée (50e appel)</h2>
+      <p><strong>${oldData.displayName}</strong> (${productId})</p>
+      <table style="border-collapse: collapse; font-size: 14px;">
+        <tr><td style="padding:4px 12px 4px 0;color:#888;">Quantité</td><td>${oldData.quantity} → ${newData.quantity}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#888;">Effet</td><td>${oldData.effect} → ${newData.effect}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#888;">Pour X m³</td><td>${oldData.forXm3} → ${newData.forXm3}</td></tr>
+      </table>
+    </div>
+  `;
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: RESEND_FROM, to: SUPPORT_EMAIL, subject: "PoolGenAI — Fiche produit re-vérifiée", html }),
+  });
+  if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
+}
+
 async function handleSendVerificationEmail(request, env, origin) {
   const authHeader = request.headers.get("Authorization") || "";
   const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
@@ -927,6 +1367,18 @@ export default {
     }
     if (url.pathname === "/account-data-request") {
       return handleAccountDataRequest(request, env, origin);
+    }
+    if (url.pathname === "/product-lookup") {
+      return handleProductLookup(request, env, origin);
+    }
+    if (url.pathname === "/product-create") {
+      return handleProductCreate(request, env, origin);
+    }
+    if (url.pathname === "/product-use") {
+      return handleProductUse(request, env, origin);
+    }
+    if (url.pathname === "/confirm-merge") {
+      return handleConfirmMerge(request, env, origin);
     }
 
     return new Response("Not found", { status: 404 });
