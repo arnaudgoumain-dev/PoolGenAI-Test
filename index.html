@@ -126,6 +126,12 @@
 <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <!-- Icônes (shim local, pas de dépendance CDN fragile) -->
 <script src="lucide-shim.js"></script>
+<!-- v1.57.1 — Google Identity Services : remplace signInWithPopup/signInWithRedirect
+     de Firebase pour la connexion Google. Ce script parle directement à
+     accounts.google.com (postMessage), sans passer par l'iframe tiers de
+     Firebase sur poolapp-ago.firebaseapp.com — évite le blocage du stockage
+     tiers qui coupait la session 1-2s après connexion sur Chrome mobile. -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 </head>
 <body>
@@ -271,7 +277,7 @@
 <!-- Firebase SDK (module) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, EmailAuthProvider, reauthenticateWithCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, deleteUser, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signInWithCredential, getRedirectResult, GoogleAuthProvider, EmailAuthProvider, reauthenticateWithCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, deleteUser, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, getDocs, addDoc, onSnapshot, writeBatch, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAnalytics, logEvent, setUserId, setUserProperties } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
@@ -338,29 +344,44 @@
     return reauthenticateWithCredential(user, credential);
   };
 
-  // v1.57.1 — Retour à signInWithPopup pour tous les appareils. Le fix
-  // "redirect sur mobile" de la v1.57.0 cassait la connexion : authDomain
-  // (poolapp-ago.firebaseapp.com) est un domaine différent de celui qui
-  // héberge l'app (github.io / app.poolgenai.com), et signInWithRedirect a
-  // besoin d'un iframe tiers vers ce domaine pour transmettre la session au
-  // retour de Google. Depuis Chrome 115+ (obligatoire depuis juin 2024), ce
-  // stockage tiers est bloqué par défaut → la session apparaît puis
-  // disparaît en 1-2 secondes. signInWithPopup n'a pas ce problème (pas
-  // besoin de cet iframe) — c'est l'option recommandée par Firebase quand
-  // l'authDomain ne correspond pas au domaine d'hébergement (cf. doc
-  // officielle "redirect-best-practices").
+  // v1.57.1 — Connexion Google via Google Identity Services (google.accounts.oauth2),
+  // au lieu de signInWithPopup/signInWithRedirect de Firebase. Les deux dépendaient
+  // in fine du même authDomain (poolapp-ago.firebaseapp.com), différent du domaine
+  // qui héberge l'app — Chrome 115+ bloque par défaut le stockage tiers nécessaire
+  // à cet échange, ce qui donnait soit un bouton bloqué (popup), soit une session
+  // qui apparaît puis disparaît en 1-2s (redirect). Le token client Google parle
+  // directement à accounts.google.com via postMessage, sans passer par ce domaine
+  // intermédiaire : on récupère un access_token, qu'on échange ensuite contre une
+  // session Firebase via signInWithCredential.
+  const GOOGLE_WEB_CLIENT_ID = "781764586143-pb34a19vgc6sgj1aqq50a93npap12k0r.apps.googleusercontent.com";
+
   window._fbSignInWithPopup = async (auth, provider) => {
-    try {
-      return await signInWithPopup(auth, provider);
-    } catch (err) {
-      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-        // Fallback : redirect (mieux qu'une erreur bloquante, même si ce
-        // chemin hérite du même problème de stockage tiers sur mobile —
-        // à revoir si ça se reproduit trop souvent).
-        return signInWithRedirect(auth, provider);
-      }
-      throw err;
+    if (!window.google?.accounts?.oauth2) {
+      throw new Error("Le service de connexion Google n'a pas pu se charger. Vérifie ta connexion et réessaie.");
     }
+    return new Promise((resolve, reject) => {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_WEB_CLIENT_ID,
+        scope: "openid email profile",
+        callback: async (tokenResponse) => {
+          if (!tokenResponse || tokenResponse.error) {
+            reject(new Error("Échec de la connexion Google"));
+            return;
+          }
+          try {
+            const credential = GoogleAuthProvider.credential(null, tokenResponse.access_token);
+            const result = await signInWithCredential(auth, credential);
+            resolve(result);
+          } catch (err) {
+            reject(err);
+          }
+        },
+        error_callback: (err) => {
+          reject(new Error(err?.type === "popup_closed" ? "Connexion annulée" : "Échec de la connexion Google"));
+        },
+      });
+      client.requestAccessToken();
+    });
   };
 
   // Récupère le résultat du redirect Google au retour sur la page
