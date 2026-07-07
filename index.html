@@ -338,22 +338,25 @@
     return reauthenticateWithCredential(user, credential);
   };
 
-  // v1.57.0 — Fix : sur mobile (Chrome Android notamment), signInWithPopup
-  // reste parfois bloqué indéfiniment sans jamais renvoyer un code d'erreur
-  // géré par le fallback ci-dessous (ni succès, ni popup-blocked/closed/
-  // cancelled) — le bouton de connexion tourne alors sans fin. Comportement
-  // connu et documenté côté Firebase depuis des années sur mobile ; on part
-  // directement en redirect sur mobile plutôt que d'attendre l'échec du popup.
+  // v1.57.1 — Retour à signInWithPopup pour tous les appareils. Le fix
+  // "redirect sur mobile" de la v1.57.0 cassait la connexion : authDomain
+  // (poolapp-ago.firebaseapp.com) est un domaine différent de celui qui
+  // héberge l'app (github.io / app.poolgenai.com), et signInWithRedirect a
+  // besoin d'un iframe tiers vers ce domaine pour transmettre la session au
+  // retour de Google. Depuis Chrome 115+ (obligatoire depuis juin 2024), ce
+  // stockage tiers est bloqué par défaut → la session apparaît puis
+  // disparaît en 1-2 secondes. signInWithPopup n'a pas ce problème (pas
+  // besoin de cet iframe) — c'est l'option recommandée par Firebase quand
+  // l'authDomain ne correspond pas au domaine d'hébergement (cf. doc
+  // officielle "redirect-best-practices").
   window._fbSignInWithPopup = async (auth, provider) => {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      return signInWithRedirect(auth, provider);
-    }
     try {
       return await signInWithPopup(auth, provider);
     } catch (err) {
       if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-        // Fallback : redirect
+        // Fallback : redirect (mieux qu'une erreur bloquante, même si ce
+        // chemin hérite du même problème de stockage tiers sur mobile —
+        // à revoir si ça se reproduit trop souvent).
         return signInWithRedirect(auth, provider);
       }
       throw err;
