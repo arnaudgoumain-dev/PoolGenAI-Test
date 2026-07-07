@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.57.2";
+const APP_VERSION = "1.57.4";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -626,6 +626,9 @@ const TRANSLATIONS = {
     pseudo_error: "Échec de l'enregistrement du pseudo",
     context_title: "Bassin affiché",
     context_own: "Mes bassins",
+    secondary_pool_unavailable_title: "Bassin introuvable",
+    secondary_pool_unavailable_desc: "Ce bassin n'est plus accessible, ou son chargement est en cours. Si le problème persiste, l'accès a peut-être été révoqué.",
+    secondary_invited_label: "{pool} - Invité",
     context_secondary_option: "Bassin de {pseudo}",
     banner_secondary: "{pool} — compte de {pseudo}",
     invite_response_title: "Invitation",
@@ -1237,6 +1240,9 @@ const TRANSLATIONS = {
     pseudo_error: "Failed to save nickname",
     context_title: "Pool shown",
     context_own: "My pools",
+    secondary_pool_unavailable_title: "Pool unavailable",
+    secondary_pool_unavailable_desc: "This pool is no longer accessible, or is still loading. If this persists, access may have been revoked.",
+    secondary_invited_label: "{pool} - Invited",
     context_secondary_option: "{pseudo}'s pool",
     banner_secondary: "{pool} — {pseudo}'s account",
     invite_response_title: "Invitation",
@@ -1850,6 +1856,9 @@ const TRANSLATIONS = {
     pseudo_error: "Speichern des Spitznamens fehlgeschlagen",
     context_title: "Angezeigtes Becken",
     context_own: "Meine Becken",
+    secondary_pool_unavailable_title: "Becken nicht verfügbar",
+    secondary_pool_unavailable_desc: "Dieses Becken ist nicht mehr zugänglich oder wird noch geladen. Falls das Problem bestehen bleibt, wurde der Zugriff möglicherweise widerrufen.",
+    secondary_invited_label: "{pool} - Eingeladen",
     context_secondary_option: "Becken von {pseudo}",
     banner_secondary: "{pool} — Konto von {pseudo}",
     invite_response_title: "Einladung",
@@ -2460,6 +2469,9 @@ const TRANSLATIONS = {
     pseudo_error: "Salvataggio del nome utente non riuscito",
     context_title: "Piscina visualizzata",
     context_own: "Le mie piscine",
+    secondary_pool_unavailable_title: "Piscina non disponibile",
+    secondary_pool_unavailable_desc: "Questa piscina non è più accessibile, oppure è ancora in caricamento. Se il problema persiste, l'accesso potrebbe essere stato revocato.",
+    secondary_invited_label: "{pool} - Invitato",
     context_secondary_option: "Piscina di {pseudo}",
     banner_secondary: "{pool} — account di {pseudo}",
     invite_response_title: "Invito",
@@ -3070,6 +3082,9 @@ const TRANSLATIONS = {
     pseudo_error: "Error al guardar el apodo",
     context_title: "Piscina mostrada",
     context_own: "Mis piscinas",
+    secondary_pool_unavailable_title: "Piscina no disponible",
+    secondary_pool_unavailable_desc: "Esta piscina ya no está accesible, o todavía se está cargando. Si el problema persiste, es posible que se haya revocado el acceso.",
+    secondary_invited_label: "{pool} - Invitado",
     context_secondary_option: "Piscina de {pseudo}",
     banner_secondary: "{pool} — cuenta de {pseudo}",
     invite_response_title: "Invitación",
@@ -3677,6 +3692,9 @@ const TRANSLATIONS = {
     pseudo_error: "Falha ao guardar o apelido",
     context_title: "Piscina exibida",
     context_own: "Minhas piscinas",
+    secondary_pool_unavailable_title: "Piscina indisponível",
+    secondary_pool_unavailable_desc: "Esta piscina já não está acessível, ou ainda está a carregar. Se o problema persistir, o acesso pode ter sido revogado.",
+    secondary_invited_label: "{pool} - Convidado",
     context_secondary_option: "Piscina de {pseudo}",
     banner_secondary: "{pool} — conta de {pseudo}",
     invite_response_title: "Convite",
@@ -5665,12 +5683,41 @@ function PoolApp() {
   const [linkedAccounts, setLinkedAccounts] = useState([]);
   const [viewContext, setViewContext] = useState(null);
   const viewContextLoadedRef = useRef(false);
+  // v1.57.4 — Switcher unifié (mes bassins + bassins invités, cf. incident
+  // "je ne vois pas le bassin invité dans mes réglages"). ownPools : mes
+  // bassins, toujours à jour indépendamment du contexte affiché (alimenté
+  // par l'effet accountSettingsSync, toujours sur authUser.uid). linkedPoolsInfo :
+  // enrichissement de linkedAccounts (nom du bassin + pseudo du principal),
+  // remonté ici depuis SecondaryUsersSection (v1.55.0) pour alimenter le
+  // switcher du Header, pas seulement l'écran réglages.
+  const [ownPools, setOwnPools] = useState([]);
+  const [linkedPoolsInfo, setLinkedPoolsInfo] = useState([]);
 
   useEffect(() => {
     if (!authUser?.uid || !FB.ready()) { setLinkedAccounts([]); return; }
     const unsub = FB.onLinkedAccounts(authUser.uid, setLinkedAccounts);
     return () => unsub();
   }, [authUser?.uid]);
+
+  // v1.57.4 — Enrichit linkedAccounts (poolName + pseudo du principal), lu
+  // directement depuis config/main du principal — autorisé par la règle
+  // isActiveSecondary. Remonté ici (avant : dans SecondaryUsersSection) pour
+  // que le switcher unifié du Header y ait accès, pas seulement l'écran réglages.
+  useEffect(() => {
+    let cancelled = false;
+    const active = linkedAccounts.filter((l) => l.status === "active");
+    if (!active.length) { setLinkedPoolsInfo([]); return; }
+    Promise.all(active.map(async (l) => {
+      try {
+        const cfg = await FB.getConfig(l.primaryUid);
+        const pool = (cfg?.pools || []).find((p) => p.id === l.poolId);
+        return { ...l, poolName: pool?.name || "", pseudo: cfg?.pseudo || l.primaryEmail };
+      } catch (e) {
+        return { ...l, poolName: "", pseudo: l.primaryEmail };
+      }
+    })).then((results) => { if (!cancelled) setLinkedPoolsInfo(results); });
+    return () => { cancelled = true; };
+  }, [linkedAccounts]);
 
   // Restaure le dernier contexte choisi (persistant entre sessions), une
   // seule fois par connexion — et seulement s'il correspond toujours à un
@@ -6104,6 +6151,14 @@ function PoolApp() {
       }
       if (config.pseudo !== undefined) {
         setMyPseudo((prev) => (prev === config.pseudo ? prev : (config.pseudo || "")));
+      }
+      // v1.57.4 — Capture aussi mes propres bassins ici, indépendamment du
+      // contexte affiché (dataUid peut pointer sur un principal). Sert
+      // uniquement au switcher unifié (mes bassins + bassins invités) — la
+      // source de vérité pour le bassin actif reste `pools`/`activePools`.
+      if (config.pools !== undefined) {
+        const myOwn = (config.pools || []).filter((p) => !p.disabled);
+        setOwnPools((prev) => (deepEqual(prev, myOwn) ? prev : myOwn));
       }
     });
     return () => unsub();
@@ -6573,6 +6628,47 @@ function PoolApp() {
       setActivePoolId(viewContext.poolId);
     }
   }, [viewContext, activePoolId]);
+
+  // v1.57.4 — Switcher unifié : mes bassins + bassins invités dans une seule
+  // liste (remplace l'ancien sélecteur séparé "Bassin affiché" / "Bassin de
+  // {pseudo}"). `key` distingue own/invited pour éviter toute collision — les
+  // poolId sont souvent "default" sur plusieurs comptes différents.
+  const switcherEntries = useMemo(() => {
+    const own = ownPools.map((p) => ({
+      key: `own:${p.id}`,
+      kind: "own",
+      id: p.id,
+      name: p.name,
+      location: p.location,
+      photo: p.photo,
+    }));
+    const invited = linkedPoolsInfo.map((l) => ({
+      key: `invited:${l.primaryUid}:${l.poolId}`,
+      kind: "invited",
+      id: l.poolId,
+      name: t("secondary_invited_label", { pool: l.poolName || l.pseudo }),
+      location: "",
+      photo: null,
+      primaryUid: l.primaryUid,
+      poolId: l.poolId,
+      poolName: l.poolName,
+      pseudo: l.pseudo,
+    }));
+    return [...own, ...invited];
+  }, [ownPools, linkedPoolsInfo, lang]);
+
+  const activeEntryKey = viewContext
+    ? `invited:${viewContext.primaryUid}:${viewContext.poolId}`
+    : `own:${activePoolId}`;
+
+  function handleSelectSwitcherEntry(entry) {
+    if (entry.kind === "invited") {
+      switchToContext({ primaryUid: entry.primaryUid, poolId: entry.poolId, poolName: entry.poolName, pseudo: entry.pseudo });
+    } else {
+      if (viewContext) switchToContext(null);
+      setActivePoolId(entry.id);
+    }
+  }
 
   const activePool = useMemo(
     () => activePools.find((p) => p.id === activePoolId) || activePools[0],
@@ -7375,8 +7471,31 @@ function PoolApp() {
         onSubmit={(action) => FB.sendAccountDataRequest(action, authUser?.uid, authUser?.email)}
       />
     )}
-    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && (
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && !viewContext && (
       <AddPoolModal forced onSave={addPool} lang={lang} />
+    )}
+    {/* v1.57.3 — En contexte secondaire, activePools peut être vide un court
+        instant (le temps que la config du principal arrive après le switch
+        de contexte) ou durablement (accès révoqué, bassin supprimé). Dans les
+        deux cas, ce n'est JAMAIS au secondaire de créer un bassin — l'ancien
+        code affichait le formulaire de création forcée y compris ici, un
+        cul-de-sac puisque addPool() est un no-op en contexte secondaire. */}
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && viewContext && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f5f8f7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
+        <Droplets size={40} color="#7ab8e8" style={{ marginBottom: 16 }} />
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 }}>
+          {t("secondary_pool_unavailable_title")}
+        </div>
+        <div style={{ fontSize: 13.5, color: "#6a7d90", marginBottom: 24, maxWidth: 320 }}>
+          {t("secondary_pool_unavailable_desc")}
+        </div>
+        <button
+          onClick={() => switchToContext(null)}
+          style={{ padding: "12px 24px", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
+        >
+          {t("context_own")}
+        </button>
+      </div>
     )}
     {showLogin && (
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, overflowY: "auto" }}>
@@ -7399,9 +7518,9 @@ function PoolApp() {
         location={activePool?.location}
         poolPhoto={activePool?.photo}
         isPremium={isPremium}
-        pools={activePools}
-        activePoolId={activePoolId}
-        onSwitchPool={setActivePoolId}
+        entries={switcherEntries}
+        activeEntryKey={activeEntryKey}
+        onSelectEntry={handleSelectSwitcherEntry}
         onAddPool={handleWantAddPool}
         viewContext={viewContext}
         lang={lang}
@@ -7537,9 +7656,6 @@ function PoolApp() {
             <SecondaryUsersSection
               authUser={authUser}
               lang={lang}
-              linkedAccounts={linkedAccounts}
-              viewContext={viewContext}
-              onSwitchContext={switchToContext}
               myPseudo={myPseudo}
             />
           )}
@@ -7891,9 +8007,8 @@ function PhotoLightbox({ src, onClose }) {
 }
 
 // ---------- Header ----------
-function Header({ poolName, location, poolPhoto, isPremium, pools, activePoolId, onSwitchPool, onAddPool, viewContext, lang }) {
+function Header({ poolName, location, poolPhoto, isPremium, entries, activeEntryKey, onSelectEntry, onAddPool, viewContext, lang }) {
   const t = useT(lang);
-  const treatmentTypes = getTreatmentTypes(lang);
   const [showSwitcher, setShowSwitcher] = useState(false);
 
   return (
@@ -7934,30 +8049,35 @@ function Header({ poolName, location, poolPhoto, isPremium, pools, activePoolId,
         <div style={styles.poolSwitcherOverlay} onClick={() => setShowSwitcher(false)}>
           <div style={styles.poolSwitcherDropdown} onClick={(e) => e.stopPropagation()}>
             <div style={styles.poolSwitcherTitle}>Mes bassins</div>
-            {pools.map((p) => (
-              <button
-                key={p.id}
-                style={{
-                  ...styles.poolSwitcherItem,
-                  background: p.id === activePoolId ? "#e9f6f1" : "transparent",
-                }}
-                onClick={() => {
-                  onSwitchPool(p.id);
-                  setShowSwitcher(false);
-                }}
-              >
-                {p.photo ? (
-                  <img src={p.photo} alt="" style={styles.poolSwitcherThumb} />
-                ) : (
-                  <Droplets size={16} color={p.id === activePoolId ? "#0a6ebd" : "#6a7d90"} />
-                )}
-                <div style={{ flex: 1, textAlign: "left" }}>
-                  <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{p.name}</div>
-                  <div style={{ fontSize: 11.5, color: "#6a7d90" }}>{p.location} · {p.volume} m³ · {treatmentTypes.find((tt) => tt.value === p.treatmentType)?.label || "Chlore"}</div>
-                </div>
-                {p.id === activePoolId && <CheckCircle2 size={16} color="#1a8fd1" />}
-              </button>
-            ))}
+            {entries.map((entry) => {
+              const active = entry.key === activeEntryKey;
+              return (
+                <button
+                  key={entry.key}
+                  style={{
+                    ...styles.poolSwitcherItem,
+                    background: active ? "#e9f6f1" : "transparent",
+                  }}
+                  onClick={() => {
+                    onSelectEntry(entry);
+                    setShowSwitcher(false);
+                  }}
+                >
+                  {entry.photo ? (
+                    <img src={entry.photo} alt="" style={styles.poolSwitcherThumb} />
+                  ) : (
+                    <Droplets size={16} color={active ? "#0a6ebd" : "#6a7d90"} />
+                  )}
+                  <div style={{ flex: 1, textAlign: "left" }}>
+                    <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{entry.name}</div>
+                    <div style={{ fontSize: 11.5, color: "#6a7d90" }}>
+                      {entry.kind === "invited" ? entry.pseudo : entry.location}
+                    </div>
+                  </div>
+                  {active && <CheckCircle2 size={16} color="#1a8fd1" />}
+                </button>
+              );
+            })}
             {!viewContext && (
               <button
                 style={styles.poolSwitcherAddBtn}
@@ -8025,11 +8145,10 @@ function TabBar({ tab, setTab, lang, viewContext }) {
 }
 
 // ---------- v1.55.0 — Utilisateurs secondaires (brique 3) ----------
-function SecondaryUsersSection({ authUser, lang, linkedAccounts, viewContext, onSwitchContext, myPseudo }) {
+function SecondaryUsersSection({ authUser, lang, myPseudo }) {
   const t = useT(lang);
   const [secondaries, setSecondaries] = useState([]); // personnes que j'ai invitées (moi = principal)
   const [pendingInvitations, setPendingInvitations] = useState([]);
-  const [enrichedLinked, setEnrichedLinked] = useState([]); // linkedAccounts + poolName/pseudo
   const [myPools, setMyPools] = useState([]); // mes propres bassins (pour le sélecteur d'invitation)
   const [inviteEmail, setInviteEmail] = useState("");
   const [invitePoolId, setInvitePoolId] = useState("");
@@ -8066,24 +8185,6 @@ function SecondaryUsersSection({ authUser, lang, linkedAccounts, viewContext, on
     } catch (e) {}
   }
   useEffect(() => { refreshPendingInvitations(); }, [authUser?.uid, secondaries.length]);
-
-  // Enrichit linkedAccounts (poolName + pseudo du principal), lu directement
-  // depuis config/main du principal — autorisé par la règle isActiveSecondary.
-  useEffect(() => {
-    let cancelled = false;
-    const active = linkedAccounts.filter((l) => l.status === "active");
-    if (!active.length) { setEnrichedLinked([]); return; }
-    Promise.all(active.map(async (l) => {
-      try {
-        const cfg = await FB.getConfig(l.primaryUid);
-        const pool = (cfg?.pools || []).find((p) => p.id === l.poolId);
-        return { ...l, poolName: pool?.name || "", pseudo: cfg?.pseudo || l.primaryEmail };
-      } catch (e) {
-        return { ...l, poolName: "", pseudo: l.primaryEmail };
-      }
-    })).then((results) => { if (!cancelled) setEnrichedLinked(results); });
-    return () => { cancelled = true; };
-  }, [linkedAccounts]);
 
   async function handleInviteSend() {
     if (!authUser || !inviteEmail || !invitePoolId) return;
@@ -8207,37 +8308,6 @@ function SecondaryUsersSection({ authUser, lang, linkedAccounts, viewContext, on
         <div style={{ fontSize: 12, color: pseudoMsg.type === "error" ? "#c0392b" : "#1a8fd1", marginBottom: 8 }}>{pseudoMsg.text}</div>
       )}
       <div style={{ fontSize: 11.5, color: "#8a9aa8", marginBottom: 20 }}>{t("pseudo_invalid")}</div>
-
-      {linkedAccounts.some((l) => l.status === "active") && (
-        <>
-          <div style={sectionTitleStyle}>{t("context_title")}</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
-            <button
-              onClick={() => onSwitchContext(null)}
-              style={{
-                textAlign: "left", padding: "10px 12px", borderRadius: 10, fontSize: 13.5, cursor: "pointer",
-                border: !viewContext ? "2px solid #0a6ebd" : "1px solid #d8e2ec",
-                background: !viewContext ? "#e8f4fd" : "#fff",
-              }}
-            >
-              {t("context_own")}
-            </button>
-            {enrichedLinked.map((l) => (
-              <button
-                key={l.primaryUid}
-                onClick={() => onSwitchContext({ primaryUid: l.primaryUid, poolId: l.poolId, poolName: l.poolName, pseudo: l.pseudo })}
-                style={{
-                  textAlign: "left", padding: "10px 12px", borderRadius: 10, fontSize: 13.5, cursor: "pointer",
-                  border: viewContext?.primaryUid === l.primaryUid ? "2px solid #0a6ebd" : "1px solid #d8e2ec",
-                  background: viewContext?.primaryUid === l.primaryUid ? "#e8f4fd" : "#fff",
-                }}
-              >
-                {t("context_secondary_option", { pseudo: l.pseudo })}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
 
       <div style={sectionTitleStyle}>{t("secondary_section_title")}</div>
       <div style={{ fontSize: 12, color: "#6a7d90", marginBottom: 12 }}>{t("secondary_section_intro")}</div>
