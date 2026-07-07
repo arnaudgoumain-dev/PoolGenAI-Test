@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.57.4";
+const APP_VERSION = "1.57.5";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -629,6 +629,7 @@ const TRANSLATIONS = {
     secondary_pool_unavailable_title: "Bassin introuvable",
     secondary_pool_unavailable_desc: "Ce bassin n'est plus accessible, ou son chargement est en cours. Si le problème persiste, l'accès a peut-être été révoqué.",
     secondary_invited_label: "{pool} - Invité",
+    context_loading: "Chargement du bassin…",
     context_secondary_option: "Bassin de {pseudo}",
     banner_secondary: "{pool} — compte de {pseudo}",
     invite_response_title: "Invitation",
@@ -1243,6 +1244,7 @@ const TRANSLATIONS = {
     secondary_pool_unavailable_title: "Pool unavailable",
     secondary_pool_unavailable_desc: "This pool is no longer accessible, or is still loading. If this persists, access may have been revoked.",
     secondary_invited_label: "{pool} - Invited",
+    context_loading: "Loading pool…",
     context_secondary_option: "{pseudo}'s pool",
     banner_secondary: "{pool} — {pseudo}'s account",
     invite_response_title: "Invitation",
@@ -1859,6 +1861,7 @@ const TRANSLATIONS = {
     secondary_pool_unavailable_title: "Becken nicht verfügbar",
     secondary_pool_unavailable_desc: "Dieses Becken ist nicht mehr zugänglich oder wird noch geladen. Falls das Problem bestehen bleibt, wurde der Zugriff möglicherweise widerrufen.",
     secondary_invited_label: "{pool} - Eingeladen",
+    context_loading: "Becken wird geladen…",
     context_secondary_option: "Becken von {pseudo}",
     banner_secondary: "{pool} — Konto von {pseudo}",
     invite_response_title: "Einladung",
@@ -2472,6 +2475,7 @@ const TRANSLATIONS = {
     secondary_pool_unavailable_title: "Piscina non disponibile",
     secondary_pool_unavailable_desc: "Questa piscina non è più accessibile, oppure è ancora in caricamento. Se il problema persiste, l'accesso potrebbe essere stato revocato.",
     secondary_invited_label: "{pool} - Invitato",
+    context_loading: "Caricamento piscina…",
     context_secondary_option: "Piscina di {pseudo}",
     banner_secondary: "{pool} — account di {pseudo}",
     invite_response_title: "Invito",
@@ -3085,6 +3089,7 @@ const TRANSLATIONS = {
     secondary_pool_unavailable_title: "Piscina no disponible",
     secondary_pool_unavailable_desc: "Esta piscina ya no está accesible, o todavía se está cargando. Si el problema persiste, es posible que se haya revocado el acceso.",
     secondary_invited_label: "{pool} - Invitado",
+    context_loading: "Cargando piscina…",
     context_secondary_option: "Piscina de {pseudo}",
     banner_secondary: "{pool} — cuenta de {pseudo}",
     invite_response_title: "Invitación",
@@ -3695,6 +3700,7 @@ const TRANSLATIONS = {
     secondary_pool_unavailable_title: "Piscina indisponível",
     secondary_pool_unavailable_desc: "Esta piscina já não está acessível, ou ainda está a carregar. Se o problema persistir, o acesso pode ter sido revogado.",
     secondary_invited_label: "{pool} - Convidado",
+    context_loading: "A carregar a piscina…",
     context_secondary_option: "Piscina de {pseudo}",
     banner_secondary: "{pool} — conta de {pseudo}",
     invite_response_title: "Convite",
@@ -7470,6 +7476,17 @@ function PoolApp() {
         onClose={() => setShowDataRequestScreen(false)}
         onSubmit={(action) => FB.sendAccountDataRequest(action, authUser?.uid, authUser?.email)}
       />
+    )}
+    {/* v1.57.5 — Pendant le chargement de la config cloud (bascule de contexte
+        ou tout premier chargement), on affichait jusqu'ici le contenu vide de
+        l'ancien contexte (measures/products encore en mémoire) — donnait
+        l'impression trompeuse d'un historique perdu le temps que la vraie
+        config du nouveau dataUid arrive (1-2s sur mobile). */}
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && !cloudConfigReceived && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f5f8f7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
+        <div style={{ fontSize: 13.5, color: "#4a6480" }}>{t("context_loading")}</div>
+      </div>
     )}
     {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && !viewContext && (
       <AddPoolModal forced onSave={addPool} lang={lang} />
