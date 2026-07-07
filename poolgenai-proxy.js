@@ -49,6 +49,15 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 
 const VERIFICATION_LINK_BASE = "https://arnaudgoumain-dev.github.io/PoolApp/";
 const VERIFICATION_TOKEN_TTL_HOURS = 24;
+// v1.55.0 — Utilisateurs secondaires (brique 2)
+const INVITATION_TOKEN_TTL_HOURS = 24;
+const MAX_SECONDARY_USERS = 2;
+// v1.55.0 — Pseudo (brique 3) : 2-24 caractères, lettres/chiffres/espaces/
+// tirets/apostrophes (accents inclus), pas d'emoji ni caractères de contrôle.
+const PSEUDO_REGEX = /^[\p{L}\p{N} '-]{2,24}$/u;
+function normalizePseudoKey(pseudo) {
+  return pseudo.trim().toLowerCase();
+}
 const RESEND_FROM = "PoolGenAI <noreply@poolgenai.com>";
 const SUPPORT_EMAIL = "support.poolgenai@gmail.com";
 
@@ -1389,6 +1398,413 @@ async function handleAccountDataRequest(request, env, origin) {
   return jsonResponse({ success: true }, 200, origin);
 }
 
+// ==========================================================================
+// v1.55.0 — Utilisateurs secondaires (brique 2 : routes Worker)
+// Les 3 routes ci-dessous sont les seules à écrire dans secondaryUsers/
+// linkedAccounts/invitations (voir firestore.rules : write:false côté client,
+// écriture réservée au compte de service via ces routes).
+// ==========================================================================
+
+// ---------- Resend : email d'invitation ----------
+async function sendSecondaryInvitationEmail(env, toEmail, primaryEmail, poolName, token) {
+  const link = `${VERIFICATION_LINK_BASE}?respondInvitation=${token}`;
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Invitation PoolGenAI</h2>
+      <p><strong>${primaryEmail}</strong> t'invite à accéder au bassin <strong>${poolName}</strong> sur PoolGenAI.</p>
+      <p>Si tu n'as pas encore de compte, crée-le d'abord avec cette adresse email, puis reviens sur ce lien.</p>
+      <p><a href="${link}" style="background:#0ea5e9;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;">Voir l'invitation</a></p>
+      <p>Ce lien expire dans ${INVITATION_TOKEN_TTL_HOURS} heures.</p>
+      <p style="color:#888;font-size:12px;">Si tu n'es pas concerné par cette invitation, ignore cet email.</p>
+    </div>
+  `;
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: RESEND_FROM, to: toEmail, subject: "Invitation PoolGenAI", html }),
+  });
+  if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
+}
+
+// ---------- Resend : email de notification de révocation ----------
+async function sendSecondaryRevokedEmail(env, toEmail, primaryEmail, poolName) {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Accès révoqué</h2>
+      <p><strong>${primaryEmail}</strong> a mis fin à ton accès au bassin <strong>${poolName}</strong> sur PoolGenAI.</p>
+    </div>
+  `;
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: RESEND_FROM, to: toEmail, subject: "PoolGenAI — Accès révoqué", html }),
+  });
+  if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
+}
+
+// ---------- Route : POST /invite-secondary-user ----------
+async function handleInviteSecondaryUser(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let payload;
+  try {
+    payload = await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+  const primaryUid = payload.sub;
+  const primaryEmail = payload.email;
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+  const { poolId, invitedEmail } = body;
+  if (!poolId || !invitedEmail) return jsonError("poolId ou invitedEmail manquant", 400, origin);
+  if (invitedEmail.toLowerCase() === (primaryEmail || "").toLowerCase()) {
+    return jsonError("Tu ne peux pas t'inviter toi-même", 400, origin);
+  }
+
+  let config, existingSecondaries;
+  try {
+    config = await firestoreGetDoc(env, `users/${primaryUid}/config`, "main");
+    existingSecondaries = await firestoreListAllDocs(env, `users/${primaryUid}/secondaryUsers`);
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+
+  const pool = (config?.pools || []).find((p) => p.id === poolId);
+  if (!pool) return jsonError("Bassin introuvable", 404, origin);
+
+  const activeSecondaries = existingSecondaries.filter((s) => s.status === "active");
+  if (activeSecondaries.length >= MAX_SECONDARY_USERS) {
+    return jsonError(`Nombre maximum de comptes secondaires atteint (${MAX_SECONDARY_USERS})`, 409, origin);
+  }
+  if (activeSecondaries.some((s) => (s.email || "").toLowerCase() === invitedEmail.toLowerCase())) {
+    return jsonError("Cette personne a déjà accès à un bassin", 409, origin);
+  }
+
+  const token = generateVerificationToken();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + INVITATION_TOKEN_TTL_HOURS * 3600 * 1000);
+
+  try {
+    await firestoreCreateDoc(env, "invitations", token, {
+      primaryUid,
+      primaryEmail: primaryEmail || "",
+      invitedEmail,
+      poolId,
+      poolName: pool.name || "",
+      createdAt: now,
+      expiresAt,
+      status: "pending",
+    });
+    await sendSecondaryInvitationEmail(env, invitedEmail, primaryEmail || "", pool.name || "", token);
+  } catch (e) {
+    return jsonError(`Échec de l'invitation : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse({ success: true }, 200, origin);
+}
+
+// ---------- Route : POST /respond-invitation ----------
+async function handleRespondInvitation(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let payload;
+  try {
+    payload = await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+  const secondaryUid = payload.sub;
+  const secondaryEmail = payload.email || "";
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+  const { token, action } = body;
+  if (!token || !["accept", "decline"].includes(action)) {
+    return jsonError("token ou action invalide", 400, origin);
+  }
+
+  let invitation;
+  try {
+    invitation = await firestoreGetDoc(env, "invitations", token);
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+
+  if (!invitation) return jsonResponse({ status: "invalid" }, 404, origin);
+  if (invitation.status !== "pending") {
+    return jsonResponse({ status: invitation.status }, 200, origin);
+  }
+  if (invitation.expiresAt && invitation.expiresAt.getTime() < Date.now()) {
+    return jsonResponse({ status: "expired" }, 410, origin);
+  }
+  if (invitation.invitedEmail.toLowerCase() !== secondaryEmail.toLowerCase()) {
+    return jsonError("Cette invitation ne correspond pas à ton compte", 403, origin);
+  }
+  if (invitation.primaryUid === secondaryUid) {
+    return jsonError("Tu ne peux pas accepter ta propre invitation", 400, origin);
+  }
+
+  if (action === "decline") {
+    try {
+      await firestorePatchDoc(env, "invitations", token, { status: "declined" });
+    } catch (e) {
+      return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+    }
+    return jsonResponse({ status: "declined" }, 200, origin);
+  }
+
+  // action === "accept"
+  try {
+    const existingSecondaries = await firestoreListAllDocs(env, `users/${invitation.primaryUid}/secondaryUsers`);
+    const activeSecondaries = existingSecondaries.filter((s) => s.status === "active" && s.id !== secondaryUid);
+    if (activeSecondaries.length >= MAX_SECONDARY_USERS) {
+      return jsonError(`Nombre maximum de comptes secondaires atteint (${MAX_SECONDARY_USERS})`, 409, origin);
+    }
+
+    const now = new Date();
+    await firestoreSetDoc(env, `users/${invitation.primaryUid}/secondaryUsers`, secondaryUid, {
+      email: secondaryEmail,
+      poolId: invitation.poolId,
+      status: "active",
+      addedAt: now,
+    });
+    await firestoreSetDoc(env, `users/${secondaryUid}/linkedAccounts`, invitation.primaryUid, {
+      primaryEmail: invitation.primaryEmail,
+      poolId: invitation.poolId,
+      addedAt: now,
+    });
+    await firestorePatchDoc(env, "invitations", token, { status: "accepted" });
+  } catch (e) {
+    return jsonError(`Échec de l'acceptation : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse(
+    { status: "accepted", poolId: invitation.poolId, primaryEmail: invitation.primaryEmail },
+    200,
+    origin
+  );
+}
+
+// ---------- Route : POST /revoke-secondary-access ----------
+async function handleRevokeSecondaryAccess(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let payload;
+  try {
+    payload = await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+  const primaryUid = payload.sub;
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+  const { secondaryUid } = body;
+  if (!secondaryUid) return jsonError("secondaryUid manquant", 400, origin);
+
+  let secondary, config;
+  try {
+    secondary = await firestoreGetDoc(env, `users/${primaryUid}/secondaryUsers`, secondaryUid);
+    config = await firestoreGetDoc(env, `users/${primaryUid}/config`, "main");
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+  if (!secondary) return jsonError("Accès secondaire introuvable", 404, origin);
+
+  const pool = (config?.pools || []).find((p) => p.id === secondary.poolId);
+
+  try {
+    await firestorePatchDoc(env, `users/${primaryUid}/secondaryUsers`, secondaryUid, {
+      status: "revoked",
+      revokedAt: new Date(),
+    });
+  } catch (e) {
+    return jsonError(`Échec de la révocation : ${e.message}`, 500, origin);
+  }
+
+  try {
+    if (secondary.email) {
+      await sendSecondaryRevokedEmail(env, secondary.email, payload.email || "", pool?.name || "");
+    }
+  } catch (e) {
+    // La révocation Firestore a réussi ; un échec d'email ne doit pas faire
+    // remonter une erreur au client (même logique que les autres routes).
+    console.error(`Échec d'envoi email de révocation : ${e.message}`);
+  }
+
+  return jsonResponse({ status: "revoked" }, 200, origin);
+}
+
+// ---------- Route : POST /set-pseudo ----------
+async function handleSetPseudo(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let payload;
+  try {
+    payload = await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+  const uid = payload.sub;
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+  const pseudo = (body.pseudo || "").trim();
+  if (!PSEUDO_REGEX.test(pseudo)) {
+    return jsonError("Pseudo invalide (2 à 24 caractères, lettres/chiffres/espaces/tirets)", 400, origin);
+  }
+  const key = normalizePseudoKey(pseudo);
+
+  let config, existing;
+  try {
+    config = await firestoreGetDoc(env, `users/${uid}/config`, "main");
+    existing = await firestoreGetDoc(env, "pseudos", key);
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+
+  if (existing && existing.uid !== uid) {
+    // Pseudo pris par quelqu'un d'autre : suggère une variante numérotée disponible.
+    let suggestion = null;
+    for (let i = 2; i <= 50; i++) {
+      const candidate = `${pseudo}${i}`;
+      const candidateKey = normalizePseudoKey(candidate);
+      let candidateDoc;
+      try {
+        candidateDoc = await firestoreGetDoc(env, "pseudos", candidateKey);
+      } catch (e) {
+        return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+      }
+      if (!candidateDoc) {
+        suggestion = candidate;
+        break;
+      }
+    }
+    return jsonResponse({ available: false, suggestion }, 409, origin);
+  }
+
+  const oldPseudo = config?.pseudo || null;
+  const oldKey = oldPseudo ? normalizePseudoKey(oldPseudo) : null;
+
+  try {
+    if (oldKey && oldKey !== key) {
+      await firestoreDeleteDoc(env, "pseudos", oldKey);
+    }
+    await firestoreSetDoc(env, "pseudos", key, { uid, pseudo, createdAt: new Date() });
+    await firestorePatchDoc(env, `users/${uid}/config`, "main", { pseudo });
+  } catch (e) {
+    return jsonError(`Échec de l'enregistrement : ${e.message}`, 500, origin);
+  }
+
+  return jsonResponse({ available: true, pseudo }, 200, origin);
+}
+
+// ---------- Route : GET /list-pending-invitations ----------
+// v1.55.0 — Liste les invitations "pending" envoyées par le compte appelant
+// (brique 3, écran réglages). Filtre en mémoire après un listing complet de
+// la collection racine invitations — acceptable vu le volume attendu (usage
+// perso/petite base), à revoir avec une requête structurée si ça grossit.
+async function handleListPendingInvitations(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let payload;
+  try {
+    payload = await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+  const primaryUid = payload.sub;
+
+  let allInvitations;
+  try {
+    allInvitations = await firestoreListAllDocs(env, "invitations");
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+
+  const now = Date.now();
+  const mine = allInvitations
+    .filter((inv) => inv.primaryUid === primaryUid && inv.status === "pending")
+    .map((inv) => ({
+      invitedEmail: inv.invitedEmail,
+      poolId: inv.poolId,
+      poolName: inv.poolName || "",
+      createdAt: inv.createdAt,
+      expiresAt: inv.expiresAt,
+      expired: inv.expiresAt ? inv.expiresAt.getTime() < now : false,
+    }));
+
+  return jsonResponse({ invitations: mine }, 200, origin);
+}
+
+// ---------- Route : GET /invitation-info?token=... ----------
+// v1.55.0 — Aperçu avant accept/decline (écran de confirmation côté invité).
+// Pas d'authentification : le token lui-même fait office de secret, même
+// modèle de confiance que /confirm-merge.
+async function handleInvitationInfo(request, env, origin) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token");
+  if (!token) return jsonError("token manquant", 400, origin);
+
+  let invitation;
+  try {
+    invitation = await firestoreGetDoc(env, "invitations", token);
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+  if (!invitation) return jsonResponse({ status: "invalid" }, 404, origin);
+  if (invitation.status !== "pending") {
+    return jsonResponse({ status: invitation.status }, 200, origin);
+  }
+  if (invitation.expiresAt && invitation.expiresAt.getTime() < Date.now()) {
+    return jsonResponse({ status: "expired" }, 410, origin);
+  }
+  let primaryConfig = null;
+  try {
+    primaryConfig = await firestoreGetDoc(env, `users/${invitation.primaryUid}/config`, "main");
+  } catch (e) {
+    // Non bloquant : on retombe sur l'email si le pseudo n'est pas lisible.
+  }
+  return jsonResponse(
+    {
+      status: "pending",
+      primaryEmail: invitation.primaryEmail,
+      primaryPseudo: primaryConfig?.pseudo || invitation.primaryEmail,
+      poolName: invitation.poolName || "",
+    },
+    200,
+    origin
+  );
+}
+
 // ---------- Route existante : POST /v1/messages (proxy Anthropic) ----------
 async function handleAnthropicProxy(request, env, origin) {
   const authHeader = request.headers.get("Authorization") || "";
@@ -1502,6 +1918,24 @@ export default {
     }
     if (url.pathname === "/product-photo-upload") {
       return handleProductPhotoUpload(request, env, origin);
+    }
+    if (url.pathname === "/invite-secondary-user") {
+      return handleInviteSecondaryUser(request, env, origin);
+    }
+    if (url.pathname === "/respond-invitation") {
+      return handleRespondInvitation(request, env, origin);
+    }
+    if (url.pathname === "/revoke-secondary-access") {
+      return handleRevokeSecondaryAccess(request, env, origin);
+    }
+    if (url.pathname === "/set-pseudo") {
+      return handleSetPseudo(request, env, origin);
+    }
+    if (url.pathname === "/list-pending-invitations") {
+      return handleListPendingInvitations(request, env, origin);
+    }
+    if (url.pathname === "/invitation-info") {
+      return handleInvitationInfo(request, env, origin);
     }
 
     return new Response("Not found", { status: 404 });

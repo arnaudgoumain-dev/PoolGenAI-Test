@@ -124,6 +124,13 @@ service cloud.firestore {
     match /invitations/{token} {
       allow read, write: if false;
     }
+    // v1.55.0 — Unicité des pseudos (brique 3). Index racine pseudo normalisé
+    // (minuscule) -> uid, écrit uniquement par le Worker (/set-pseudo), qui
+    // gère la réservation/libération. Jamais lu ni écrit directement par le
+    // client (le pseudo affiché vient de users/{uid}/config/main.pseudo).
+    match /pseudos/{pseudoKey} {
+      allow read, write: if false;
+    }
 
     // Config (pools, products, lang, aiEnabled, apiProvider, activePlan, isPremium)
     // Le client peut tout modifier SAUF isPremium, réservé au backend (Admin SDK / webhook Stripe)
@@ -141,19 +148,25 @@ service cloud.firestore {
       // v1.53.0 — Un secondaire actif peut modifier le champ "products"
       // (stock partagé) mais rien d'autre : ni "pools" (pas de création/
       // suppression de bassin), ni "isPremium", "lang", "aiEnabled",
-      // "apiProvider", "activePlan". Note (260706) : products/pools restent
-      // des tableaux dans ce même document, pas des sous-collections par
-      // bassin — un secondaire avec accès à un seul bassin voit donc
-      // techniquement l'ensemble du tableau products de tous les bassins du
-      // compte, pas juste le sien (l'app ne montre/n'édite que son bassin,
-      // mais les règles ne peuvent pas le garantir sans migrer products en
+      // "apiProvider". Note (260706) : products/pools restent des tableaux
+      // dans ce même document, pas des sous-collections par bassin — un
+      // secondaire avec accès à un seul bassin voit donc techniquement
+      // l'ensemble du tableau products de tous les bassins du compte, pas
+      // juste le sien (l'app ne montre/n'édite que son bassin, mais les
+      // règles ne peuvent pas le garantir sans migrer products en
       // sous-collection — accepté comme compromis, cohérent avec le fait que
       // le propriétaire lui-même n'a aucun cloisonnement par bassin sur ce
       // champ non plus).
+      // v1.55.0 — "activePlan" (map poolId -> plan) devient modifiable par un
+      // secondaire, mais seulement la clé de son propre bassin (brique 3 :
+      // sans ça, un secondaire ne peut pas suivre le plan de traitement en
+      // cours sur le bassin qu'on lui a confié). .get(..., {}) évite une
+      // erreur d'évaluation si le champ est absent (nouveau compte).
       allow update: if (isActiveOwner(uid) &&
           request.resource.data.get('isPremium', false) == resource.data.get('isPremium', false)) ||
         (isActiveSecondary(uid) &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['products', 'updatedAt']));
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['products', 'activePlan', 'updatedAt']) &&
+          request.resource.data.get('activePlan', {}).diff(resource.data.get('activePlan', {})).affectedKeys().hasOnly([secondaryLink(uid).data.poolId]));
       allow delete: if isOwner(uid);
     }
     // Lot B — Calibration bandelette/photomètre (v1.32.0, champ renommé
