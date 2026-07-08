@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.59.1";
+const APP_VERSION = "1.59.2";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -5776,7 +5776,7 @@ function PoolApp() {
       try {
         const cfg = await FB.getConfig(l.primaryUid);
         const pool = (cfg?.pools || []).find((p) => p.id === l.poolId);
-        return { ...l, poolName: pool?.name || "", poolPhoto: pool?.photo || null, pseudo: cfg?.pseudo || l.primaryEmail };
+        return { ...l, poolName: pool?.name || "", poolPhoto: pool?.photo || null, pseudo: cfg?.pseudo || l.primaryEmail, ownerIsPremium: !!cfg?.isPremium };
       } catch (e) {
         return { ...l, poolName: "", pseudo: l.primaryEmail };
       }
@@ -6732,6 +6732,18 @@ function PoolApp() {
     ? `invited:${viewContext.primaryUid}:${viewContext.poolId}`
     : `own:${activePoolId}`;
 
+  // v1.59.2 — Un invité (secondaire) doit hériter des fonctionnalités premium
+  // du bassin sur lequel il est invité (celles-ci sont payées par le
+  // propriétaire, pas par l'invité). Ne s'applique qu'aux fonctionnalités
+  // liées au bassin (limite de mesures, stock, IA, rapport, diagnostic) —
+  // PAS à la carte "Mon abonnement" dans Réglages, qui reste celui du compte
+  // connecté (demande explicite : "l'abonnement pour mon bassin, pas pour
+  // le bassin sur lequel je suis invité").
+  const currentLinkedInfo = viewContext
+    ? linkedPoolsInfo.find((l) => l.primaryUid === viewContext.primaryUid && l.poolId === viewContext.poolId)
+    : null;
+  const effectiveIsPremium = viewContext ? !!currentLinkedInfo?.ownerIsPremium : isPremium;
+
   function handleSelectSwitcherEntry(entry) {
     if (entry.kind === "invited") {
       switchToContext({ primaryUid: entry.primaryUid, poolId: entry.poolId, poolName: entry.poolName, pseudo: entry.pseudo });
@@ -6785,7 +6797,7 @@ function PoolApp() {
     const activeIds = new Set(activePools.map((p) => p.id));
     return measures.filter((m) => activeIds.has(m.poolId || "default"));
   }, [measures, activePools]);
-  const blockedByLimit = !isPremium && hasMeasureToday(visibleMeasuresForLimit);
+  const blockedByLimit = !effectiveIsPremium && hasMeasureToday(visibleMeasuresForLimit);
 
   const tFn = (key, vars) => {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.fr;
@@ -7107,7 +7119,7 @@ function PoolApp() {
   // activé (pas seulement isPremium). Un utilisateur premium qui n'a pas activé
   // la gestion de stock retombe aussi sur le paywall.
   function handleValidateApplication(m, recsOverride, selectedRecsOverride, adjustMode) {
-    if (!isPremium || !activePool?.manageStock) {
+    if (!effectiveIsPremium || !activePool?.manageStock) {
       openPaywall("start_plan");
       return;
     }
@@ -7601,7 +7613,7 @@ function PoolApp() {
         poolName={activePool?.name}
         location={activePool?.location}
         poolPhoto={activePool?.photo}
-        isPremium={isPremium}
+        isPremium={effectiveIsPremium}
         entries={switcherEntries}
         activeEntryKey={activeEntryKey}
         onSelectEntry={handleSelectSwitcherEntry}
@@ -7623,8 +7635,8 @@ function PoolApp() {
             onValidateApplication={handleValidateApplication}
             applicationForLatest={latest ? poolApplications.find((a) => a.measureId === latest.id) : null}
             blockedByLimit={blockedByLimit}
-            isPremium={isPremium}
-            apiKey={aiEnabled && isPremium ? apiKey : ""}
+            isPremium={effectiveIsPremium}
+            apiKey={aiEnabled && effectiveIsPremium ? apiKey : ""}
             apiProvider={apiProvider}
             recentMeasures={sortedMeasures}
             effectiveTargets={effectiveTargets}
@@ -7646,12 +7658,12 @@ function PoolApp() {
             }}
             onValidateApplication={handleValidateApplication}
             applications={poolApplications}
-            isPremium={isPremium}
+            isPremium={effectiveIsPremium}
             poolName={activePool?.name}
             onGenerateReport={() => setShowReport(true)}
             onWantPremiumForReport={() => openPaywall("report")}
             lang={lang}
-            apiKey={aiEnabled && isPremium ? apiKey : ""}
+            apiKey={aiEnabled && effectiveIsPremium ? apiKey : ""}
             apiProvider={apiProvider}
             authUid={dataUid}
             pool={activePool}
@@ -7671,7 +7683,7 @@ function PoolApp() {
             }}
             onDelete={deleteProduct}
             onResetAll={resetAllProducts}
-            isPremium={isPremium}
+            isPremium={effectiveIsPremium}
             poolName={activePool?.name}
             manageStock={!!activePool?.manageStock}
             onWantPremium={() => openPaywall("products")}
@@ -7784,7 +7796,7 @@ function PoolApp() {
             setEditingMeasure(null);
           }}
           onSave={addMeasure}
-          isPremium={isPremium}
+          isPremium={effectiveIsPremium}
           onRequestPhotoAccess={(cb) => {
             setPhotoWarningCallback(() => cb);
             setShowPhotoWarning(true);
@@ -7794,7 +7806,7 @@ function PoolApp() {
             setEditingMeasure(null);
             openPaywall(source || "photos");
           }}
-          apiKey={aiEnabled && isPremium ? apiKey : ""}
+          apiKey={aiEnabled && effectiveIsPremium ? apiKey : ""}
           apiProvider={apiProvider}
           activeParamKeys={activeParamKeys}
           lang={lang}
@@ -7813,7 +7825,7 @@ function PoolApp() {
             setEditingProduct(null);
           }}
           onSave={saveProduct}
-          isPremium={isPremium}
+          isPremium={effectiveIsPremium}
           onWantPremium={(source) => {
             setShowAddProduct(false);
             setEditingProduct(null);
@@ -7823,7 +7835,7 @@ function PoolApp() {
           manageStock={!!activePool?.manageStock}
           lang={lang}
           aiEnabled={aiEnabled}
-          apiKey={aiEnabled && isPremium ? apiKey : ""}
+          apiKey={aiEnabled && effectiveIsPremium ? apiKey : ""}
           apiProvider={apiProvider}
           authUid={dataUid}
           onWantManageStock={() => {
@@ -7953,7 +7965,7 @@ function PoolApp() {
         </div>
       )}
 
-      {showWizard && activePlan && isPremium && (
+      {showWizard && activePlan && effectiveIsPremium && (
         <TreatmentWizard
           plan={activePlan}
           products={poolProducts}
@@ -7968,7 +7980,7 @@ function PoolApp() {
         />
       )}
 
-      {showReport && isPremium && (
+      {showReport && effectiveIsPremium && (
         <ReportView
           pool={activePool}
           measures={poolMeasures}
@@ -7978,7 +7990,7 @@ function PoolApp() {
           manageStock={!!activePool?.manageStock}
           lang={lang}
           authUid={dataUid}
-          isPremium={isPremium}
+          isPremium={effectiveIsPremium}
         />
       )}
 
