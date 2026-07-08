@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.57.8";
+const APP_VERSION = "1.57.9";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -7147,10 +7147,12 @@ function PoolApp() {
     syncConfig({ activePlan: activePlanByPool });
   }, [activePlanByPool]);
 
-  useEffect(() => {
-    if (!loaded || !authUser?.uid) return;
-    syncOwnConfig({ isPremium });
-  }, [isPremium]);
+  // v1.57.9 — isPremium reste volontairement local (pas de sync Firestore) :
+  // la règle de sécurité bloque toute écriture client sur ce champ, y compris
+  // pour le propriétaire (empêche l'auto-attribution du statut premium).
+  // C'est le comportement voulu — seul un futur webhook Stripe côté Worker
+  // (service account, hors règles de sécurité) pourra le faire passer à true.
+  // L'interrupteur de test ici ne simule que l'état local, sans persistance.
 
   useEffect(() => {
     if (!loaded || !authUser?.uid) return;
