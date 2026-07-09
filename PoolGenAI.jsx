@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.59.6";
+const APP_VERSION = "1.60.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -597,6 +597,15 @@ const TRANSLATIONS = {
     filtration_cartouche: "Cartouche",
     filtration_diatomees: "Diatomées",
     filtration_aucune: "Sans filtration (naturelle)",
+    // v1.60.0 — Section Délégation (regroupe utilisateurs secondaires +
+    // bassins où JE suis invité)
+    delegation_section_title: "Délégation",
+    linked_pools_title: "Bassins où je suis invité",
+    linked_pools_empty: "Tu n'as accès à aucun bassin en tant qu'invité.",
+    request_revocation_button: "Demander la révocation",
+    request_revocation_confirm: "Demander la révocation de ton accès au bassin \"{pool}\" ? {pseudo} recevra un email pour confirmer.",
+    request_revocation_sent: "Demande envoyée. Tu recevras un email une fois la révocation confirmée.",
+    request_revocation_error: "Échec de l'envoi de la demande.",
     // v1.55.0 — Utilisateurs secondaires (brique 3)
     secondary_section_title: "Utilisateurs secondaires",
     secondary_section_intro: "Invite jusqu'à 2 personnes à accéder à un de tes bassins.",
@@ -646,6 +655,15 @@ const TRANSLATIONS = {
     invite_response_mismatch: "Cette invitation ne correspond pas à ton compte connecté.",
     invite_response_error: "Erreur lors du traitement de l'invitation.",
     invite_response_checking: "Vérification de l'invitation…",
+    // v1.60.0 — Confirmation de révocation (côté propriétaire, miroir invite_response_*)
+    revocation_response_title: "Demande de révocation",
+    revocation_response_text: "{pseudo} a demandé la révocation de son invitation sur le bassin {pool}.",
+    revocation_response_accept: "Accepter la demande de révocation",
+    revocation_response_done: "Révocation effectuée.",
+    revocation_response_invalid: "Cette demande n'existe plus ou a déjà été traitée.",
+    revocation_response_expired: "Cette demande de révocation a expiré.",
+    revocation_response_mismatch: "Cette demande ne concerne pas ton compte connecté.",
+    revocation_response_error: "Erreur lors du traitement de la demande.",
   },
   en: {
     tab_pool: "Pool",
@@ -1216,6 +1234,14 @@ const TRANSLATIONS = {
     filtration_cartouche: "Cartridge",
     filtration_diatomees: "Diatomaceous earth",
     filtration_aucune: "No filtration (natural)",
+    // v1.60.0 — Delegation section (secondary users + pools I'm invited to)
+    delegation_section_title: "Delegation",
+    linked_pools_title: "Pools I'm invited to",
+    linked_pools_empty: "You don't have access to any pool as a guest.",
+    request_revocation_button: "Request revocation",
+    request_revocation_confirm: "Request revocation of your access to pool \"{pool}\"? {pseudo} will get an email to confirm.",
+    request_revocation_sent: "Request sent. You'll get an email once the revocation is confirmed.",
+    request_revocation_error: "Failed to send the request.",
     secondary_section_title: "Secondary users",
     secondary_section_intro: "Invite up to 2 people to access one of your pools.",
     secondary_invite_button: "Invite someone",
@@ -1264,6 +1290,14 @@ const TRANSLATIONS = {
     invite_response_mismatch: "This invitation doesn't match your logged-in account.",
     invite_response_error: "Error while processing the invitation.",
     invite_response_checking: "Checking invitation…",
+    revocation_response_title: "Revocation request",
+    revocation_response_text: "{pseudo} requested revocation of their invitation to pool {pool}.",
+    revocation_response_accept: "Accept the revocation request",
+    revocation_response_done: "Revocation done.",
+    revocation_response_invalid: "This request no longer exists or was already handled.",
+    revocation_response_expired: "This revocation request has expired.",
+    revocation_response_mismatch: "This request doesn't match your logged-in account.",
+    revocation_response_error: "Error while processing the request.",
   },
   de: {
     tab_pool: "Becken",
@@ -1836,6 +1870,13 @@ const TRANSLATIONS = {
     filtration_cartouche: "Kartusche",
     filtration_diatomees: "Diatomeenerde",
     filtration_aucune: "Ohne Filtration (natürlich)",
+    delegation_section_title: "Delegation",
+    linked_pools_title: "Becken, zu denen ich eingeladen bin",
+    linked_pools_empty: "Du hast als Gast keinen Zugriff auf ein Becken.",
+    request_revocation_button: "Widerruf beantragen",
+    request_revocation_confirm: "Widerruf deines Zugriffs auf das Becken \"{pool}\" beantragen? {pseudo} erhält eine E-Mail zur Bestätigung.",
+    request_revocation_sent: "Anfrage gesendet. Du erhältst eine E-Mail, sobald der Widerruf bestätigt ist.",
+    request_revocation_error: "Anfrage konnte nicht gesendet werden.",
     secondary_section_title: "Zweitnutzer",
     secondary_section_intro: "Lade bis zu 2 Personen ein, auf eines deiner Becken zuzugreifen.",
     secondary_invite_button: "Jemanden einladen",
@@ -1884,6 +1925,14 @@ const TRANSLATIONS = {
     invite_response_mismatch: "Diese Einladung passt nicht zu deinem angemeldeten Konto.",
     invite_response_error: "Fehler bei der Verarbeitung der Einladung.",
     invite_response_checking: "Einladung wird geprüft…",
+    revocation_response_title: "Widerrufsanfrage",
+    revocation_response_text: "{pseudo} hat den Widerruf der Einladung zum Becken {pool} beantragt.",
+    revocation_response_accept: "Widerrufsanfrage bestätigen",
+    revocation_response_done: "Widerruf durchgeführt.",
+    revocation_response_invalid: "Diese Anfrage existiert nicht mehr oder wurde bereits bearbeitet.",
+    revocation_response_expired: "Diese Widerrufsanfrage ist abgelaufen.",
+    revocation_response_mismatch: "Diese Anfrage passt nicht zu deinem angemeldeten Konto.",
+    revocation_response_error: "Fehler bei der Bearbeitung der Anfrage.",
   },
   it: {
     tab_pool: "Vasca",
@@ -2453,6 +2502,13 @@ const TRANSLATIONS = {
     filtration_cartouche: "Cartuccia",
     filtration_diatomees: "Diatomee",
     filtration_aucune: "Senza filtrazione (naturale)",
+    delegation_section_title: "Delega",
+    linked_pools_title: "Vasche a cui sono invitato",
+    linked_pools_empty: "Non hai accesso a nessuna vasca come ospite.",
+    request_revocation_button: "Richiedi revoca",
+    request_revocation_confirm: "Richiedere la revoca del tuo accesso alla vasca \"{pool}\"? {pseudo} riceverà un'email per confermare.",
+    request_revocation_sent: "Richiesta inviata. Riceverai un'email quando la revoca sarà confermata.",
+    request_revocation_error: "Invio della richiesta non riuscito.",
     secondary_section_title: "Utenti secondari",
     secondary_section_intro: "Invita fino a 2 persone ad accedere a una delle tue piscine.",
     secondary_invite_button: "Invita qualcuno",
@@ -2501,6 +2557,14 @@ const TRANSLATIONS = {
     invite_response_mismatch: "Questo invito non corrisponde al tuo account collegato.",
     invite_response_error: "Errore durante l'elaborazione dell'invito.",
     invite_response_checking: "Verifica dell'invito…",
+    revocation_response_title: "Richiesta di revoca",
+    revocation_response_text: "{pseudo} ha richiesto la revoca del proprio invito alla vasca {pool}.",
+    revocation_response_accept: "Accetta la richiesta di revoca",
+    revocation_response_done: "Revoca effettuata.",
+    revocation_response_invalid: "Questa richiesta non esiste più o è già stata gestita.",
+    revocation_response_expired: "Questa richiesta di revoca è scaduta.",
+    revocation_response_mismatch: "Questa richiesta non corrisponde al tuo account connesso.",
+    revocation_response_error: "Errore durante l'elaborazione della richiesta.",
   },
   es: {
     tab_pool: "Piscina",
@@ -3070,6 +3134,13 @@ const TRANSLATIONS = {
     filtration_cartouche: "Cartucho",
     filtration_diatomees: "Tierra de diatomeas",
     filtration_aucune: "Sin filtración (natural)",
+    delegation_section_title: "Delegación",
+    linked_pools_title: "Piscinas a las que estoy invitado",
+    linked_pools_empty: "No tienes acceso a ninguna piscina como invitado.",
+    request_revocation_button: "Solicitar revocación",
+    request_revocation_confirm: "¿Solicitar la revocación de tu acceso a la piscina \"{pool}\"? {pseudo} recibirá un email para confirmar.",
+    request_revocation_sent: "Solicitud enviada. Recibirás un email cuando se confirme la revocación.",
+    request_revocation_error: "Fallo al enviar la solicitud.",
     secondary_section_title: "Usuarios secundarios",
     secondary_section_intro: "Invita hasta a 2 personas a acceder a una de tus piscinas.",
     secondary_invite_button: "Invitar a alguien",
@@ -3118,6 +3189,14 @@ const TRANSLATIONS = {
     invite_response_mismatch: "Esta invitación no corresponde a tu cuenta conectada.",
     invite_response_error: "Error al procesar la invitación.",
     invite_response_checking: "Comprobando la invitación…",
+    revocation_response_title: "Solicitud de revocación",
+    revocation_response_text: "{pseudo} ha solicitado la revocación de su invitación a la piscina {pool}.",
+    revocation_response_accept: "Aceptar la solicitud de revocación",
+    revocation_response_done: "Revocación realizada.",
+    revocation_response_invalid: "Esta solicitud ya no existe o ya ha sido gestionada.",
+    revocation_response_expired: "Esta solicitud de revocación ha caducado.",
+    revocation_response_mismatch: "Esta solicitud no corresponde a tu cuenta conectada.",
+    revocation_response_error: "Error al procesar la solicitud.",
   },
   pt: {
     tab_pool: "Piscina",
@@ -3684,6 +3763,13 @@ const TRANSLATIONS = {
     filtration_cartouche: "Cartucho",
     filtration_diatomees: "Terra de diatomáceas",
     filtration_aucune: "Sem filtração (natural)",
+    delegation_section_title: "Delegação",
+    linked_pools_title: "Piscinas às quais fui convidado",
+    linked_pools_empty: "Não tens acesso a nenhuma piscina como convidado.",
+    request_revocation_button: "Pedir revogação",
+    request_revocation_confirm: "Pedir a revogação do teu acesso à piscina \"{pool}\"? {pseudo} vai receber um email para confirmar.",
+    request_revocation_sent: "Pedido enviado. Vais receber um email assim que a revogação for confirmada.",
+    request_revocation_error: "Falha ao enviar o pedido.",
     secondary_section_title: "Usuários secundários",
     secondary_section_intro: "Convide até 2 pessoas para acessar uma das tuas piscinas.",
     secondary_invite_button: "Convidar alguém",
@@ -3732,6 +3818,14 @@ const TRANSLATIONS = {
     invite_response_mismatch: "Este convite não corresponde à tua conta ligada.",
     invite_response_error: "Erro ao processar o convite.",
     invite_response_checking: "A verificar o convite…",
+    revocation_response_title: "Pedido de revogação",
+    revocation_response_text: "{pseudo} pediu a revogação do seu convite à piscina {pool}.",
+    revocation_response_accept: "Aceitar o pedido de revogação",
+    revocation_response_done: "Revogação efetuada.",
+    revocation_response_invalid: "Este pedido já não existe ou já foi tratado.",
+    revocation_response_expired: "Este pedido de revogação expirou.",
+    revocation_response_mismatch: "Este pedido não corresponde à tua conta ligada.",
+    revocation_response_error: "Erro ao processar o pedido.",
   },
 };
 
@@ -4794,6 +4888,24 @@ async function respondToInvitation(idToken, token, action) {
   return { status: res.status, ...data };
 }
 
+// v1.60.0 — Demande de révocation initiée par l'invité, confirmée par le
+// propriétaire (miroir de getInvitationInfo/respondToInvitation).
+async function getRevocationRequestInfo(token) {
+  const res = await fetch(`${PROXY_BASE_URL}/revocation-info?token=${encodeURIComponent(token)}`);
+  const data = await res.json().catch(() => ({}));
+  return { status: res.status, ...data };
+}
+
+async function respondToRevocation(idToken, token) {
+  const res = await fetch(`${PROXY_BASE_URL}/respond-revocation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify({ token }),
+  });
+  const data = await res.json().catch(() => ({}));
+  return { status: res.status, ...data };
+}
+
 // ---------- Composant principal ----------
 
 class ErrorBoundary extends React.Component {
@@ -5759,6 +5871,56 @@ function PoolApp() {
     }
   }
 
+  // v1.60.0 — Landing de confirmation de révocation (côté PROPRIÉTAIRE cette
+  // fois, pas l'invité) : miroir exact du bloc invitation ci-dessus, avec
+  // ?respondRevocation=token à la place de ?respondInvitation=token.
+  // null | "loading_info" | "info_ready" | "responding" | "done" |
+  // "expired" | "invalid" | "mismatch" | "error"
+  const [revocationLinkStatus, setRevocationLinkStatus] = useState(null);
+  const [revocationLinkToken, setRevocationLinkToken] = useState(null);
+  const [revocationLinkInfo, setRevocationLinkInfo] = useState(null); // { secondaryPseudo, poolName }
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("respondRevocation");
+    if (!token) return;
+    setRevocationLinkToken(token);
+    setRevocationLinkStatus("loading_info");
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
+    getRevocationRequestInfo(token)
+      .then((result) => {
+        if (typeof result.status === "number") { setRevocationLinkStatus("error"); return; }
+        if (result.status === "pending") {
+          setRevocationLinkInfo({ secondaryPseudo: result.secondaryPseudo, poolName: result.poolName });
+          setRevocationLinkStatus("info_ready");
+        } else {
+          setRevocationLinkStatus(result.status || "error"); // invalid | expired | done
+        }
+      })
+      .catch(() => setRevocationLinkStatus("error"));
+  }, []);
+
+  // Force l'écran de connexion tant qu'une demande de révocation est en
+  // attente de confirmation et qu'on n'est pas connecté (il faut être
+  // connecté avec le compte propriétaire pour confirmer).
+  useEffect(() => {
+    if (revocationLinkStatus && authUser === null) setShowLogin(true);
+  }, [revocationLinkStatus, authUser]);
+
+  async function handleRevocationConfirm() {
+    if (!revocationLinkToken || !authUser) return;
+    setRevocationLinkStatus("responding");
+    try {
+      const idToken = await authUser.getIdToken();
+      const result = await respondToRevocation(idToken, revocationLinkToken);
+      if (result.status === 403) { setRevocationLinkStatus("mismatch"); return; }
+      if (typeof result.status === "number") { setRevocationLinkStatus("error"); return; }
+      setRevocationLinkStatus(result.status || "error");
+    } catch (e) {
+      setRevocationLinkStatus("error");
+    }
+  }
+
   // ── Comptes qui m'ont invité (moi = secondaire) + contexte affiché ──
   // linkedAccounts : liste brute (users/{moi}/linkedAccounts), enrichie à la
   // volée (poolName/pseudo) au moment de l'ouverture des réglages — voir
@@ -5829,6 +5991,23 @@ function PoolApp() {
   function switchToContext(next) {
     setViewContext(next);
     window.storage.set(STORAGE_KEYS.viewContext, JSON.stringify(next || null)).catch(() => {});
+  }
+
+  // v1.60.0 — Demande de révocation de mon propre accès à un bassin invité
+  // (je ne peux pas me révoquer moi-même). Envoie un email au propriétaire
+  // avec un lien de confirmation — voir /request-revoke-own-access.
+  async function handleRequestRevocation(primaryUid) {
+    if (!authUser) throw new Error("not_signed_in");
+    const idToken = await authUser.getIdToken();
+    const res = await fetch(`${PROXY_BASE_URL}/request-revoke-own-access`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ primaryUid }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "request_failed");
+    }
   }
 
   // uid dont les données (measures/applications/config) sont actuellement
@@ -7467,6 +7646,55 @@ function PoolApp() {
         </div>
       </div>
     )}
+    {authUser && revocationLinkStatus && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+          {revocationLinkStatus === "loading_info" || revocationLinkStatus === "responding" ? (
+            <>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
+              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("invite_response_checking")}</div>
+            </>
+          ) : revocationLinkStatus === "info_ready" ? (
+            <>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>🔓</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+                {t("revocation_response_title")}
+              </div>
+              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+                {t("revocation_response_text", {
+                  pseudo: revocationLinkInfo?.secondaryPseudo || "",
+                  pool: revocationLinkInfo?.poolName || "",
+                })}
+              </div>
+              <button
+                onClick={handleRevocationConfirm}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+              >
+                {t("revocation_response_accept")}
+              </button>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>
+                {revocationLinkStatus === "done" ? "✅" : "⚠️"}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+                {t("revocation_response_title")}
+              </div>
+              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+                {t(`revocation_response_${revocationLinkStatus}`)}
+              </div>
+              <button
+                onClick={() => { setRevocationLinkStatus(null); setRevocationLinkToken(null); setRevocationLinkInfo(null); }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+              >
+                {t("verify_link_continue_btn")}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    )}
     {forceUpdate && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
@@ -7775,6 +8003,7 @@ function PoolApp() {
             setLang={setLang}
             cguAcceptedDate={cguAcceptedDate}
             dataConsent={dataConsent}
+            myPseudo={myPseudo}
             onRevokeDataConsent={() => {
               setDataConsent(false);
               if (authUser?.uid) {
@@ -7783,10 +8012,11 @@ function PoolApp() {
             }}
           />
           {authUser && (
-            <SecondaryUsersSection
+            <DelegationSection
               authUser={authUser}
               lang={lang}
-              myPseudo={myPseudo}
+              linkedPoolsInfo={linkedPoolsInfo}
+              onRequestRevocation={handleRequestRevocation}
             />
           )}
           <DangerZoneSection
@@ -7795,6 +8025,7 @@ function PoolApp() {
             poolMeasureCount={poolMeasures.length}
             onDeleteAllMeasures={deleteAllMeasuresForActivePool}
             authUser={authUser}
+            cguAcceptedDate={cguAcceptedDate}
             onDeleteAccount={async () => {
               const isGoogle = authUser?.providerData?.some(p => p.providerId === "google.com");
               if (isGoogle) {
@@ -8302,7 +8533,7 @@ function TabBar({ tab, setTab, lang, viewContext }) {
 }
 
 // ---------- v1.55.0 — Utilisateurs secondaires (brique 3) ----------
-function SecondaryUsersSection({ authUser, lang, myPseudo }) {
+function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocation }) {
   const t = useT(lang);
   const [secondaries, setSecondaries] = useState([]); // personnes que j'ai invitées (moi = principal)
   const [pendingInvitations, setPendingInvitations] = useState([]);
@@ -8311,11 +8542,8 @@ function SecondaryUsersSection({ authUser, lang, myPseudo }) {
   const [invitePoolId, setInvitePoolId] = useState("");
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteMsg, setInviteMsg] = useState(null);
-  const [pseudoInput, setPseudoInput] = useState(myPseudo || "");
-  const [pseudoBusy, setPseudoBusy] = useState(false);
-  const [pseudoMsg, setPseudoMsg] = useState(null);
-
-  useEffect(() => { setPseudoInput(myPseudo || ""); }, [myPseudo]);
+  const [revokeReqBusy, setRevokeReqBusy] = useState(null); // primaryUid en cours
+  const [revokeReqMsg, setRevokeReqMsg] = useState(null); // { primaryUid, text }
 
   useEffect(() => {
     if (!authUser?.uid || !FB.ready()) return;
@@ -8409,35 +8637,27 @@ function SecondaryUsersSection({ authUser, lang, myPseudo }) {
     }
   }
 
-  async function handleSavePseudo() {
-    if (!authUser || !pseudoInput.trim()) return;
-    setPseudoBusy(true);
-    setPseudoMsg(null);
+  // v1.60.0 — Demande de révocation de mon propre accès (bassin où je suis
+  // invité). Je ne peux pas me révoquer moi-même (écriture réservée au
+  // Worker) : ça envoie un email au propriétaire avec un lien de confirmation.
+  async function handleRequestRevocation(link) {
+    if (!authUser) return;
+    const ok = window.confirm(t("request_revocation_confirm", { pool: link.poolName, pseudo: link.pseudo }));
+    if (!ok) return;
+    setRevokeReqBusy(link.primaryUid);
+    setRevokeReqMsg(null);
     try {
-      const idToken = await authUser.getIdToken();
-      const res = await fetch(`${PROXY_BASE_URL}/set-pseudo`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({ pseudo: pseudoInput.trim() }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.status === 409) {
-        setPseudoMsg({ type: "error", text: t("pseudo_taken_suggestion", { suggestion: data.suggestion || "?" }) });
-        return;
-      }
-      if (!res.ok) {
-        setPseudoMsg({ type: "error", text: data.error || t("pseudo_error") });
-        return;
-      }
-      setPseudoMsg({ type: "ok", text: t("pseudo_saved") });
+      await onRequestRevocation(link.primaryUid);
+      setRevokeReqMsg({ primaryUid: link.primaryUid, text: t("request_revocation_sent") });
     } catch (e) {
-      setPseudoMsg({ type: "error", text: t("pseudo_error") });
+      setRevokeReqMsg({ primaryUid: link.primaryUid, text: t("request_revocation_error"), error: true });
     } finally {
-      setPseudoBusy(false);
+      setRevokeReqBusy(null);
     }
   }
 
   const activeSecondaries = secondaries.filter((s) => s.status === "active");
+  const activeLinkedPools = (linkedPoolsInfo || []).filter((l) => l.status === "active");
   const sectionTitleStyle = { fontSize: 13, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 };
   const subTitleStyle = { fontSize: 12.5, fontWeight: 600, color: "#4a6480", marginBottom: 6 };
   const emptyStyle = { fontSize: 12.5, color: "#8a9aa8", marginBottom: 14 };
@@ -8445,26 +8665,41 @@ function SecondaryUsersSection({ authUser, lang, myPseudo }) {
 
   return (
     <div style={{ marginTop: 24, padding: "0 16px 24px" }}>
-      <div style={sectionTitleStyle}>{t("pseudo_label")}</div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-        <input
-          value={pseudoInput}
-          onChange={(e) => setPseudoInput(e.target.value)}
-          placeholder={t("pseudo_placeholder")}
-          style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid #d8e2ec", fontSize: 13.5 }}
-        />
-        <button
-          onClick={handleSavePseudo}
-          disabled={pseudoBusy}
-          style={{ padding: "10px 16px", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 600, fontSize: 13, cursor: pseudoBusy ? "not-allowed" : "pointer" }}
-        >
-          {t("pseudo_save")}
-        </button>
-      </div>
-      {pseudoMsg && (
-        <div style={{ fontSize: 12, color: pseudoMsg.type === "error" ? "#c0392b" : "#1a8fd1", marginBottom: 8 }}>{pseudoMsg.text}</div>
+      <div style={sectionTitleStyle}>{t("delegation_section_title")}</div>
+
+      {/* v1.60.0 — Bassins où JE suis invité (l'inverse de "Utilisateurs
+          secondaires" ci-dessous, qui liste les personnes que J'AI invitées).
+          Pas de révocation directe côté invité : demande envoyée par email
+          au propriétaire, qui confirme via un lien (voir /request-revoke-own-access). */}
+      <div style={subTitleStyle}>{t("linked_pools_title")}</div>
+      {activeLinkedPools.length === 0 ? (
+        <div style={emptyStyle}>{t("linked_pools_empty")}</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+          {activeLinkedPools.map((l) => (
+            <div key={l.primaryUid} style={cardStyle}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#0d2b4e" }}>{l.poolName || t("secondary_pool_label", { pool: "" })}</div>
+                  <div style={{ fontSize: 11.5, color: "#8a9aa8" }}>{l.pseudo}</div>
+                </div>
+                <button
+                  onClick={() => handleRequestRevocation(l)}
+                  disabled={revokeReqBusy === l.primaryUid}
+                  style={{ padding: "7px 12px", borderRadius: 8, border: "1px solid #e0a0a0", background: "#fff5f5", color: "#c0392b", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+                >
+                  {revokeReqBusy === l.primaryUid ? "..." : t("request_revocation_button")}
+                </button>
+              </div>
+              {revokeReqMsg?.primaryUid === l.primaryUid && (
+                <div style={{ fontSize: 11.5, color: revokeReqMsg.error ? "#c0392b" : "#1a7a4a", marginTop: 6 }}>
+                  {revokeReqMsg.text}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       )}
-      <div style={{ fontSize: 11.5, color: "#8a9aa8", marginBottom: 20 }}>{t("pseudo_invalid")}</div>
 
       <div style={sectionTitleStyle}>{t("secondary_section_title")}</div>
       <div style={{ fontSize: 12, color: "#6a7d90", marginBottom: 12 }}>{t("secondary_section_intro")}</div>
@@ -12313,16 +12548,50 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
   );
 }
 
-function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, viewContext, onDeleteAllMeasures: onDeleteAllMeasuresRaw, orphanedCount, onRepairOrphanedData, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, aiEnabled, setAiEnabled, calibrationContribution, setCalibrationContribution, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount, dataConsent, onRevokeDataConsent, cguAcceptedDate }) {
+function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, viewContext, onDeleteAllMeasures: onDeleteAllMeasuresRaw, orphanedCount, onRepairOrphanedData, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, aiEnabled, setAiEnabled, calibrationContribution, setCalibrationContribution, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount, dataConsent, onRevokeDataConsent, cguAcceptedDate, myPseudo }) {
   const [editingPool, setEditingPool] = useState(null);
-  const [showLegalModal, setShowLegalModal] = useState(false);
-  const t = useT(lang);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const [pendingLang, setPendingLang] = useState(lang);
   const treatmentTypes = getTreatmentTypes(lang);
   const filtrationTypes = getFiltrationTypes(lang);
   const activePool = pools.find((p) => p.id === activePoolId) || pools[0];
   const [repairing, setRepairing] = useState(false);
+  // v1.60.0 — Pseudo déplacé ici depuis SecondaryUsersSection (désormais
+  // DelegationSection) : demande explicite de le regrouper dans "Mon compte".
+  const [pseudoInput, setPseudoInput] = useState(myPseudo || "");
+  const [pseudoBusy, setPseudoBusy] = useState(false);
+  const [pseudoMsg, setPseudoMsg] = useState(null);
+  const t = useT(lang);
+
+  useEffect(() => { setPseudoInput(myPseudo || ""); }, [myPseudo]);
+
+  async function handleSavePseudo() {
+    if (!authUser || !pseudoInput.trim()) return;
+    setPseudoBusy(true);
+    setPseudoMsg(null);
+    try {
+      const idToken = await authUser.getIdToken();
+      const res = await fetch(`${PROXY_BASE_URL}/set-pseudo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ pseudo: pseudoInput.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 409) {
+        setPseudoMsg({ type: "error", text: t("pseudo_taken_suggestion", { suggestion: data.suggestion || "?" }) });
+        return;
+      }
+      if (!res.ok) {
+        setPseudoMsg({ type: "error", text: data.error || t("pseudo_error") });
+        return;
+      }
+      setPseudoMsg({ type: "ok", text: t("pseudo_saved") });
+    } catch (e) {
+      setPseudoMsg({ type: "error", text: t("pseudo_error") });
+    } finally {
+      setPseudoBusy(false);
+    }
+  }
 
   async function handleRepair() {
     const ok = window.confirm(t("repair_orphaned_confirm", { count: orphanedCount }));
@@ -12435,6 +12704,35 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
           >
             {t("sign_in")}
           </button>
+        </div>
+      )}
+
+      {authUser && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 }}>{t("pseudo_label")}</div>
+          <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+            <input
+              type="text"
+              style={{ ...styles.input, flex: 1 }}
+              value={pseudoInput}
+              onChange={(e) => setPseudoInput(e.target.value)}
+              placeholder={t("pseudo_placeholder")}
+              maxLength={24}
+            />
+            <button
+              style={{ padding: "0 16px", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0 }}
+              onClick={handleSavePseudo}
+              disabled={pseudoBusy || !pseudoInput.trim()}
+            >
+              {pseudoBusy ? "..." : t("pseudo_save")}
+            </button>
+          </div>
+          <div style={{ fontSize: 11, color: "#8a9aa8", marginBottom: pseudoMsg ? 4 : 0 }}>{t("pseudo_invalid")}</div>
+          {pseudoMsg && (
+            <div style={{ fontSize: 12, color: pseudoMsg.type === "error" ? "#c0392b" : "#1a7a4a", marginTop: 2 }}>
+              {pseudoMsg.text}
+            </div>
+          )}
         </div>
       )}
 
@@ -12579,20 +12877,8 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
 
 
 
-      {/* Mentions légales */}
-      <div style={styles.sectionRow}>
-        <span style={styles.sectionLabel}>{t("legal_notices")}</span>
-      </div>
-      <div style={{ background: "#f5f8fc", borderRadius: 10, padding: "10px 14px", marginBottom: 12, fontSize: 12, color: "#4a6480" }}>
-        <div>{t("cgu_version_label")} : <strong>CGU {CGU_VERSION}</strong></div>
-        {cguAcceptedDate && <div>{t("cgu_accepted_on")} : {new Date(cguAcceptedDate).toLocaleDateString()}</div>}
-      </div>
-      <button
-        style={{ width: "100%", padding: "10px 0", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 16 }}
-        onClick={() => setShowLegalModal(true)}
-      >
-        {t("legal_notices")}
-      </button>
+      {/* v1.60.0 — Bloc CGU/Mentions légales déplacé dans DangerZoneSection,
+          juste au-dessus de la zone sensible (demande explicite). */}
 
       {/* Révocation consentement données */}
       {dataConsent && (
@@ -12611,6 +12897,49 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
 
       {/* v1.59.1 — Zone sensible (suppression mesures/compte) déplacée dans
           DangerZoneSection, rendue en bas de page après SecondaryUsersSection. */}
+
+      {editingPool && (
+        <AddPoolModal
+          onClose={() => setEditingPool(null)}
+          onSave={(updated) => { onUpdatePool(updated.id, updated); setEditingPool(null); }}
+          lang={lang}
+          existingPool={editingPool}
+        />
+      )}
+    </div>
+  );
+}
+
+// v1.59.1 — Zone sensible (suppression mesures/compte) extraite de SettingsView
+// pour être rendue après SecondaryUsersSection : demande explicite de la
+// positionner tout en bas de la page Réglages (loin des actions courantes).
+function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAllMeasures, authUser, onDeleteAccount, cguAcceptedDate }) {
+  const t = useT(lang);
+  const [showLegalModal, setShowLegalModal] = useState(false);
+
+  function handleDeleteAllMeasures() {
+    if (!poolMeasureCount) return;
+    const ok = window.confirm(`${t("delete_measures")} "${activePoolName}" ?`);
+    if (ok) onDeleteAllMeasures();
+  }
+
+  return (
+    <div style={{ marginTop: 24 }}>
+      {/* v1.60.0 — CGU/Mentions légales, déplacées ici juste au-dessus de la
+          zone sensible (demande explicite : regrouper les infos "sérieuses"). */}
+      <div style={styles.sectionRow}>
+        <span style={styles.sectionLabel}>{t("legal_notices")}</span>
+      </div>
+      <div style={{ background: "#f5f8fc", borderRadius: 10, padding: "10px 14px", marginBottom: 12, fontSize: 12, color: "#4a6480" }}>
+        <div>{t("cgu_version_label")} : <strong>CGU {CGU_VERSION}</strong></div>
+        {cguAcceptedDate && <div>{t("cgu_accepted_on")} : {new Date(cguAcceptedDate).toLocaleDateString()}</div>}
+      </div>
+      <button
+        style={{ width: "100%", padding: "10px 0", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 20 }}
+        onClick={() => setShowLegalModal(true)}
+      >
+        {t("legal_notices")}
+      </button>
 
       {showLegalModal && (
         <div style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(10,30,60,0.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
@@ -12649,32 +12978,6 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         </div>
       )}
 
-      {editingPool && (
-        <AddPoolModal
-          onClose={() => setEditingPool(null)}
-          onSave={(updated) => { onUpdatePool(updated.id, updated); setEditingPool(null); }}
-          lang={lang}
-          existingPool={editingPool}
-        />
-      )}
-    </div>
-  );
-}
-
-// v1.59.1 — Zone sensible (suppression mesures/compte) extraite de SettingsView
-// pour être rendue après SecondaryUsersSection : demande explicite de la
-// positionner tout en bas de la page Réglages (loin des actions courantes).
-function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAllMeasures, authUser, onDeleteAccount }) {
-  const t = useT(lang);
-
-  function handleDeleteAllMeasures() {
-    if (!poolMeasureCount) return;
-    const ok = window.confirm(`${t("delete_measures")} "${activePoolName}" ?`);
-    if (ok) onDeleteAllMeasures();
-  }
-
-  return (
-    <div style={{ marginTop: 24 }}>
       <div style={styles.sectionRow}>
         <span style={styles.sectionLabel}>{t("sensitive_zone")}</span>
       </div>
