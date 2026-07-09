@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.59.3";
+const APP_VERSION = "1.59.4";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -272,6 +272,8 @@ const TRANSLATIONS = {
     wizard_in: "Dans",
     wizard_at: "à",
     wizard_scheduled: "Prévu",
+    wizard_earliest: "Au plus tôt",
+    chlore_timing_tip: "Pour une meilleure efficacité, applique de préférence le soir, après la dernière baignade et au coucher du soleil.",
     wizard_done: "C'est fait",
     wizard_skip: "Passer cette étape",
     wizard_anticipate: "Appliquer maintenant",
@@ -895,6 +897,8 @@ const TRANSLATIONS = {
     wizard_in: "In",
     wizard_at: "at",
     wizard_scheduled: "Scheduled",
+    wizard_earliest: "Earliest",
+    chlore_timing_tip: "For best results, apply preferably in the evening, after the last swim and at sunset.",
     wizard_done: "Done",
     wizard_skip: "Skip this step",
     wizard_anticipate: "Apply now",
@@ -1510,6 +1514,8 @@ const TRANSLATIONS = {
     wizard_in: "In",
     wizard_at: "um",
     wizard_scheduled: "Geplant",
+    wizard_earliest: "Frühestens",
+    chlore_timing_tip: "Für beste Wirksamkeit am besten abends anwenden, nach dem letzten Bad und bei Sonnenuntergang.",
     wizard_done: "Erledigt",
     wizard_skip: "Schritt überspringen",
     wizard_anticipate: "Jetzt anwenden",
@@ -2128,6 +2134,8 @@ const TRANSLATIONS = {
     wizard_in: "Tra",
     wizard_at: "alle",
     wizard_scheduled: "Previsto",
+    wizard_earliest: "Al più presto",
+    chlore_timing_tip: "Per una migliore efficacia, applica preferibilmente la sera, dopo l'ultimo bagno e al tramonto.",
     wizard_done: "Fatto",
     wizard_skip: "Salta questo passo",
     wizard_anticipate: "Applica ora",
@@ -2743,6 +2751,8 @@ const TRANSLATIONS = {
     wizard_in: "En",
     wizard_at: "a las",
     wizard_scheduled: "Programado",
+    wizard_earliest: "Lo antes posible",
+    chlore_timing_tip: "Para una mejor eficacia, aplica preferiblemente por la noche, después del último baño y al atardecer.",
     wizard_done: "Hecho",
     wizard_skip: "Saltar este paso",
     wizard_anticipate: "Aplicar ahora",
@@ -3358,6 +3368,8 @@ const TRANSLATIONS = {
     wizard_in: "Em",
     wizard_at: "às",
     wizard_scheduled: "Previsto",
+    wizard_earliest: "O mais cedo possível",
+    chlore_timing_tip: "Para melhor eficácia, aplica de preferência à noite, após o último banho e ao pôr do sol.",
     wizard_done: "Feito",
     wizard_skip: "Pular este passo",
     wizard_anticipate: "Aplicar agora",
@@ -8836,6 +8848,7 @@ function RecoCard({ reco, isLast, manageStock, products, lang }) {
       })()}
       {reco.doseText && <div style={styles.recoDose}>{reco.doseText}</div>}
       {reco.missingTip && <div style={styles.recoNote}>{reco.missingTip}</div>}
+      {reco.timingTip && <div style={{ fontSize: 12.5, color: "#3a5a78", marginTop: 4 }}>🌙 {reco.timingTip}</div>}
 
       {!!reco.waitHours && (
         <div style={styles.recoWait}>
@@ -8988,7 +9001,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         missingTip: !prod ? _("missing_product_tip", { action: "ph-" }) : null,
         computedDoseAmount: computedDose,
         doseUnit: doseSrc?.doseUnit || null,
-        note: prodNote(prod, "reco_note_tac"),
+        note: prodNote(prod, "note_ph_minus"),
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["ph-"],
       });
     } else if (phVal < phTargets.min) {
@@ -9009,7 +9022,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         missingTip: !prod ? _("missing_product_tip", { action: "ph+" }) : null,
         computedDoseAmount: computedDose,
         doseUnit: doseSrc?.doseUnit || null,
-        note: prodNote(prod, "reco_note_tac"),
+        note: prodNote(prod, "note_ph_plus"),
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["ph+"],
       });
     }
@@ -9072,6 +9085,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         computedDoseAmount: computedDose,
         doseUnit: doseSrc?.doseUnit || null,
         note: _("reco_note_combined"),
+        timingTip: _("chlore_timing_tip"),
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["chlore"],
       });
     } else if (fCl < fclT.min) {
@@ -9100,6 +9114,7 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         // si l'utilisateur en a saisi une, sinon pas de note plutôt qu'un message
         // trompeur.
         note: prod ? ((prod.noteKey ? _(prod.noteKey) : prod.note) || null) : null,
+        timingTip: _("chlore_timing_tip"),
         waitHours: prod?.waitHours ?? DEFAULT_WAIT_HOURS["chlore"],
       });
     } else if (fCl > fclT.max) {
@@ -9343,12 +9358,11 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
     combined,
     metalsUrgent,
   };
-  const tacNotCritical = stepPriorityCtx.tac == null || stepPriorityCtx.tac >= 60;
-  const phTooHigh = stepPriorityCtx.phVal != null && stepPriorityCtx.phTargetMax != null && stepPriorityCtx.phVal > stepPriorityCtx.phTargetMax;
-  if (phTooHigh && tacNotCritical) {
-    const phStep = steps.find((s) => s.action === "ph-");
-    if (phStep) phStep.note = _("reco_note_ph_before_tac");
-  }
+  // v1.59.4 — Ne plus écraser la note de l'étape pH avec une justification
+  // d'ordonnancement mentionnant le TAC et le chlore : cette étape ne doit
+  // parler que du produit pH appliqué. L'ordre de traitement reste calculé
+  // par computeStepPriority (inchangé), seul l'affichage de la justification
+  // est retiré.
 
   steps.sort((a, b) => computeStepPriority(a, stepPriorityCtx) - computeStepPriority(b, stepPriorityCtx));
 
@@ -11106,7 +11120,9 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
             marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between",
           }}>
             <div>
-              <div style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>{t("wizard_scheduled")}</div>
+              <div style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>
+                {t(step.action === "chlore" ? "wizard_earliest" : "wizard_scheduled")}
+              </div>
               <div style={{ fontSize: 20, fontWeight: 800, color: "#0a6ebd", fontVariantNumeric: "tabular-nums" }}>
                 {formatCountdown(remaining)}
               </div>
@@ -11122,6 +11138,11 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
             marginBottom: 14, fontSize: 13, fontWeight: 700, color: "#1a8fd1",
           }}>
             ✓ {t("countdown_done")}
+          </div>
+        )}
+        {step.timingTip && (
+          <div style={{ background: "#eef6fc", borderRadius: 8, padding: "8px 14px", marginBottom: 12, fontSize: 12.5, color: "#3a5a78" }}>
+            🌙 {step.timingTip}
           </div>
         )}
 
