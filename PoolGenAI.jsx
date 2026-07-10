@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.62.0";
+const APP_VERSION = "1.63.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -225,6 +225,8 @@ const TRANSLATIONS = {
     products_to_buy_empty: "Rien à acheter pour le moment — tous les stocks sont suffisants.",
     reason_low_stock: "Stock bas",
     reason_insufficient_plan: "Insuffisant pour le plan en cours",
+    apply_product_manual: "Appliquer un produit",
+    reason_manual_maintenance: "Entretien manuel",
     products_locked: "Fonctionnalité réservée à la version illimitée",
     stock_not_managed: "La gestion du stock n'est pas activée pour ce bassin. Active-la dans Réglages pour gérer les quantités et voir les consommations.",
     activate_in_settings: "Activer dans Réglages →",
@@ -889,6 +891,8 @@ const TRANSLATIONS = {
     products_to_buy_empty: "Nothing to buy right now — all stock levels are sufficient.",
     reason_low_stock: "Low stock",
     reason_insufficient_plan: "Not enough for the current plan",
+    apply_product_manual: "Apply a product",
+    reason_manual_maintenance: "Manual maintenance",
     products_locked: "Feature reserved for the unlimited version",
     stock_not_managed: "Stock management is not enabled for this pool. Enable it in Settings to track quantities and view consumption.",
     activate_in_settings: "Enable in Settings →",
@@ -1542,6 +1546,8 @@ const TRANSLATIONS = {
     products_to_buy_empty: "Aktuell nichts zu kaufen — alle Bestände sind ausreichend.",
     reason_low_stock: "Niedriger Bestand",
     reason_insufficient_plan: "Nicht genug für den laufenden Plan",
+    apply_product_manual: "Produkt anwenden",
+    reason_manual_maintenance: "Manuelle Pflege",
     products_locked: "Funktion für unbegrenzte Version reserviert",
     stock_not_managed: "Lagerverwaltung für dieses Becken nicht aktiviert. In Einstellungen aktivieren.",
     activate_in_settings: "In Einstellungen aktivieren →",
@@ -2196,6 +2202,8 @@ const TRANSLATIONS = {
     products_to_buy_empty: "Niente da acquistare al momento — le scorte sono sufficienti.",
     reason_low_stock: "Scorta bassa",
     reason_insufficient_plan: "Insufficiente per il piano in corso",
+    apply_product_manual: "Applica un prodotto",
+    reason_manual_maintenance: "Manutenzione manuale",
     products_locked: "Funzione riservata alla versione illimitata",
     stock_not_managed: "La gestione dello stock non è attivata per questa vasca. Attivala nelle Impostazioni.",
     activate_in_settings: "Attiva nelle Impostazioni →",
@@ -2847,6 +2855,8 @@ const TRANSLATIONS = {
     products_to_buy_empty: "Nada que comprar por ahora — todas las existencias son suficientes.",
     reason_low_stock: "Stock bajo",
     reason_insufficient_plan: "Insuficiente para el plan en curso",
+    apply_product_manual: "Aplicar un producto",
+    reason_manual_maintenance: "Mantenimiento manual",
     products_locked: "Función reservada para la versión ilimitada",
     stock_not_managed: "La gestión de stock no está activada para esta piscina. Actívala en Ajustes.",
     activate_in_settings: "Activar en Ajustes →",
@@ -3498,6 +3508,8 @@ const TRANSLATIONS = {
     products_to_buy_empty: "Nada a comprar por agora — todos os stocks são suficientes.",
     reason_low_stock: "Stock baixo",
     reason_insufficient_plan: "Insuficiente para o plano em curso",
+    apply_product_manual: "Aplicar um produto",
+    reason_manual_maintenance: "Manutenção manual",
     products_locked: "Funcionalidade reservada para a versão ilimitada",
     stock_not_managed: "A gestão de estoque não está ativada para esta piscina. Ative nas Configurações.",
     activate_in_settings: "Ativar nas Configurações →",
@@ -6150,6 +6162,8 @@ function PoolApp() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   // v1.62.0 — Sous-page "Mes produits à acheter", accessible depuis l'onglet Produits.
   const [showProductsToBuy, setShowProductsToBuy] = useState(false);
+  // v1.63.0 — Application manuelle d'un produit hors plan de traitement.
+  const [showManualApply, setShowManualApply] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingMeasure, setEditingMeasure] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -7305,6 +7319,50 @@ function PoolApp() {
     setValidatingMeasure(null);
   }
 
+  // v1.63.0 — Application manuelle hors plan (ex. entretien périodique).
+  // Décrémente le stock immédiatement (contrairement au plan, pas d'attente
+  // de fin de séquence) et enregistre une application distincte, sans
+  // measureId, marquée type: "manual" pour être reconnue dans l'historique
+  // et le rapport PDF sans se substituer aux applications liées à une mesure.
+  function saveManualApplication(product, amount, doseUnit, appliedAt) {
+    track("manual_application", { product: product.name });
+    if (product.containerAmount) {
+      const cUnit = product.containerUnit || "kg";
+      let appliedInContainerUnit = amount;
+      if (cUnit === "kg" && doseUnit === "g") appliedInContainerUnit = amount / 1000;
+      if (cUnit === "L" && doseUnit === "mL") appliedInContainerUnit = amount / 1000;
+      const consumed = (appliedInContainerUnit / product.containerAmount) * 100;
+      const prevStock = product.stockPercent ?? 100;
+      const newStock = Math.max(0, prevStock - consumed);
+      const rounded = Math.round(newStock * 10) / 10;
+      setProducts((prev) => prev.map((p) => (p.id === product.id ? { ...p, stockPercent: rounded } : p)));
+      if (!product.isDefault && prevStock > 0 && rounded <= 0) {
+        setTimeout(() => {
+          setProducts((prev) => {
+            const p = prev.find((x) => x.id === product.id);
+            if (!p) return prev;
+            const ok = window.confirm(t("product_empty_delete_confirm", { name: p.name }));
+            return ok ? prev.filter((x) => x.id !== product.id) : prev;
+          });
+        }, 300);
+      }
+    }
+    const newApp = {
+      id: uid(),
+      poolId: activePoolId,
+      measureId: null,
+      type: "manual",
+      productName: product.name,
+      appliedAmount: amount,
+      doseUnit,
+      appliedAt,
+      createdBy: authUser?.uid || null,
+    };
+    setApplications((prev) => [...prev, newApp]);
+    if (dataUid) FB.saveApplication(dataUid, newApp).catch(() => {});
+    setShowManualApply(false);
+  }
+
   // Démarre le wizard pour une mesure donnée
   function startPlan(measureId, recs) {
     const now = new Date();
@@ -8062,6 +8120,7 @@ function PoolApp() {
             activeParamKeys={activeParamKeys}
             activePlan={activePlan}
             onResumePlan={() => setShowWizard(true)}
+            onOpenManualApply={() => setShowManualApply(true)}
             authUid={dataUid}
           />
         )}
@@ -8419,6 +8478,15 @@ function PoolApp() {
           onClose={() => { setShowWizard(false); }}
           onCancel={() => { cancelPlan(); setShowWizard(false); }}
           onWantAddProduct={() => { setShowWizard(false); setTab("products"); }}
+        />
+      )}
+
+      {showManualApply && (
+        <ManualApplyModal
+          products={poolProducts}
+          lang={lang}
+          onClose={() => setShowManualApply(false)}
+          onSave={saveManualApplication}
         />
       )}
 
@@ -8971,7 +9039,7 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
 }
 
 // ---------- Dashboard ----------
-function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang, activePlan, onResumePlan, authUid }) {
+function Dashboard({ latest, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang, activePlan, onResumePlan, onOpenManualApply, authUid }) {
   const t = useT(lang);
   const [aiComment, setAiComment] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -9197,6 +9265,23 @@ Réponds directement en français, sans titre ni introduction.`;
             );
           })()}
         </div>
+      )}
+
+      {/* v1.63.0 — Application manuelle hors plan (ex. entretien périodique
+          au galet), indépendante d'une mesure/plan de traitement. */}
+      {manageStock && (
+        <button
+          type="button"
+          onClick={onOpenManualApply}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            width: "100%", boxSizing: "border-box", marginTop: 10,
+            padding: "11px 0", borderRadius: 12, border: "1.5px solid #d0e4f5",
+            background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          <Plus size={16} /> {t("apply_product_manual")}
+        </button>
       )}
 
     </div>
@@ -10325,21 +10410,37 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {measures.map((m) => (
-          <MeasureRow
-            key={m.id}
-            measure={m}
-            onDelete={() => onDelete(m.id)}
-            onEdit={() => onEdit(m)}
-            onValidateApplication={() => onValidateApplication(m)}
-            application={applications.find((a) => a.measureId === m.id)}
-            isPremium={isPremium}
-            manageStock={!!pool?.manageStock}
-            lang={lang}
-            activePlan={activePlan}
-            authUid={authUid}
-          />
-        ))}
+        {(() => {
+          // v1.63.0 — Journal fusionné : mesures + entretiens manuels (hors
+          // plan), triés ensemble par date décroissante (comme measures seul
+          // auparavant). Les entretiens manuels n'ont pas de measureId — ils
+          // ne rentrent jamais en collision avec la logique existante de
+          // MeasureRow/application liée à une mesure.
+          const manualApps = (applications || []).filter((a) => a.type === "manual");
+          const items = [
+            ...measures.map((m) => ({ kind: "measure", date: m.date, m })),
+            ...manualApps.map((a) => ({ kind: "manual", date: a.appliedAt, a })),
+          ].sort((x, y) => new Date(y.date) - new Date(x.date));
+          return items.map((item) =>
+            item.kind === "measure" ? (
+              <MeasureRow
+                key={item.m.id}
+                measure={item.m}
+                onDelete={() => onDelete(item.m.id)}
+                onEdit={() => onEdit(item.m)}
+                onValidateApplication={() => onValidateApplication(item.m)}
+                application={applications.find((a) => a.measureId === item.m.id)}
+                isPremium={isPremium}
+                manageStock={!!pool?.manageStock}
+                lang={lang}
+                activePlan={activePlan}
+                authUid={authUid}
+              />
+            ) : (
+              <ManualApplicationRow key={item.a.id} app={item.a} lang={lang} />
+            )
+          );
+        })()}
       </div>
 
       <div style={{ ...styles.sectionRow, marginTop: 18 }}>
@@ -10463,6 +10564,32 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// v1.63.0 — Ligne compacte pour une application manuelle hors plan (ex.
+// entretien périodique), affichée dans le même journal que les mesures.
+function ManualApplicationRow({ app, lang }) {
+  const t = useT(lang || "fr");
+  return (
+    <div style={{ ...styles.productRow, cursor: "default" }}>
+      <div style={{ ...styles.productThumbPlaceholder, background: "#fff7f2" }}>
+        <Beaker size={16} color="#c4502f" />
+      </div>
+      <div style={{ flex: 1, textAlign: "left" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: "#c4502f", background: "#fff0e8", border: "1px solid #f3d9c8", borderRadius: 99, padding: "2px 8px" }}>
+            🔧 {t("reason_manual_maintenance")}
+          </span>
+          <span style={{ fontSize: 11.5, color: "#6a7d90" }}>
+            {formatDate(app.appliedAt)} · {new Date(app.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#0d2b4e", marginTop: 4 }}>
+          {app.productName} — {formatDose(app.appliedAmount, app.doseUnit || "g")}
+        </div>
+      </div>
     </div>
   );
 }
@@ -11870,6 +11997,91 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
         )}
       </div>
     </div>
+  );
+}
+
+// v1.63.0 — Application manuelle d'un produit hors plan de traitement (ex.
+// entretien périodique au galet). Tous les produits en stock sont proposés,
+// sans filtre par action. Champ quantité adaptatif kg/galets comme le Wizard.
+function ManualApplyModal({ products, onClose, onSave, lang }) {
+  const t = useT(lang || "fr");
+  const candidates = (products || [])
+    .filter((p) => p.action !== "outil-mesure" && (p.stockPercent ?? 100) > 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const [selectedName, setSelectedName] = useState(candidates[0]?.name || "");
+  const selected = candidates.find((p) => p.name === selectedName) || null;
+  const isGalets = selected?.packagingType === "galets" && selected?.unitWeight > 0;
+  const [amount, setAmount] = useState("");
+  const [time, setTime] = useState(() => {
+    const d = new Date();
+    return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  });
+
+  function handleSubmit() {
+    if (!selected) return;
+    const v = parseFloat(amount);
+    if (isNaN(v) || v <= 0) return;
+    const doseUnit = selected.doseUnit || "g";
+    const finalAmount = isGalets ? Math.round(v) * selected.unitWeight : v * 1000;
+    let appliedAt = new Date().toISOString();
+    if (time) {
+      const [h, m] = time.split(":").map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      appliedAt = d.toISOString();
+    }
+    onSave(selected, finalAmount, doseUnit, appliedAt);
+  }
+
+  return (
+    <ModalShell onClose={onClose} title={t("apply_product_manual")}>
+      {candidates.length === 0 ? (
+        <p style={styles.helpText}>{t("no_stock_category_hint")}</p>
+      ) : (
+        <>
+          <label style={styles.fieldLabel}>{t("product_col")}</label>
+          <select
+            value={selectedName}
+            onChange={(e) => { setSelectedName(e.target.value); setAmount(""); }}
+            style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff", marginBottom: 14 }}
+          >
+            {candidates.map((p) => (
+              <option key={p.id || p.name} value={p.name}>{p.name}</option>
+            ))}
+          </select>
+
+          <label style={styles.fieldLabel}>{t("quantity_applied")}</label>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 14 }}>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              style={{ flex: 1, fontSize: 22, fontWeight: 700, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", textAlign: "center", outline: "none" }}
+              step={isGalets ? "1" : "0.01"}
+            />
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#4a6480", minWidth: 32 }}>
+              {isGalets ? t("unit_galets") : "kg"}
+            </div>
+          </div>
+
+          <label style={styles.fieldLabel}>{t("wizard_apply_time")}</label>
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            style={{ width: "100%", boxSizing: "border-box", fontSize: 18, fontWeight: 700, color: "#0a6ebd", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", marginBottom: 16 }}
+          />
+
+          <button
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "14px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer" }}
+            onClick={handleSubmit}
+          >
+            <CheckCircle2 size={18} /> {t("wizard_done")}
+          </button>
+        </>
+      )}
+    </ModalShell>
   );
 }
 
@@ -14004,6 +14216,22 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     });
   }, [sortedMeasures, pool, products, applications]);
 
+  // v1.63.0 — Journal fusionné pour le tableau détaillé du rapport : mesures
+  // (rows, inchangé — toujours utilisé pour le graphique et les photos) +
+  // applications manuelles hors plan, triées ensemble par date croissante
+  // (même ordre que rows seul auparavant).
+  const journalRows = useMemo(() => {
+    const manualItems = (applications || [])
+      .filter((a) => a.type === "manual")
+      .map((a) => ({ manual: true, app: a }));
+    const measureItems = rows.map((r) => ({ manual: false, ...r }));
+    return [...measureItems, ...manualItems].sort((a, b) => {
+      const da = a.manual ? new Date(a.app.appliedAt) : new Date(a.measure.date);
+      const db = b.manual ? new Date(b.app.appliedAt) : new Date(b.measure.date);
+      return da - db;
+    });
+  }, [rows, applications]);
+
   // v1.40.0 — Fix : la section photos du rapport n'affichait plus rien pour les
   // mesures synchronisées cloud, car measure.photos/poolPhotos sont vides
   // depuis leur migration vers la sous-collection measures/{id}/photos (voir
@@ -14578,7 +14806,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         )}
 
         <div style={styles.reportSectionTitle}>{t("detailed_history")}</div>
-        {rows.length === 0 ? (
+        {journalRows.length === 0 ? (
           <p style={styles.helpTextSmall}>{t("no_measures_report")}</p>
         ) : (
           <table style={{ ...styles.reportTable, fontSize: 11 }}>
@@ -14604,7 +14832,32 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
               </tr>
             </thead>
             <tbody>
-              {rows.flatMap(({ measure, recs, application }, i) => {
+              {journalRows.flatMap((item, i) => {
+                // v1.63.0 — Ligne d'entretien manuel : une seule ligne, les
+                // colonnes de mesure (Date + 11 paramètres) sont fusionnées
+                // en une seule cellule (même principe que la ligne "note"
+                // plus bas), le reste (produit/dose/heure) rempli normalement.
+                if (item.manual) {
+                  const a = item.app;
+                  const prod = products.find((p) => p.name === a.productName);
+                  return [(
+                    <tr key={`manual-${a.id}`} style={{ background: i % 2 === 0 ? "#f8fafd" : "#ffffff" }}>
+                      <td colSpan={12} style={{ ...styles.reportTdCell, fontWeight: 600, color: "#0d2b4e" }}>
+                        {formatDate(a.appliedAt)} · <span style={{ fontStyle: "italic", color: "#c4502f" }}>🔧 {t("reason_manual_maintenance")}</span>
+                      </td>
+                      <td style={styles.reportTdCell}>{a.productName}</td>
+                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>—</td>
+                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "#0a6ebd" }}>{formatDose(a.appliedAmount, a.doseUnit || "g")}</td>
+                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
+                        {new Date(a.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                        {prod ? formatDose(Math.round((prod.stockPercent ?? 100) / 100 * (prod.containerAmount ?? 1) * 10) / 10, prod.containerUnit || "kg") : "—"}
+                      </td>}
+                    </tr>
+                  )];
+                }
+                const { measure, recs, application } = item;
                 const applied = application?.steps?.filter(s => !s.skipped) || [];
                 const useSteps = applied.length > 0;
                 const rowCount = useSteps ? Math.max(1, applied.length) : Math.max(1, recs.length);
