@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.65.1";
+const APP_VERSION = "1.66.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -297,6 +297,7 @@ const TRANSLATIONS = {
     wizard_partial: "Plan en cours",
     countdown_done: "C'est l'heure !",
     treatment_at: "Traitement appliqué à",
+    edit_treatment_section_title: "Traitement appliqué",
     treatment_skipped: "Étape passée",
     // Settings
     settings_title: "Réglages",
@@ -962,6 +963,7 @@ const TRANSLATIONS = {
     wizard_partial: "Plan in progress",
     countdown_done: "Time to treat!",
     treatment_at: "Treatment applied at",
+    edit_treatment_section_title: "Treatment applied",
     treatment_skipped: "Step skipped",
     settings_title: "Settings",
     my_pools: "My pools",
@@ -1617,6 +1619,7 @@ const TRANSLATIONS = {
     wizard_partial: "Plan läuft",
     countdown_done: "Zeit für die Behandlung!",
     treatment_at: "Behandlung angewendet um",
+    edit_treatment_section_title: "Angewendete Behandlung",
     treatment_skipped: "Schritt übersprungen",
     settings_title: "Einstellungen",
     my_pools: "Meine Becken",
@@ -2274,6 +2277,7 @@ const TRANSLATIONS = {
     wizard_partial: "Piano in corso",
     countdown_done: "È ora di trattare!",
     treatment_at: "Trattamento applicato alle",
+    edit_treatment_section_title: "Trattamento applicato",
     treatment_skipped: "Passo saltato",
     settings_title: "Impostazioni",
     my_pools: "Le mie vasche",
@@ -2928,6 +2932,7 @@ const TRANSLATIONS = {
     wizard_partial: "Plan en curso",
     countdown_done: "¡Es hora de tratar!",
     treatment_at: "Tratamiento aplicado a las",
+    edit_treatment_section_title: "Tratamiento aplicado",
     treatment_skipped: "Paso omitido",
     settings_title: "Ajustes",
     my_pools: "Mis piscinas",
@@ -3582,6 +3587,7 @@ const TRANSLATIONS = {
     wizard_partial: "Plano em andamento",
     countdown_done: "Hora do tratamento!",
     treatment_at: "Tratamento aplicado às",
+    edit_treatment_section_title: "Tratamento aplicado",
     treatment_skipped: "Passo ignorado",
     settings_title: "Configurações",
     my_pools: "Minhas piscinas",
@@ -6172,6 +6178,10 @@ function PoolApp() {
   const [showManualApply, setShowManualApply] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingMeasure, setEditingMeasure] = useState(null);
+  // v1.66.0 — Application (traitement) associée à la mesure en cours
+  // d'édition, pour permettre de modifier produit/quantité/heure en même
+  // temps que la mesure depuis l'écran "Modifier" de l'historique.
+  const [editingApplication, setEditingApplication] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallSource, setPaywallSource] = useState(null);
   function openPaywall(source) {
@@ -7369,6 +7379,48 @@ function PoolApp() {
     setShowManualApply(false);
   }
 
+  // v1.66.0 — Édition d'une application déjà enregistrée (produit/quantité/
+  // heure), depuis l'écran "Modifier" de l'historique. Corrige le stock en
+  // delta : recrédite l'ancien produit puis décompte le nouveau, uniquement
+  // pour les steps réellement modifiés (produit ou quantité différents).
+  // Un produit générique (non trouvé dans poolProducts) ne subit aucun
+  // mouvement de stock, comme partout ailleurs dans l'app.
+  function editHistoricalApplication(applicationId, newSteps) {
+    const app = applications.find((a) => a.id === applicationId);
+    if (!app) return;
+    const oldSteps = app.steps || [];
+
+    function applyDelta(list, productName, amount, doseUnit, sign) {
+      if (!amount) return list;
+      return list.map((p) => {
+        if (p.name !== productName || !p.containerAmount) return p;
+        const cUnit = p.containerUnit || "kg";
+        let inContainerUnit = amount;
+        if (cUnit === "kg" && doseUnit === "g") inContainerUnit = amount / 1000;
+        if (cUnit === "L" && doseUnit === "mL") inContainerUnit = amount / 1000;
+        const pct = (inContainerUnit / p.containerAmount) * 100;
+        const next = Math.max(0, Math.min(100, (p.stockPercent ?? 100) + sign * pct));
+        return { ...p, stockPercent: Math.round(next * 10) / 10 };
+      });
+    }
+
+    setProducts((prev) => {
+      let updated = prev;
+      newSteps.forEach((ns, i) => {
+        const os = oldSteps[i];
+        if (!os || ns.skipped || !ns.appliedAt) return;
+        if (ns.productName === os.productName && ns.appliedAmount === os.appliedAmount) return;
+        updated = applyDelta(updated, os.productName, os.appliedAmount, os.doseUnit, +1); // recrédite l'ancien
+        updated = applyDelta(updated, ns.productName, ns.appliedAmount, ns.doseUnit, -1); // décompte le nouveau
+      });
+      return updated;
+    });
+
+    const updatedApp = { ...app, steps: newSteps };
+    setApplications((prev) => prev.map((a) => (a.id === applicationId ? updatedApp : a)));
+    if (dataUid) FB.saveApplication(dataUid, updatedApp).catch(() => {});
+  }
+
   // Démarre le wizard pour une mesure donnée
   function startPlan(measureId, recs) {
     const now = new Date();
@@ -7538,14 +7590,16 @@ function PoolApp() {
     if (blockedByLimit) {
       openPaywall("measure_limit");
     } else {
+      setEditingApplication(null);
       setShowAddMeasure(true);
     }
   }
 
-  function handleEditMeasure(m) {
+  function handleEditMeasure(m, application) {
     // Modifier une mesure existante ne crée pas de nouvelle entrée :
     // pas concerné par la limite quotidienne gratuite.
     setEditingMeasure(m);
+    setEditingApplication(application || null);
     setShowAddMeasure(true);
   }
 
@@ -8138,6 +8192,7 @@ function PoolApp() {
             onAdd={handleOpenAddMeasure}
             onAddPrefilled={(prefilled) => {
               setEditingMeasure({ ...prefilled, __prefilled: true });
+              setEditingApplication(null);
               setShowAddMeasure(true);
             }}
             onValidateApplication={handleValidateApplication}
@@ -8298,9 +8353,14 @@ function PoolApp() {
       {showAddMeasure && (
         <AddMeasureModal
           measure={editingMeasure}
+          application={editingApplication}
+          products={poolProducts}
+          manageStock={!!activePool?.manageStock}
+          onSaveApplication={editHistoricalApplication}
           onClose={() => {
             setShowAddMeasure(false);
             setEditingMeasure(null);
+            setEditingApplication(null);
           }}
           onSave={addMeasure}
           isPremium={effectiveIsPremium}
@@ -8311,6 +8371,7 @@ function PoolApp() {
           onWantPremium={(source) => {
             setShowAddMeasure(false);
             setEditingMeasure(null);
+            setEditingApplication(null);
             openPaywall(source || "photos");
           }}
           apiKey={aiEnabled && effectiveIsPremium ? apiKey : ""}
@@ -10455,7 +10516,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
                 key={item.m.id}
                 measure={item.m}
                 onDelete={() => onDelete(item.m.id)}
-                onEdit={() => onEdit(item.m)}
+                onEdit={() => onEdit(item.m, applications.find((a) => a.measureId === item.m.id))}
                 onValidateApplication={() => onValidateApplication(item.m)}
                 application={applications.find((a) => a.measureId === item.m.id)}
                 isPremium={isPremium}
@@ -10809,10 +10870,86 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
 }
 
 // ---------- Modal Ajout mesure ----------
-function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, apiKey, apiProvider, activeParamKeys, lang, onRequestPhotoAccess, authUid, measureDevice, stripProducts, calibrationContribution }) {
+function AddMeasureModal({ measure, application, products, manageStock, onSaveApplication, onClose, onSave, isPremium, onWantPremium, apiKey, apiProvider, activeParamKeys, lang, onRequestPhotoAccess, authUid, measureDevice, stripProducts, calibrationContribution }) {
   const t = useT(lang || "fr");
   const isPrefilled = !!measure?.__prefilled;
   const isEditing = !!measure && !isPrefilled;
+
+  // v1.66.0 — Édition du traitement appliqué (produit/quantité/heure) en
+  // même temps que la mesure. N'a de sens qu'en édition d'une mesure ayant
+  // une application enregistrée avec au moins une étape non ignorée.
+  function findAnyProdForEdit(name) {
+    return (products || []).find((p) => p.name === name) || DEFAULT_PRODUCTS.find((p) => p.name === name) || null;
+  }
+  function toDispUnitForEdit(amount, unit, product) {
+    if (product?.packagingType === "galets" && product?.unitWeight > 0 && unit === "g") {
+      const v = amount != null ? Math.round(amount / product.unitWeight) : "";
+      return { value: v, unit: t("unit_galets") };
+    }
+    if (unit === "g") {
+      const v = amount != null ? parseFloat((amount / 1000).toFixed(3)) : "";
+      return { value: v, unit: "kg" };
+    }
+    if (unit === "mL") {
+      const v = amount != null ? parseFloat((amount / 1000).toFixed(3)) : "";
+      return { value: v, unit: "L" };
+    }
+    return { value: amount ?? "", unit };
+  }
+  function toBaseAmtForEdit(value, dispUnit, baseUnit, product) {
+    const v = parseFloat(value);
+    if (isNaN(v)) return null;
+    if (product?.packagingType === "galets" && product?.unitWeight > 0 && baseUnit === "g") {
+      return Math.round(v) * product.unitWeight;
+    }
+    if (baseUnit === "g") return v * 1000;
+    if (baseUnit === "mL") return v * 1000;
+    return v;
+  }
+  function candidatesForEditAction(action, currentName) {
+    const rel = action === "chlore" ? ["chlore", "chlore-stabilise"] : [action];
+    const real = (products || []).filter((p) => rel.includes(p.action) && (p.stockPercent ?? 100) > 0);
+    const generic = DEFAULT_PRODUCTS.filter((p) => rel.includes(p.action));
+    const list = [...real, ...generic];
+    if (currentName && !list.some((p) => p.name === currentName)) {
+      list.unshift(findAnyProdForEdit(currentName) || { name: currentName });
+    }
+    return list;
+  }
+  const applicationSteps = application?.steps || [];
+  const [treatmentEdits, setTreatmentEdits] = useState(() => {
+    const map = {};
+    applicationSteps.forEach((s, i) => {
+      if (s.skipped || !s.appliedAt) return;
+      const prod = findAnyProdForEdit(s.productName);
+      const { value, unit } = toDispUnitForEdit(s.appliedAmount, s.doseUnit || "g", prod);
+      const d = new Date(s.appliedAt);
+      map[i] = {
+        productName: s.productName,
+        dispValue: value === "" || value == null ? "" : String(value),
+        dispUnit: unit,
+        time: `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`,
+      };
+    });
+    return map;
+  });
+  function buildUpdatedApplicationSteps() {
+    return applicationSteps.map((s, i) => {
+      const ev = treatmentEdits[i];
+      if (!ev) return s;
+      const baseUnit = s.doseUnit || "g";
+      const prod = findAnyProdForEdit(ev.productName);
+      const amount = toBaseAmtForEdit(ev.dispValue, ev.dispUnit, baseUnit, prod);
+      let appliedAt = s.appliedAt;
+      if (ev.time) {
+        const [h, m] = ev.time.split(":").map(Number);
+        const d = new Date(s.appliedAt);
+        d.setHours(h, m, 0, 0);
+        appliedAt = d.toISOString();
+      }
+      return { ...s, productName: ev.productName, appliedAmount: amount, appliedAt };
+    });
+  }
   const [date, setDate] = useState(
     measure ? new Date(measure.date).toISOString().slice(0, 16) : todayLocalDatetime()
   );
@@ -11199,6 +11336,13 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
     }
     setCclError(null);
 
+    // v1.66.0 — Mise à jour du traitement appliqué (produit/quantité/heure),
+    // en plus de la mesure elle-même, si une application existe pour cette
+    // mesure. Corrige le stock en delta côté parent (editHistoricalApplication).
+    if (application && onSaveApplication) {
+      onSaveApplication(application.id, buildUpdatedApplicationSteps());
+    }
+
     onSave({
       ...(isEditing ? { id: measure.id } : {}),
       ...(isPrefilled && measure?.importedFromPdf ? { importedFromPdf: true } : {}),
@@ -11487,6 +11631,69 @@ function AddMeasureModal({ measure, onClose, onSave, isPremium, onWantPremium, a
             <Lock size={16} />
             <span>{t("pool_photo_locked")}</span>
           </button>
+        </div>
+      )}
+
+      {/* v1.66.0 — Édition du traitement appliqué (produit/quantité/heure),
+          en plus de la mesure. Uniquement en édition d'une mesure ayant une
+          application avec au moins une étape non ignorée. */}
+      {isEditing && applicationSteps.length > 0 && (
+        <div style={{ marginTop: 4, marginBottom: 4 }}>
+          <label style={styles.fieldLabel}>{t("edit_treatment_section_title")}</label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {applicationSteps.map((s, i) => {
+              const ev = treatmentEdits[i];
+              if (!ev) {
+                // Étape ignorée ou non appliquée : lecture seule, non modifiable.
+                return (
+                  <div key={i} style={{ fontSize: 12.5, color: "#9ab0c4", padding: "4px 0" }}>
+                    {s.productName || s.title} — {t("treatment_skipped")}
+                  </div>
+                );
+              }
+              const candidates = candidatesForEditAction(s.action, ev.productName);
+              return (
+                <div key={i} style={{ border: "1.5px solid #d0e4f5", borderRadius: 10, padding: 10 }}>
+                  <select
+                    value={ev.productName}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      const oldProd = findAnyProdForEdit(ev.productName);
+                      const newProd = findAnyProdForEdit(newName);
+                      const baseUnit = s.doseUnit || "g";
+                      const baseAmount = toBaseAmtForEdit(ev.dispValue, ev.dispUnit, baseUnit, oldProd);
+                      const { value, unit } = toDispUnitForEdit(baseAmount, baseUnit, newProd);
+                      setTreatmentEdits((prev) => ({
+                        ...prev,
+                        [i]: { ...prev[i], productName: newName, dispValue: value === "" || value == null ? "" : String(value), dispUnit: unit },
+                      }));
+                    }}
+                    style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff", marginBottom: 8 }}
+                  >
+                    {candidates.map((p) => (
+                      <option key={p.id || p.name} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <input
+                      type="number"
+                      value={ev.dispValue}
+                      onChange={(e) => setTreatmentEdits((prev) => ({ ...prev, [i]: { ...prev[i], dispValue: e.target.value } }))}
+                      style={{ flex: 1, fontSize: 18, fontWeight: 700, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "8px 10px", textAlign: "center", outline: "none" }}
+                      step={ev.dispUnit === t("unit_galets") ? "1" : "0.01"}
+                    />
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#4a6480", minWidth: 32 }}>{ev.dispUnit}</div>
+                    <input
+                      type="time"
+                      value={ev.time}
+                      onChange={(e) => setTreatmentEdits((prev) => ({ ...prev, [i]: { ...prev[i], time: e.target.value } }))}
+                      style={{ fontSize: 14, fontWeight: 700, color: "#0a6ebd", border: "2px solid #d0e4f5", borderRadius: 10, padding: "8px 10px", outline: "none" }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
