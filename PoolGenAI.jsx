@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.61.0";
+const APP_VERSION = "1.62.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -221,6 +221,10 @@ const TRANSLATIONS = {
     // Products
     my_products: "MES PRODUITS",
     products_formula: "Le dosage est calculé selon : {quantité produit} pour faire varier le paramètre de {effet} sur {volume de référence} m³. Ces produits sont propres à ce bassin.",
+    products_to_buy: "Mes produits à acheter",
+    products_to_buy_empty: "Rien à acheter pour le moment — tous les stocks sont suffisants.",
+    reason_low_stock: "Stock bas",
+    reason_insufficient_plan: "Insuffisant pour le plan en cours",
     products_locked: "Fonctionnalité réservée à la version illimitée",
     stock_not_managed: "La gestion du stock n'est pas activée pour ce bassin. Active-la dans Réglages pour gérer les quantités et voir les consommations.",
     activate_in_settings: "Activer dans Réglages →",
@@ -881,6 +885,10 @@ const TRANSLATIONS = {
     save_changes: "Save changes",
     my_products: "MY PRODUCTS",
     products_formula: "Dosage calculated as: {quantity} to change parameter by {effect} per {volume} m³. These products are specific to this pool.",
+    products_to_buy: "Products to buy",
+    products_to_buy_empty: "Nothing to buy right now — all stock levels are sufficient.",
+    reason_low_stock: "Low stock",
+    reason_insufficient_plan: "Not enough for the current plan",
     products_locked: "Feature reserved for the unlimited version",
     stock_not_managed: "Stock management is not enabled for this pool. Enable it in Settings to track quantities and view consumption.",
     activate_in_settings: "Enable in Settings →",
@@ -1530,6 +1538,10 @@ const TRANSLATIONS = {
     save_changes: "Änderungen speichern",
     my_products: "MEINE PRODUKTE",
     products_formula: "Dosierung berechnet als: {Menge} um Parameter um {Effekt} pro {Volumen} m³ zu ändern.",
+    products_to_buy: "Einkaufsliste",
+    products_to_buy_empty: "Aktuell nichts zu kaufen — alle Bestände sind ausreichend.",
+    reason_low_stock: "Niedriger Bestand",
+    reason_insufficient_plan: "Nicht genug für den laufenden Plan",
     products_locked: "Funktion für unbegrenzte Version reserviert",
     stock_not_managed: "Lagerverwaltung für dieses Becken nicht aktiviert. In Einstellungen aktivieren.",
     activate_in_settings: "In Einstellungen aktivieren →",
@@ -2180,6 +2192,10 @@ const TRANSLATIONS = {
     save_changes: "Salva modifiche",
     my_products: "I MIEI PRODOTTI",
     products_formula: "Il dosaggio è calcolato come: {quantità} per variare il parametro di {effetto} per {volume} m³.",
+    products_to_buy: "Prodotti da acquistare",
+    products_to_buy_empty: "Niente da acquistare al momento — le scorte sono sufficienti.",
+    reason_low_stock: "Scorta bassa",
+    reason_insufficient_plan: "Insufficiente per il piano in corso",
     products_locked: "Funzione riservata alla versione illimitata",
     stock_not_managed: "La gestione dello stock non è attivata per questa vasca. Attivala nelle Impostazioni.",
     activate_in_settings: "Attiva nelle Impostazioni →",
@@ -2827,6 +2843,10 @@ const TRANSLATIONS = {
     save_changes: "Guardar cambios",
     my_products: "MIS PRODUCTOS",
     products_formula: "El dosaje se calcula como: {cantidad} para variar el parámetro en {efecto} por {volumen} m³.",
+    products_to_buy: "Productos por comprar",
+    products_to_buy_empty: "Nada que comprar por ahora — todas las existencias son suficientes.",
+    reason_low_stock: "Stock bajo",
+    reason_insufficient_plan: "Insuficiente para el plan en curso",
     products_locked: "Función reservada para la versión ilimitada",
     stock_not_managed: "La gestión de stock no está activada para esta piscina. Actívala en Ajustes.",
     activate_in_settings: "Activar en Ajustes →",
@@ -3474,6 +3494,10 @@ const TRANSLATIONS = {
     save_changes: "Salvar alterações",
     my_products: "MEUS PRODUTOS",
     products_formula: "A dosagem é calculada como: {quantidade} para variar o parâmetro em {efeito} por {volume} m³.",
+    products_to_buy: "Produtos a comprar",
+    products_to_buy_empty: "Nada a comprar por agora — todos os stocks são suficientes.",
+    reason_low_stock: "Stock baixo",
+    reason_insufficient_plan: "Insuficiente para o plano em curso",
     products_locked: "Funcionalidade reservada para a versão ilimitada",
     stock_not_managed: "A gestão de estoque não está ativada para esta piscina. Ative nas Configurações.",
     activate_in_settings: "Ativar nas Configurações →",
@@ -6124,6 +6148,8 @@ function PoolApp() {
   const [tab, setTab] = useState("dashboard"); // dashboard | history | products | settings
   const [showAddMeasure, setShowAddMeasure] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
+  // v1.62.0 — Sous-page "Mes produits à acheter", accessible depuis l'onglet Produits.
+  const [showProductsToBuy, setShowProductsToBuy] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingMeasure, setEditingMeasure] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -8063,7 +8089,26 @@ function PoolApp() {
             activePlan={activePlan}
           />
         )}
-        {tab === "products" && (
+        {tab === "products" && showProductsToBuy && (
+          <ProductsToBuyView
+            products={poolProducts}
+            plan={activePlan}
+            latest={latest}
+            volume={activePool?.volume || 0}
+            effectiveTargets={effectiveTargets}
+            activeParamKeys={activeParamKeys}
+            lang={lang}
+            manageStock={!!activePool?.manageStock}
+            poolName={activePool?.name}
+            onBack={() => setShowProductsToBuy(false)}
+            onEditProduct={(p) => {
+              setEditingProduct(p);
+              setShowAddProduct(true);
+              setShowProductsToBuy(false);
+            }}
+          />
+        )}
+        {tab === "products" && !showProductsToBuy && (
           <ProductsView
             products={poolProducts}
             onEdit={(p) => {
@@ -8081,6 +8126,7 @@ function PoolApp() {
             manageStock={!!activePool?.manageStock}
             onWantPremium={() => openPaywall("products")}
             onWantSettings={() => setTab("settings")}
+            onWantProductsToBuy={() => setShowProductsToBuy(true)}
             lang={lang}
           />
         )}
@@ -12001,7 +12047,7 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
 }
 
 // ---------- Produits ----------
-function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, onWantSettings, poolName, manageStock, lang }) {
+function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPremium, onWantPremium, onWantSettings, onWantProductsToBuy, poolName, manageStock, lang }) {
   const t = useT(lang);
 
   // Version gratuite : écran paywall uniquement
@@ -12052,6 +12098,23 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
       ) : (
         <>
           <p style={styles.helpText}>{t("products_formula")}</p>
+
+          <button
+            type="button"
+            onClick={onWantProductsToBuy}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              width: "100%", boxSizing: "border-box", background: "#fff7f2",
+              border: "1px solid #f3d9c8", borderRadius: 12, padding: "12px 14px",
+              marginBottom: 14, cursor: "pointer", textAlign: "left",
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 700, color: "#c4502f" }}>
+              <AlertTriangle size={16} />
+              {t("products_to_buy")}
+            </span>
+            <ChevronRight size={16} color="#c4502f" />
+          </button>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {products
@@ -12138,6 +12201,120 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
   );
 }
 
+// v1.62.0 — "Mes produits à acheter" : agrège deux critères indépendants
+// (stock bas, et stock insuffisant pour couvrir le plan de traitement en
+// cours ou les recommandations calculées sur la dernière mesure) sur le
+// bassin actuellement affiché. Entièrement recalculé à l'ouverture, pas de
+// données stockées séparément.
+function remainingInDoseUnit(prod, doseUnit) {
+  if (!prod?.containerAmount) return null;
+  const cUnit = prod.containerUnit || "kg";
+  let remaining = prod.containerAmount * ((prod.stockPercent ?? 100) / 100); // en containerUnit
+  if (cUnit === "kg" && doseUnit === "g") remaining *= 1000;
+  if (cUnit === "L" && doseUnit === "mL") remaining *= 1000;
+  return remaining;
+}
+
+function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, activeParamKeys, lang, manageStock, poolName, onBack, onEditProduct }) {
+  const t = useT(lang || "fr");
+
+  const rows = useMemo(() => {
+    if (!manageStock || !products) return [];
+    const reasonsByProduct = new Map(); // id -> Set(reason)
+    const addReason = (prod, reason) => {
+      if (!prod) return;
+      const set = reasonsByProduct.get(prod.id) || new Set();
+      set.add(reason);
+      reasonsByProduct.set(prod.id, set);
+    };
+
+    // Critère 1 : stock bas (≤10%) — couvre correctif ET entretien, pas de
+    // calcul séparé sur unitWeight (sans portée pour un produit d'entretien).
+    products.forEach((p) => {
+      if (p.action !== "outil-mesure" && (p.stockPercent ?? 100) <= 10) {
+        addReason(p, "low_stock");
+      }
+    });
+
+    // Critère 2 : insuffisant pour couvrir le plan en cours (ou, à défaut,
+    // les recommandations calculées sur la dernière mesure sans plan démarré).
+    let pendingSteps = [];
+    if (plan) {
+      pendingSteps = plan.steps.filter((s) => !s.appliedAt && !s.skipped && s.mode !== "entretien");
+    } else if (latest) {
+      pendingSteps = computeRecommendations(latest, volume, products, effectiveTargets, activeParamKeys, null);
+    }
+    pendingSteps.forEach((step) => {
+      if (!step.productName || step.computedDoseAmount == null || !step.doseUnit) return;
+      const prod = products.find((p) => p.name === step.productName);
+      if (!prod) return;
+      const remaining = remainingInDoseUnit(prod, step.doseUnit);
+      if (remaining != null && remaining < step.computedDoseAmount) {
+        addReason(prod, "insufficient_plan");
+      }
+    });
+
+    return [...reasonsByProduct.entries()]
+      .map(([id, reasons]) => ({ product: products.find((p) => p.id === id), reasons: [...reasons] }))
+      .filter((r) => !!r.product)
+      .sort((a, b) => (a.product.stockPercent ?? 100) - (b.product.stockPercent ?? 100));
+  }, [products, plan, latest, volume, effectiveTargets, activeParamKeys, manageStock]);
+
+  return (
+    <div>
+      {poolName && <div style={styles.poolNameTag}>{poolName}</div>}
+      <div style={styles.sectionRow}>
+        <button
+          type="button"
+          onClick={onBack}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "#0a6ebd", fontWeight: 700, fontSize: 13, padding: 0, display: "flex", alignItems: "center", gap: 4 }}
+        >
+          {t("back_btn")}
+        </button>
+      </div>
+      <div style={styles.sectionRow}>
+        <span style={styles.sectionLabel}>{t("products_to_buy")}</span>
+      </div>
+
+      {!manageStock ? (
+        <div style={styles.stockNotManagedBox}>
+          <span>{t("stock_not_managed")}</span>
+        </div>
+      ) : rows.length === 0 ? (
+        <p style={styles.emptyText}>{t("products_to_buy_empty")}</p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {rows.map(({ product: p, reasons }) => (
+            <button key={p.id} style={styles.productRow} onClick={() => onEditProduct(p)}>
+              {p.photo ? (
+                <img src={p.photo} alt="" style={styles.productThumb} />
+              ) : (
+                <div style={styles.productThumbPlaceholder}>
+                  <Beaker size={16} color="#7ab8e8" />
+                </div>
+              )}
+              <div style={{ flex: 1, textAlign: "left" }}>
+                <div style={styles.productName}>{p.name}</div>
+                <div style={{ fontSize: 11, color: "#c0392b", fontWeight: 600, marginTop: 3 }}>
+                  {t("stock_label")} {p.stockPercent ?? 100} %
+                </div>
+                <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+                  {reasons.map((r) => (
+                    <span key={r} style={{ fontSize: 10.5, fontWeight: 700, color: "#c4502f", background: "#fff0e8", border: "1px solid #f3d9c8", borderRadius: 99, padding: "3px 8px" }}>
+                      {t(r === "low_stock" ? "reason_low_stock" : "reason_insufficient_plan")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <ChevronRight size={16} color="#6a7d90" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, applications, manageStock, onWantManageStock, lang, aiEnabled, apiKey, apiProvider, authUid }) {
   const t = useT(lang || "fr");
   const [name, setName] = useState(product?.name || "");
@@ -12193,6 +12370,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
   const [detectedBarcode, setDetectedBarcode] = useState(null);
   const [detectedSubstance, setDetectedSubstance] = useState(null);
   const fileInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
   const formErrorRef = useRef(null);
 
   async function handlePhotoChange(e) {
@@ -12244,6 +12422,15 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
       if (suggDoseAmount != null && suggDoseUnit === "kg") { suggDoseAmount *= 1000; suggDoseUnit = "g"; }
       if (suggDoseAmount != null && suggDoseUnit === "L") { suggDoseAmount *= 1000; suggDoseUnit = "mL"; }
       if (suggDoseUnit) setDoseUnit(suggDoseUnit);
+      // v1.61.2 — Sur demande explicite d'Arnaud : les 3 champs de dosage
+      // sont désormais pré-remplis directement par l'IA (plus seulement en
+      // placeholder à retaper — règle v1.46.0 assouplie en connaissance de
+      // cause). Restent entièrement modifiables par l'utilisateur avant
+      // enregistrement.
+      if (suggDoseAmount != null) setDoseAmount(suggDoseAmount);
+      if (result.effectAmount != null) setEffectAmount(result.effectAmount);
+      if (result.effectPer != null) setEffectPer(result.effectPer);
+      if (result.waitHours != null) setWaitHours(result.waitHours);
       setAiSuggestion({
         doseAmount: suggDoseAmount,
         effectAmount: result.effectAmount ?? null,
@@ -12468,16 +12655,27 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
           )}
 
           {analysisPhotos.length < 4 && (
-            <button
-              type="button"
-              style={{ ...styles.photoCaptureBtn, marginTop: analysisPhotos.length ? 8 : 0 }}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Camera size={17} />
-              {photoBusy ? "..." : analysisPhotos.length ? t("other_photo") : t("camera_btn")}
-            </button>
+            <div style={{ ...styles.photoCaptureBtnRow, marginTop: analysisPhotos.length ? 8 : 0 }}>
+              <button
+                type="button"
+                style={styles.photoCaptureBtnHalf}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera size={17} />
+                {photoBusy ? t("loading") : analysisPhotos.length ? t("other_photo") : t("camera_btn")}
+              </button>
+              <button
+                type="button"
+                style={styles.photoCaptureBtnHalf}
+                onClick={() => galleryInputRef.current?.click()}
+              >
+                <ImageOff size={17} />
+                {photoBusy ? t("loading") : analysisPhotos.length ? t("other_gallery") : t("gallery_btn")}
+              </button>
+            </div>
           )}
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={styles.hiddenFileInput} />
+          <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} style={styles.hiddenFileInput} />
+          <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={styles.hiddenFileInput} />
 
           {analysisPhotos.length > 0 && aiEnabled && apiKey && (
             <button
