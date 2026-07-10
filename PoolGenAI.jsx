@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.64.0";
+const APP_VERSION = "1.65.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -12074,9 +12074,17 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
 // sans filtre par action. Champ quantité adaptatif kg/galets comme le Wizard.
 function ManualApplyModal({ products, onClose, onSave, lang }) {
   const t = useT(lang || "fr");
-  const candidates = (products || [])
+  const realCandidates = (products || [])
     .filter((p) => p.action !== "outil-mesure" && (p.stockPercent ?? 100) > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
+  // v1.64.0 — Aucun produit réel en stock : on propose le catalogue générique
+  // (DEFAULT_PRODUCTS), comme dans le wizard de plan de traitement. Jamais
+  // décompté du stock réel (saveManualApplication ne matche que par id, un
+  // produit générique n'en partage aucun avec "products").
+  const isGeneric = realCandidates.length === 0;
+  const candidates = isGeneric
+    ? DEFAULT_PRODUCTS.filter((p) => p.action !== "outil-mesure").sort((a, b) => a.name.localeCompare(b.name))
+    : realCandidates;
 
   const [selectedName, setSelectedName] = useState(candidates[0]?.name || "");
   const selected = candidates.find((p) => p.name === selectedName) || null;
@@ -12109,6 +12117,9 @@ function ManualApplyModal({ products, onClose, onSave, lang }) {
         <p style={styles.helpText}>{t("no_stock_category_hint")}</p>
       ) : (
         <>
+          {isGeneric && (
+            <div style={{ fontSize: 12, color: "#c0392b", marginBottom: 8 }}>{t("no_stock_generic_hint")}</div>
+          )}
           <label style={styles.fieldLabel}>{t("product_col")}</label>
           <select
             value={selectedName}
