@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.63.0";
+const APP_VERSION = "1.63.1";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -14218,8 +14218,8 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
 
   // v1.63.0 — Journal fusionné pour le tableau détaillé du rapport : mesures
   // (rows, inchangé — toujours utilisé pour le graphique et les photos) +
-  // applications manuelles hors plan, triées ensemble par date croissante
-  // (même ordre que rows seul auparavant).
+  // applications manuelles hors plan.
+  // v1.63.1 — Tri décroissant (le plus récent en premier), sur demande d'Arnaud.
   const journalRows = useMemo(() => {
     const manualItems = (applications || [])
       .filter((a) => a.type === "manual")
@@ -14228,7 +14228,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     return [...measureItems, ...manualItems].sort((a, b) => {
       const da = a.manual ? new Date(a.app.appliedAt) : new Date(a.measure.date);
       const db = b.manual ? new Date(b.app.appliedAt) : new Date(b.measure.date);
-      return da - db;
+      return db - da;
     });
   }, [rows, applications]);
 
@@ -14446,7 +14446,62 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     const paramStartX = mL;
     const prodStartX  = paramCols.reduce((s,c) => s + c.w, mL);
 
-    sortedMeasures.forEach((m, i) => {
+    // v1.63.1 — Journal fusionné (mesures + entretiens manuels), trié
+    // décroissant (le plus récent en premier) — même logique que journalRows
+    // côté aperçu écran, reconstruite ici car generatePdfBlob n'a pas accès
+    // au useMemo du composant.
+    const manualEntries = (applications || [])
+      .filter((a) => a.type === "manual")
+      .map((a) => ({ manual: true, app: a }));
+    const measureEntries = sortedMeasures.map((m) => ({ manual: false, m }));
+    const journalEntries = [...measureEntries, ...manualEntries].sort((a, b) => {
+      const da = a.manual ? new Date(a.app.appliedAt) : new Date(a.m.date);
+      const db = b.manual ? new Date(b.app.appliedAt) : new Date(b.m.date);
+      return db - da;
+    });
+
+    journalEntries.forEach((entry, i) => {
+      if (entry.manual) {
+        const a = entry.app;
+        const prod = products.find(p => p.name === a.productName);
+        const blockH = rowH;
+
+        checkPage(blockH);
+        if (i % 2 === 0) { pdf.setFillColor(247,250,254); pdf.rect(mL, y, cW, blockH, "F"); }
+
+        const d = new Date(a.appliedAt);
+        const dateStr = `${d.getDate().toString().padStart(2,"0")}/${(d.getMonth()+1).toString().padStart(2,"0")} ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+
+        // Cellule fusionnée (paramCols) : date + libellé entretien manuel
+        pdf.setTextColor(30,30,30);
+        pdf.text(`${dateStr} · 🔧 ${t("reason_manual_maintenance")}`, paramStartX + 0.8, y + 3.8, { maxWidth: (prodStartX - paramStartX) - 1.5 });
+
+        const stockVal = (() => {
+          if (!manageStock || !prod) return "—";
+          const qty = Math.round((prod.stockPercent ?? 100) / 100 * (prod.containerAmount ?? 1) * 10) / 10;
+          return formatDose(qty, prod.containerUnit || "kg");
+        })();
+
+        const prodVals = {
+          prod:    a.productName || "—",
+          advised: "—",
+          qty:     formatDose(a.appliedAmount, a.doseUnit || "g"),
+          stock:   stockVal,
+        };
+
+        x = prodStartX;
+        prodCols.forEach(c => {
+          pdf.text(String(prodVals[c.key] ?? '—'), x+0.8, y + 3.8, { maxWidth: c.w - 1.5 });
+          x += c.w;
+        });
+
+        pdf.setDrawColor(200,212,228); pdf.setLineWidth(0.15);
+        pdf.line(mL, y+blockH, mL+cW, y+blockH);
+        y += blockH;
+        return;
+      }
+
+      const m = entry.m;
       const app   = applications.find(a => a.measureId === m.id);
       const appliedSteps = app?.steps?.filter(s => !s.skipped) || [];
       const repTargets = getEffectiveTargets(pool?.treatmentType || "chlore");
