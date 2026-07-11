@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.66.0";
+const APP_VERSION = "1.66.1";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -526,6 +526,7 @@ const TRANSLATIONS = {
     reco_water_renewal: "Renouvellement d'eau partiel",
     reco_water_renewal_text: "Renouveler ≈ {pct} % du volume pour revenir vers 40 mg/L",
     reco_cl_excess_text: "Laisser le chlore se dégrader naturellement au soleil, ne pas se baigner en attendant.",
+    reco_recheck_later: "Recontrôle recommandé dans quelques heures",
     reco_cl_shock_text: "ce soir (choc renforcé)",
     reco_note_tac: "Un TAC bas rend le pH instable.",
     reco_note_tac_minus: "Même acide que le pH-, mais effet à calibrer séparément sur le TAC. Corriger avant le pH, par petites doses.",
@@ -1186,6 +1187,7 @@ const TRANSLATIONS = {
     reco_water_renewal: "Partial water renewal",
     reco_water_renewal_text: "Renew ≈ {pct} % of volume to return to 40 mg/L",
     reco_cl_excess_text: "Let chlorine degrade naturally in sunlight, avoid swimming in the meantime.",
+    reco_recheck_later: "Recheck recommended in a few hours",
     reco_cl_shock_text: "tonight (shock treatment)",
     reco_note_tac: "Low TAC makes pH unstable.",
     reco_note_tac_minus: "Same acid as pH-, but its TAC effect must be calibrated separately. Correct before pH, in small doses.",
@@ -1845,6 +1847,7 @@ const TRANSLATIONS = {
     reco_water_renewal: "Teilweiser Wasserwechsel",
     reco_water_renewal_text: "≈ {pct} % des Volumens erneuern, um auf 40 mg/L zu kommen",
     reco_cl_excess_text: "Chlor natürlich in der Sonne abbauen lassen, zwischenzeitlich nicht schwimmen.",
+    reco_recheck_later: "Erneute Kontrolle in ein paar Stunden empfohlen",
     reco_cl_shock_text: "heute Abend (Schockbehandlung)",
     reco_note_tac: "Niedriger KH macht den pH instabil.",
     reco_note_tac_minus: "Gleiche Säure wie pH-, aber die KH-Wirkung muss separat kalibriert werden. Vor dem pH korrigieren, in kleinen Dosen.",
@@ -2500,6 +2503,7 @@ const TRANSLATIONS = {
     reco_water_renewal: "Rinnovo parziale dell'acqua",
     reco_water_renewal_text: "Rinnovare ≈ {pct} % del volume per tornare a 40 mg/L",
     reco_cl_excess_text: "Lasciare che il cloro si degradi naturalmente al sole, evitare di nuotare nel frattempo.",
+    reco_recheck_later: "Ricontrollo consigliato tra qualche ora",
     reco_cl_shock_text: "stasera (trattamento shock)",
     reco_note_tac: "Un TAC basso rende il pH instabile.",
     reco_note_tac_minus: "Stesso acido del pH-, ma l'effetto sul TAC va calibrato separatamente. Correggere prima del pH, a piccole dosi.",
@@ -3155,6 +3159,7 @@ const TRANSLATIONS = {
     reco_water_renewal: "Renovación parcial del agua",
     reco_water_renewal_text: "Renovar ≈ {pct} % del volumen para volver a 40 mg/L",
     reco_cl_excess_text: "Dejar que el cloro se degrade naturalmente al sol, evitar bañarse mientras tanto.",
+    reco_recheck_later: "Se recomienda volver a comprobar en unas horas",
     reco_cl_shock_text: "esta noche (tratamiento de choque)",
     reco_note_tac: "Un TAC bajo hace el pH inestable.",
     reco_note_tac_minus: "Mismo ácido que el pH-, pero su efecto sobre el TAC debe calibrarse por separado. Corregir antes que el pH, en dosis pequeñas.",
@@ -3807,6 +3812,7 @@ const TRANSLATIONS = {
     reco_water_renewal: "Renovação parcial da água",
     reco_water_renewal_text: "Renovar ≈ {pct} % do volume para voltar a 40 mg/L",
     reco_cl_excess_text: "Deixar o cloro degradar naturalmente ao sol, evitar nadar enquanto isso.",
+    reco_recheck_later: "Recomenda-se novo controlo dentro de algumas horas",
     reco_cl_shock_text: "esta noite (tratamento de choque)",
     reco_note_tac: "Um TAC baixo torna o pH instável.",
     reco_note_tac_minus: "Mesmo ácido do pH-, mas o efeito no TAC deve ser calibrado à parte. Corrigir antes do pH, em pequenas doses.",
@@ -9407,16 +9413,21 @@ function ParamCard({ param, value, effectiveTargets, lang }) {
 
 function RecoCard({ reco, isLast, manageStock, products, lang }) {
   const t = useT(lang || "fr");
+  const isInfo = !!reco.noAction;
   return (
-    <div style={styles.recoCard}>
+    <div style={isInfo ? styles.recoCardInfo : styles.recoCard}>
       <div style={{ ...styles.recoTop, justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={styles.recoStepBadge}>{reco.stepNumber}</div>
-          <span style={styles.recoParam}>{reco.title}</span>
+          <div style={isInfo ? styles.recoStepBadgeInfo : styles.recoStepBadge}>{reco.stepNumber}</div>
+          <span style={isInfo ? styles.recoParamInfo : styles.recoParam}>{reco.title}</span>
         </div>
       </div>
 
-      {reco.startsAfterHours > 0 && (
+      {/* v1.66.1 — Le badge "À débuter au moins Xh après" n'a de sens que
+          pour une vraie action à déclencher. Sur une carte informative
+          (rien à appliquer), on affiche à la place un simple rappel de
+          recontrôle, sans lien avec le timing des étapes précédentes. */}
+      {!isInfo && reco.startsAfterHours > 0 && (
         <div style={styles.recoTiming}>
           <Clock size={13} color="#a8721a" />
           {t("start_after", { h: reco.startsAfterHours })}
@@ -9451,7 +9462,14 @@ function RecoCard({ reco, isLast, manageStock, products, lang }) {
       {reco.missingTip && <div style={styles.recoNote}>{reco.missingTip}</div>}
       {reco.timingTip && <div style={{ fontSize: 12.5, color: "#3a5a78", marginTop: 4 }}>🌙 {reco.timingTip}</div>}
 
-      {!!reco.waitHours && (
+      {isInfo && (
+        <div style={styles.recoInfoTiming}>
+          <Clock size={13} color="#2d6a9a" />
+          {t("reco_recheck_later")}
+        </div>
+      )}
+
+      {!isInfo && !!reco.waitHours && (
         <div style={styles.recoWait}>
           <Clock size={13} color="#0a6ebd" />
           {isLast ? t("measure_after", { h: reco.waitHours }) : t("wait_before_next", { h: reco.waitHours })}
@@ -9728,6 +9746,10 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         computedDoseAmount: null,
         doseUnit: null,
         waitHours: 0,
+        // v1.66.1 — Carte purement informative (rien à appliquer, dégradation
+        // naturelle) : pas de "À débuter après" ni de style "à traiter", voir
+        // RecoCard.
+        noAction: true,
       });
     }
   }
@@ -9857,6 +9879,8 @@ function computeRecommendations(latest, volume, products, effectiveTargets, acti
         doseUnit: null,
         note: _("reco_note_cya"),
         waitHours: 0,
+        // v1.66.1 — Idem chlore-excess : carte informative, pas d'action.
+        noAction: true,
       });
     }
   }
@@ -15886,6 +15910,15 @@ const styles = {
     borderRadius: 14,
     padding: "13px 14px",
   },
+  // v1.66.1 — Variante neutre pour les cartes purement informatives (rien à
+  // appliquer, ex. chlore/dureté trop haut) : évite le style "à traiter"
+  // rouge/orange qui suggère à tort une action en attente.
+  recoCardInfo: {
+    background: "#eaf4fb",
+    border: "1px solid #c8e0f5",
+    borderRadius: 14,
+    padding: "13px 14px",
+  },
   recoTop: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 },
   recoStepBadge: {
     width: 20,
@@ -15901,6 +15934,20 @@ const styles = {
     flexShrink: 0,
   },
   recoParam: { fontSize: 13.5, fontWeight: 700, color: "#8a3a1f" },
+  recoStepBadgeInfo: {
+    width: 20,
+    height: 20,
+    borderRadius: 99,
+    background: "#5a8bb0",
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: 800,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  recoParamInfo: { fontSize: 13.5, fontWeight: 700, color: "#2d5a78" },
   recoTiming: {
     display: "flex",
     alignItems: "center",
@@ -15956,6 +16003,21 @@ const styles = {
     fontSize: 12,
     fontWeight: 600,
     color: "#0a6ebd",
+    marginTop: 7,
+  },
+  // v1.66.1 — Ligne "recontrôle recommandé" des cartes informatives, en
+  // remplacement du badge "À débuter après" (non pertinent sans action).
+  recoInfoTiming: {
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
+    fontSize: 11.5,
+    fontWeight: 700,
+    color: "#2d6a9a",
+    background: "#dcedf9",
+    border: "1px solid #b8d8ef",
+    borderRadius: 8,
+    padding: "5px 8px",
     marginTop: 7,
   },
   recoNote: { fontSize: 11.5, color: "#6a7d90", marginTop: 6, lineHeight: 1.4 },
