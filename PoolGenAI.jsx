@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.70.0";
+const APP_VERSION = "1.73.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -577,6 +577,19 @@ const TRANSLATIONS = {
     premium_downgrade_confirm_desc: "Tu perdras l'accès à :",
     premium_downgrade_confirm_btn: "Désactiver la version illimitée",
     premium_downgrade_cancel_btn: "Annuler et continuer Premium",
+    onboarding_step1_title: "Bienvenue sur PoolGenAI",
+    onboarding_step1_text: "Suis la chimie de ta piscine facilement : mesures, dosages, plan de traitement personnalisé.",
+    onboarding_step2_title: "Deux façons de mesurer",
+    onboarding_step2_text: "Bandelette + photo (analyse automatique des couleurs), ou photomètre avec saisie manuelle. Le détail t'attend au moment de ta première mesure.",
+    onboarding_step3_title: "Des résultats clairs",
+    onboarding_step3_text: "Chaque paramètre est comparé à sa cible. L'app te propose alors les doses à appliquer.",
+    onboarding_step4_title: "Prêt à commencer",
+    onboarding_step4_text: "Ajoute ta première mesure quand tu veux. Bassins illimités, rapport PDF et plus : découvre Premium plus tard dans Réglages.",
+    onboarding_next: "Suivant",
+    onboarding_skip: "Passer",
+    onboarding_start: "C'est parti",
+    help_section: "Aide",
+    settings_replay_onboarding: "Revoir la présentation",
     report_print_btn: "Imprimer / Enregistrer en PDF",
     share_report: "Partager le rapport",
     report_email_subject: "Rapport PoolGenAI — {pool}",
@@ -1251,6 +1264,19 @@ const TRANSLATIONS = {
     premium_downgrade_confirm_desc: "You will lose access to:",
     premium_downgrade_confirm_btn: "Disable unlimited version",
     premium_downgrade_cancel_btn: "Cancel and keep Premium",
+    onboarding_step1_title: "Welcome to PoolGenAI",
+    onboarding_step1_text: "Track your pool's chemistry with ease: readings, dosing, and a personalized treatment plan.",
+    onboarding_step2_title: "Two ways to measure",
+    onboarding_step2_text: "Test strip + photo (automatic color analysis), or photometer with manual entry. Details come at your first reading.",
+    onboarding_step3_title: "Clear results",
+    onboarding_step3_text: "Each parameter is compared to its target. The app then suggests the doses to apply.",
+    onboarding_step4_title: "Ready to start",
+    onboarding_step4_text: "Add your first reading whenever you like. Unlimited pools, PDF reports and more: discover Premium later in Settings.",
+    onboarding_next: "Next",
+    onboarding_skip: "Skip",
+    onboarding_start: "Let's go",
+    help_section: "Help",
+    settings_replay_onboarding: "Replay the introduction",
     report_print_btn: "Print / Save as PDF",
     share_report: "Share report",
     report_email_subject: "PoolGenAI report — {pool}",
@@ -1924,6 +1950,19 @@ const TRANSLATIONS = {
     premium_downgrade_confirm_desc: "Du verlierst den Zugriff auf:",
     premium_downgrade_confirm_btn: "Unbegrenzte Version deaktivieren",
     premium_downgrade_cancel_btn: "Abbrechen und Premium behalten",
+    onboarding_step1_title: "Willkommen bei PoolGenAI",
+    onboarding_step1_text: "Behalte die Chemie deines Pools im Blick: Messungen, Dosierung und ein persönlicher Behandlungsplan.",
+    onboarding_step2_title: "Zwei Messmethoden",
+    onboarding_step2_text: "Teststreifen + Foto (automatische Farbanalyse) oder Photometer mit manueller Eingabe. Details folgen bei deiner ersten Messung.",
+    onboarding_step3_title: "Klare Ergebnisse",
+    onboarding_step3_text: "Jeder Parameter wird mit seinem Zielwert verglichen. Die App schlägt dir dann die passende Dosierung vor.",
+    onboarding_step4_title: "Bereit loszulegen",
+    onboarding_step4_text: "Füge deine erste Messung hinzu, wann immer du möchtest. Unbegrenzte Pools, PDF-Berichte und mehr: entdecke Premium später in den Einstellungen.",
+    onboarding_next: "Weiter",
+    onboarding_skip: "Überspringen",
+    onboarding_start: "Los geht's",
+    help_section: "Hilfe",
+    settings_replay_onboarding: "Einführung erneut ansehen",
     report_print_btn: "Drucken / Als PDF speichern",
     share_report: "Bericht teilen",
     report_email_subject: "PoolGenAI-Bericht — {pool}",
@@ -2593,6 +2632,19 @@ const TRANSLATIONS = {
     premium_downgrade_confirm_desc: "Perderai l'accesso a:",
     premium_downgrade_confirm_btn: "Disattiva versione illimitata",
     premium_downgrade_cancel_btn: "Annulla e mantieni Premium",
+    onboarding_step1_title: "Benvenuto su PoolGenAI",
+    onboarding_step1_text: "Tieni sotto controllo la chimica della tua piscina: misurazioni, dosaggi e un piano di trattamento personalizzato.",
+    onboarding_step2_title: "Due modi per misurare",
+    onboarding_step2_text: "Striscia reattiva + foto (analisi automatica dei colori), oppure fotometro con inserimento manuale. I dettagli arrivano alla tua prima misurazione.",
+    onboarding_step3_title: "Risultati chiari",
+    onboarding_step3_text: "Ogni parametro viene confrontato con il suo obiettivo. L'app ti suggerisce quindi le dosi da applicare.",
+    onboarding_step4_title: "Pronto per iniziare",
+    onboarding_step4_text: "Aggiungi la tua prima misurazione quando vuoi. Piscine illimitate, report PDF e altro: scopri Premium più avanti nelle Impostazioni.",
+    onboarding_next: "Avanti",
+    onboarding_skip: "Salta",
+    onboarding_start: "Iniziamo",
+    help_section: "Aiuto",
+    settings_replay_onboarding: "Rivedi la presentazione",
     report_print_btn: "Stampa / Salva come PDF",
     share_report: "Condividi il rapporto",
     report_email_subject: "Rapporto PoolGenAI — {pool}",
@@ -3262,6 +3314,19 @@ const TRANSLATIONS = {
     premium_downgrade_confirm_desc: "Perderás el acceso a:",
     premium_downgrade_confirm_btn: "Desactivar versión ilimitada",
     premium_downgrade_cancel_btn: "Cancelar y mantener Premium",
+    onboarding_step1_title: "Bienvenido a PoolGenAI",
+    onboarding_step1_text: "Controla la química de tu piscina fácilmente: mediciones, dosis y un plan de tratamiento personalizado.",
+    onboarding_step2_title: "Dos formas de medir",
+    onboarding_step2_text: "Tira reactiva + foto (análisis automático de colores), o fotómetro con introducción manual. Los detalles llegan en tu primera medición.",
+    onboarding_step3_title: "Resultados claros",
+    onboarding_step3_text: "Cada parámetro se compara con su objetivo. La app te sugiere entonces las dosis a aplicar.",
+    onboarding_step4_title: "Listo para empezar",
+    onboarding_step4_text: "Añade tu primera medición cuando quieras. Piscinas ilimitadas, informes en PDF y más: descubre Premium más tarde en Ajustes.",
+    onboarding_next: "Siguiente",
+    onboarding_skip: "Omitir",
+    onboarding_start: "Empezar",
+    help_section: "Ayuda",
+    settings_replay_onboarding: "Volver a ver la presentación",
     report_print_btn: "Imprimir / Guardar como PDF",
     share_report: "Compartir informe",
     report_email_subject: "Informe PoolGenAI — {pool}",
@@ -3928,6 +3993,19 @@ const TRANSLATIONS = {
     premium_downgrade_confirm_desc: "Perderás o acesso a:",
     premium_downgrade_confirm_btn: "Desativar versão ilimitada",
     premium_downgrade_cancel_btn: "Cancelar e manter Premium",
+    onboarding_step1_title: "Bem-vindo ao PoolGenAI",
+    onboarding_step1_text: "Acompanha a química da tua piscina com facilidade: medições, dosagens e um plano de tratamento personalizado.",
+    onboarding_step2_title: "Duas formas de medir",
+    onboarding_step2_text: "Tira reagente + foto (análise automática de cores), ou fotómetro com introdução manual. Os detalhes chegam na tua primeira medição.",
+    onboarding_step3_title: "Resultados claros",
+    onboarding_step3_text: "Cada parâmetro é comparado com o seu objetivo. A app sugere então as doses a aplicar.",
+    onboarding_step4_title: "Pronto para começar",
+    onboarding_step4_text: "Adiciona a tua primeira medição quando quiseres. Piscinas ilimitadas, relatório PDF e mais: descobre o Premium mais tarde em Definições.",
+    onboarding_next: "Seguinte",
+    onboarding_skip: "Saltar",
+    onboarding_start: "Vamos lá",
+    help_section: "Ajuda",
+    settings_replay_onboarding: "Rever a apresentação",
     report_print_btn: "Imprimir / Salvar como PDF",
     share_report: "Partilhar relatório",
     report_email_subject: "Relatório PoolGenAI — {pool}",
@@ -4615,7 +4693,7 @@ function statusColor(status) {
   if (status === "ok") return "#1a8fd1";
   if (status === "low") return "#d98c2b";
   if (status === "high") return "#c4502f";
-  return "#6a7d90";
+  return "#6a7d90"; // v1.71.0 — statut inconnu : couleur neutre fixe, jamais thémée
 }
 
 function statusLabel(status, t) {
@@ -5744,16 +5822,16 @@ By creating an account, the user acknowledges having read this document in full 
     const text = disclaimerText[detectedLang || lang] || disclaimerText.en;
     return (
       <div style={{ minHeight: "100vh", background: "#eaf4fb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 }}>
-        <div style={{ width: "100%", maxWidth: 480, background: "#fff", borderRadius: 20, padding: 24, boxShadow: "0 4px 24px #0a6ebd18", maxHeight: "90dvh", display: "flex", flexDirection: "column" }}>
+        <div style={{ width: "100%", maxWidth: 480, background: "#fff", borderRadius: 20, padding: 24, boxShadow: "0 4px 24px var(--brand-primary)18", maxHeight: "90dvh", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#0d2b4e" }}>{tDisc("disclaimer_title")}</div>
-            <button onClick={() => setMode("signup")} style={{ background: "none", border: "none", cursor: "pointer", color: "#6a7d90" }}><X size={20} /></button>
+            <div style={{ fontSize: 15, fontWeight: 800, color: "var(--brand-text-strong)" }}>{tDisc("disclaimer_title")}</div>
+            <button onClick={() => setMode("signup")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand-text-muted)" }}><X size={20} /></button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", fontSize: 12, color: "#2d4a6e", lineHeight: 1.7, whiteSpace: "pre-wrap", background: "#f5f8fc", borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
             {text}
           </div>
           <button
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
             onClick={() => { setCguAccepted(true); setMode("signup"); }}
           >
             {tDisc("disclaimer_cgu")}
@@ -5773,12 +5851,12 @@ By creating an account, the user acknowledges having read this document in full 
   if (mode === "done") {
     return (
       <div style={{ minHeight: "100vh", background: "#eaf4fb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <div style={{ width: "100%", maxWidth: 380, background: "#fff", borderRadius: 20, padding: 32, boxShadow: "0 4px 24px #0a6ebd18", textAlign: "center" }}>
+        <div style={{ width: "100%", maxWidth: 380, background: "#fff", borderRadius: 20, padding: 32, boxShadow: "0 4px 24px var(--brand-primary)18", textAlign: "center" }}>
           <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#e8f8ef", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
             <CheckCircle2 size={28} color="#1a8fd1" />
           </div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("account_created")}</div>
-          <div style={{ fontSize: 13, color: "#6a7d90", marginBottom: 12 }}>{t("account_created_sub")}</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("account_created")}</div>
+          <div style={{ fontSize: 13, color: "var(--brand-text-muted)", marginBottom: 12 }}>{t("account_created_sub")}</div>
           {verifyEmailFailed ? (
             <div style={{ fontSize: 12, color: "#c0392b", background: "#fdf0ef", border: "1px solid #f3c9c4", borderRadius: 10, padding: "10px 14px", marginBottom: 14, textAlign: "left" }}>
               ⚠️ {t("verify_email_send_failed")}
@@ -5790,7 +5868,7 @@ By creating an account, the user acknowledges having read this document in full 
           )}
           {verifyEmailFailed && (
             <button
-              style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 600, fontSize: 13.5, cursor: resendBusy ? "default" : "pointer", marginBottom: 14 }}
+              style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1.5px solid var(--brand-primary)", background: "#fff", color: "var(--brand-primary)", fontWeight: 600, fontSize: 13.5, cursor: resendBusy ? "default" : "pointer", marginBottom: 14 }}
               disabled={resendBusy}
               onClick={async () => {
                 setResendBusy(true);
@@ -5808,7 +5886,7 @@ By creating an account, the user acknowledges having read this document in full 
             </button>
           )}
           <button
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
             onClick={onSkip}
           >
             {t("start_app")}
@@ -5820,14 +5898,14 @@ By creating an account, the user acknowledges having read this document in full 
 
   return (
     <div style={{ minHeight: "100vh", background: "#eaf4fb", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ width: "100%", maxWidth: 380, background: "#fff", borderRadius: 20, padding: 28, boxShadow: "0 4px 24px #0a6ebd18" }}>
+      <div style={{ width: "100%", maxWidth: 380, background: "#fff", borderRadius: 20, padding: 28, boxShadow: "0 4px 24px var(--brand-primary)18" }}>
         {/* Logo */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 24 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: "#0a6ebd", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: "var(--brand-primary)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
             <Droplets size={28} color="#fff" />
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#0d2b4e" }}>PoolGenAI</div>
-          <div style={{ fontSize: 13, color: "#6a7d90", marginTop: 2 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: "var(--brand-text-strong)" }}>PoolGenAI</div>
+          <div style={{ fontSize: 13, color: "var(--brand-text-muted)", marginTop: 2 }}>
             {mode === "signup" ? t("create_account") : mode === "reset" ? t("reset_password") : t("sign_in")}
           </div>
         </div>
@@ -5842,7 +5920,7 @@ By creating an account, the user acknowledges having read this document in full 
         {firebaseReady && mode !== "reset" && (
           <>
             <button
-              style={{ width: "100%", padding: "12px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#f8fafd", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, fontWeight: 600, color: "#0d2b4e", cursor: busy ? "not-allowed" : "pointer", marginBottom: 16, opacity: busy ? 0.6 : 1 }}
+              style={{ width: "100%", padding: "12px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#f8fafd", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)", cursor: busy ? "not-allowed" : "pointer", marginBottom: 16, opacity: busy ? 0.6 : 1 }}
               onClick={handleGoogle}
               disabled={busy}
             >
@@ -5860,7 +5938,7 @@ By creating an account, the user acknowledges having read this document in full 
         {/* Formulaire email */}
         {firebaseReady && (
           <>
-            <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>Email</FieldLabel>
+            <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 4 }}>Email</FieldLabel>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
               style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
@@ -5870,7 +5948,7 @@ By creating an account, the user acknowledges having read this document in full 
 
             {mode !== "reset" && (
               <>
-                <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>{t("password")}</FieldLabel>
+                <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 4 }}>{t("password")}</FieldLabel>
                 <input
                   type="password" value={pwd} onChange={e => setPwd(e.target.value)}
                   style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
@@ -5883,7 +5961,7 @@ By creating an account, the user acknowledges having read this document in full 
             {/* Confirmation mot de passe à l'inscription */}
             {mode === "signup" && (
               <>
-                <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>{t("confirm_password")}</FieldLabel>
+                <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 4 }}>{t("confirm_password")}</FieldLabel>
                 <input
                   type="password" value={pwd2} onChange={e => setPwd2(e.target.value)}
                   style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: pwd2 && pwd !== pwd2 ? "1.5px solid #c0392b" : "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
@@ -5905,12 +5983,12 @@ By creating an account, the user acknowledges having read this document in full 
                     type="checkbox"
                     checked={cguAccepted}
                     onChange={e => setCguAccepted(e.target.checked)}
-                    style={{ marginTop: 2, accentColor: "#0a6ebd", width: 16, height: 16, flexShrink: 0 }}
+                    style={{ marginTop: 2, accentColor: "var(--brand-primary)", width: 16, height: 16, flexShrink: 0 }}
                   />
-                  <span style={{ fontSize: 12, color: "#0d2b4e", lineHeight: 1.5 }}>
+                  <span style={{ fontSize: 12, color: "var(--brand-text-strong)", lineHeight: 1.5 }}>
                     <strong>{t("disclaimer_cgu")}</strong>
                     {" "}<span
-                      style={{ color: "#0a6ebd", textDecoration: "underline", cursor: "pointer" }}
+                      style={{ color: "var(--brand-primary)", textDecoration: "underline", cursor: "pointer" }}
                       onClick={e => { e.preventDefault(); setMode("disclaimer"); }}
                     >{t("disclaimer_title")}</span>
                   </span>
@@ -5921,9 +5999,9 @@ By creating an account, the user acknowledges having read this document in full 
                     type="checkbox"
                     checked={dataAccepted}
                     onChange={e => setDataAccepted(e.target.checked)}
-                    style={{ marginTop: 2, accentColor: "#0a6ebd", width: 16, height: 16, flexShrink: 0 }}
+                    style={{ marginTop: 2, accentColor: "var(--brand-primary)", width: 16, height: 16, flexShrink: 0 }}
                   />
-                  <span style={{ fontSize: 12, color: "#4a6480", lineHeight: 1.5 }}>
+                  <span style={{ fontSize: 12, color: "var(--brand-text-secondary)", lineHeight: 1.5 }}>
                     {t("disclaimer_data")}
                   </span>
                 </label>
@@ -5940,7 +6018,7 @@ By creating an account, the user acknowledges having read this document in full 
                   <button
                     type="button"
                     onClick={() => { setMode("signup"); setError(""); setShowCreateAccountHint(false); }}
-                    style={{ marginTop: 6, background: "none", border: "none", color: "#0a6ebd", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                    style={{ marginTop: 6, background: "none", border: "none", color: "var(--brand-primary)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}
                   >
                     {t("create_account_hint")}
                   </button>
@@ -5949,7 +6027,7 @@ By creating an account, the user acknowledges having read this document in full 
                   <button
                     type="button"
                     onClick={() => { setMode("reset"); setError(""); setShowResetHint(false); }}
-                    style={{ marginTop: 6, background: "none", border: "none", color: "#0a6ebd", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                    style={{ marginTop: 6, background: "none", border: "none", color: "var(--brand-primary)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}
                   >
                     {t("reset_password_hint")}
                   </button>
@@ -5959,7 +6037,7 @@ By creating an account, the user acknowledges having read this document in full 
             {info && <div style={{ fontSize: 12, color: "#1a8fd1", marginBottom: 8, padding: "8px 10px", background: "#e8f4fd", borderRadius: 8 }}>{info}</div>}
 
             <button
-              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: busy ? "#7ab8e8" : "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: busy ? "not-allowed" : "pointer", marginBottom: 14 }}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: busy ? "var(--brand-icon-light)" : "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: busy ? "not-allowed" : "pointer", marginBottom: 14 }}
               onClick={handleSubmit}
               disabled={busy}
             >
@@ -5969,15 +6047,15 @@ By creating an account, the user acknowledges having read this document in full 
             <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
               {mode === "login" && (
                 <>
-                  <button onClick={() => { setMode("signup"); setError(""); setPwd(""); setPwd2(""); }} style={{ background: "none", border: "none", color: "#0a6ebd", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>{t("no_account")}</button>
+                  <button onClick={() => { setMode("signup"); setError(""); setPwd(""); setPwd2(""); }} style={{ background: "none", border: "none", color: "var(--brand-primary)", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>{t("no_account")}</button>
                   <button onClick={() => { setMode("reset"); setError(""); }} style={{ background: "none", border: "none", color: "#9aa9a5", fontSize: 12, cursor: "pointer" }}>{t("forgot_password")}</button>
                 </>
               )}
               {mode === "signup" && (
-                <button onClick={() => { setMode("login"); setError(""); setPwd(""); setPwd2(""); }} style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 13, cursor: "pointer" }}>{t("already_account")}</button>
+                <button onClick={() => { setMode("login"); setError(""); setPwd(""); setPwd2(""); }} style={{ background: "none", border: "none", color: "var(--brand-text-muted)", fontSize: 13, cursor: "pointer" }}>{t("already_account")}</button>
               )}
               {mode === "reset" && (
-                <button onClick={() => { setMode("login"); setError(""); }} style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 12, cursor: "pointer" }}>{t("back_to_login")}</button>
+                <button onClick={() => { setMode("login"); setError(""); }} style={{ background: "none", border: "none", color: "var(--brand-text-muted)", fontSize: 12, cursor: "pointer" }}>{t("back_to_login")}</button>
               )}
             </div>
           </>
@@ -6372,6 +6450,12 @@ function PoolApp() {
   // partagées (CGU clause 11). Activé par défaut — données anonymes, coût nul
   // pour l'utilisateur, cohérent avec le texte CGU ("peut désactiver").
   const [calibrationContribution, setCalibrationContribution] = useState(true);
+  // v1.72.0 — Wizard d'accueil : affiché une seule fois après la création du
+  // tout premier bassin d'un compte. onboardingSeen est synchronisé via
+  // Firestore (comme calibrationContribution) pour ne pas le revoir en cas
+  // de changement d'appareil.
+  const [onboardingSeen, setOnboardingSeen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(false);
   const [suspended, setSuspended] = useState(false);
@@ -6696,6 +6780,9 @@ function PoolApp() {
       }
       if (config.calibrationContribution !== undefined) {
         setCalibrationContribution((prev) => (prev === config.calibrationContribution ? prev : config.calibrationContribution));
+      }
+      if (config.onboardingSeen !== undefined) {
+        setOnboardingSeen((prev) => (prev === config.onboardingSeen ? prev : config.onboardingSeen));
       }
       if (config.pseudo !== undefined) {
         setMyPseudo((prev) => (prev === config.pseudo ? prev : (config.pseudo || "")));
@@ -7893,6 +7980,10 @@ function PoolApp() {
   // quantité — quel que soit le statut premium ou la gestion de stock.
   function addPool(pool) {
     if (viewContext) return; // v1.55.0 — réservé au propriétaire du compte
+    // v1.72.0 — pools.length (pas activePools) : un compte qui a supprimé tous
+    // ses bassins par le passé a déjà pools.length > 0 (soft delete), donc ne
+    // revoit pas le wizard. Seul un compte réellement neuf déclenche l'onboarding.
+    const isFirstPoolEver = pools.length === 0;
     const id = uid();
     setPools((prev) => [...prev, { id, ...pool }]);
     setProducts((prev) => {
@@ -7906,6 +7997,20 @@ function PoolApp() {
     });
     setActivePoolId(id);
     setShowAddPool(false);
+    if (isFirstPoolEver && !onboardingSeen) {
+      setShowOnboarding(true);
+    }
+  }
+
+  // v1.72.0 — Marque l'onboarding comme vu (fin normale ou "Passer"), synchronisé
+  // Firestore pour ne pas le revoir sur un autre appareil. Le lien "Revoir la
+  // présentation" dans Réglages rouvre le wizard sans repasser par ici.
+  function markOnboardingSeen() {
+    setShowOnboarding(false);
+    if (!onboardingSeen) {
+      setOnboardingSeen(true);
+      syncOwnConfig({ onboardingSeen: true });
+    }
   }
 
   function updatePool(id, updates) {
@@ -7944,26 +8049,26 @@ function PoolApp() {
     <>
     {verifyLinkStatus && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
           {verifyLinkStatus === "verifying" ? (
             <>
-              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
-              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("verify_link_checking")}</div>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "var(--brand-primary)" }} />
+              <div style={{ fontSize: 14, color: "var(--brand-text-secondary)" }}>{t("verify_link_checking")}</div>
             </>
           ) : (
             <>
               <div style={{ fontSize: 34, marginBottom: 10 }}>
                 {verifyLinkStatus === "verified" || verifyLinkStatus === "already_verified" ? "✅" : "⚠️"}
               </div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t(`verify_link_${verifyLinkStatus}_title`)}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t(`verify_link_${verifyLinkStatus}_desc`)}
               </div>
               <button
                 onClick={() => setVerifyLinkStatus(null)}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
               >
                 {t("verify_link_continue_btn")}
               </button>
@@ -7974,48 +8079,48 @@ function PoolApp() {
     )}
     {mergeLinkStatus && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
           {mergeLinkStatus === "pending_confirmation" ? (
             <>
               <div style={{ fontSize: 34, marginBottom: 10 }}>🔗</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t("merge_link_pending_title")}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t("merge_link_pending_desc")}
               </div>
               <button
                 onClick={handleConfirmMergeClick}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 10 }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 10 }}
               >
                 {t("merge_link_confirm_btn")}
               </button>
               <button
                 onClick={() => { setMergeLinkStatus(null); setMergeLinkParams(null); }}
-                style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1px solid #d8e2ec", background: "transparent", color: "#4a6480", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1px solid #d8e2ec", background: "transparent", color: "var(--brand-text-secondary)", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
               >
                 {t("merge_link_cancel_btn")}
               </button>
             </>
           ) : mergeLinkStatus === "confirming" ? (
             <>
-              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
-              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("merge_link_confirming")}</div>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "var(--brand-primary)" }} />
+              <div style={{ fontSize: 14, color: "var(--brand-text-secondary)" }}>{t("merge_link_confirming")}</div>
             </>
           ) : (
             <>
               <div style={{ fontSize: 34, marginBottom: 10 }}>
                 {mergeLinkStatus === "merged" || mergeLinkStatus === "already_merged" ? "✅" : "⚠️"}
               </div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t(`merge_link_${mergeLinkStatus}_title`)}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t(`merge_link_${mergeLinkStatus}_desc`)}
               </div>
               <button
                 onClick={() => { setMergeLinkStatus(null); setMergeLinkParams(null); }}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
               >
                 {t("verify_link_continue_btn")}
               </button>
@@ -8026,19 +8131,19 @@ function PoolApp() {
     )}
     {authUser && inviteLinkStatus && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
           {inviteLinkStatus === "loading_info" || inviteLinkStatus === "responding" ? (
             <>
-              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
-              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("invite_response_checking")}</div>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "var(--brand-primary)" }} />
+              <div style={{ fontSize: 14, color: "var(--brand-text-secondary)" }}>{t("invite_response_checking")}</div>
             </>
           ) : inviteLinkStatus === "info_ready" ? (
             <>
               <div style={{ fontSize: 34, marginBottom: 10 }}>🔗</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t("invite_response_title")}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t("invite_response_text", {
                   pseudo: inviteLinkInfo?.primaryPseudo || inviteLinkInfo?.primaryEmail || "",
                   pool: inviteLinkInfo?.poolName || "",
@@ -8046,13 +8151,13 @@ function PoolApp() {
               </div>
               <button
                 onClick={() => handleInviteResponse("accept")}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 10 }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 10 }}
               >
                 {t("invite_response_accept")}
               </button>
               <button
                 onClick={() => handleInviteResponse("decline")}
-                style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1px solid #d8e2ec", background: "transparent", color: "#4a6480", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1px solid #d8e2ec", background: "transparent", color: "var(--brand-text-secondary)", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
               >
                 {t("invite_response_decline")}
               </button>
@@ -8062,15 +8167,15 @@ function PoolApp() {
               <div style={{ fontSize: 34, marginBottom: 10 }}>
                 {inviteLinkStatus === "accepted" ? "✅" : "⚠️"}
               </div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t("invite_response_title")}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t(`invite_response_${inviteLinkStatus}`)}
               </div>
               <button
                 onClick={() => { setInviteLinkStatus(null); setInviteLinkToken(null); setInviteLinkInfo(null); }}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
               >
                 {t("verify_link_continue_btn")}
               </button>
@@ -8081,19 +8186,19 @@ function PoolApp() {
     )}
     {authUser && revocationLinkStatus && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
           {revocationLinkStatus === "loading_info" || revocationLinkStatus === "responding" ? (
             <>
-              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
-              <div style={{ fontSize: 14, color: "#4a6480" }}>{t("invite_response_checking")}</div>
+              <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "var(--brand-primary)" }} />
+              <div style={{ fontSize: 14, color: "var(--brand-text-secondary)" }}>{t("invite_response_checking")}</div>
             </>
           ) : revocationLinkStatus === "info_ready" ? (
             <>
               <div style={{ fontSize: 34, marginBottom: 10 }}>🔓</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t("revocation_response_title")}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t("revocation_response_text", {
                   pseudo: revocationLinkInfo?.secondaryPseudo || "",
                   pool: revocationLinkInfo?.poolName || "",
@@ -8101,7 +8206,7 @@ function PoolApp() {
               </div>
               <button
                 onClick={handleRevocationConfirm}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
               >
                 {t("revocation_response_accept")}
               </button>
@@ -8111,15 +8216,15 @@ function PoolApp() {
               <div style={{ fontSize: 34, marginBottom: 10 }}>
                 {revocationLinkStatus === "done" ? "✅" : "⚠️"}
               </div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>
                 {t("revocation_response_title")}
               </div>
-              <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
                 {t(`revocation_response_${revocationLinkStatus}`)}
               </div>
               <button
                 onClick={() => { setRevocationLinkStatus(null); setRevocationLinkToken(null); setRevocationLinkInfo(null); }}
-                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
               >
                 {t("verify_link_continue_btn")}
               </button>
@@ -8130,13 +8235,13 @@ function PoolApp() {
     )}
     {forceUpdate && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #0a6ebd33" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
           <div style={{ fontSize: 34, marginBottom: 10 }}>🔄</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("update_required_title")}</div>
-          <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 20, lineHeight: 1.5 }}>{t("update_required_desc")}</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("update_required_title")}</div>
+          <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 20, lineHeight: 1.5 }}>{t("update_required_desc")}</div>
           <button
             onClick={forceReloadApp}
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
           >
             {t("update_required_btn")}
           </button>
@@ -8147,8 +8252,8 @@ function PoolApp() {
       <div style={{ position: "fixed", inset: 0, zIndex: 3050, background: "rgba(10,60,50,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
           <div style={{ fontSize: 34, marginBottom: 10 }}>📧</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("verify_gate_title")}</div>
-          <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 18, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("verify_gate_title")}</div>
+          <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5 }}>
             {t("verify_gate_desc")}{authUser?.email ? ` (${authUser.email})` : ""}
           </div>
           {verifyCheckFailed && (
@@ -8169,7 +8274,7 @@ function PoolApp() {
           <button
             onClick={handleCheckEmailVerified}
             disabled={verifyChecking}
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: verifyChecking ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: verifyChecking ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}
           >
             {verifyChecking ? <Loader2 size={16} className="spin" /> : null}
             {verifyChecking ? t("verify_gate_checking") : t("verify_gate_check_btn")}
@@ -8177,13 +8282,13 @@ function PoolApp() {
           <button
             onClick={handleResendVerification}
             disabled={verifySending}
-            style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#fff", color: "#0a6ebd", fontWeight: 600, fontSize: 13.5, cursor: verifySending ? "default" : "pointer", marginBottom: 14 }}
+            style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1.5px solid #d0e4f5", background: "#fff", color: "var(--brand-primary)", fontWeight: 600, fontSize: 13.5, cursor: verifySending ? "default" : "pointer", marginBottom: 14 }}
           >
             {verifySending ? "..." : t("verify_gate_resend_btn")}
           </button>
           <button
             onClick={handleSignOutFromVerification}
-            style={{ background: "none", border: "none", color: "#6a7d90", fontSize: 12.5, cursor: "pointer" }}
+            style={{ background: "none", border: "none", color: "var(--brand-text-muted)", fontSize: 12.5, cursor: "pointer" }}
           >
             {t("verify_gate_signout")}
           </button>
@@ -8194,10 +8299,10 @@ function PoolApp() {
       <div style={{ position: "fixed", inset: 0, zIndex: 3100, background: "rgba(60,20,20,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
           <div style={{ fontSize: 34, marginBottom: 10 }}>⛔</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("suspended_title")}</div>
-          <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: suspendReason ? 8 : 20, lineHeight: 1.5 }}>{t("suspended_desc")}</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("suspended_title")}</div>
+          <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: suspendReason ? 8 : 20, lineHeight: 1.5 }}>{t("suspended_desc")}</div>
           {suspendReason && (
-            <div style={{ fontSize: 12.5, color: "#6a7d90", marginBottom: 20, fontStyle: "italic", background: "#f5f7fa", borderRadius: 8, padding: "8px 10px" }}>
+            <div style={{ fontSize: 12.5, color: "var(--brand-text-muted)", marginBottom: 20, fontStyle: "italic", background: "#f5f7fa", borderRadius: 8, padding: "8px 10px" }}>
               {suspendReason}
             </div>
           )}
@@ -8216,27 +8321,27 @@ function PoolApp() {
       <div style={{ position: "fixed", inset: 0, zIndex: 3100, background: "rgba(60,20,20,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
           <div style={{ fontSize: 34, marginBottom: 10 }}>⛔</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8 }}>{t("account_deleted_title")}</div>
-          <div style={{ fontSize: 13.5, color: "#4a6480", marginBottom: 20, lineHeight: 1.5 }}>{t("account_deleted_desc")}</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("account_deleted_title")}</div>
+          <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 20, lineHeight: 1.5 }}>{t("account_deleted_desc")}</div>
           <button
             onClick={() => {
               if (window.confirm(t("reactivate_confirm"))) reactivateAccount();
             }}
             disabled={reactivating}
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: reactivating ? "#7ab8e8" : "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: reactivating ? "default" : "pointer", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: reactivating ? "var(--brand-icon-light)" : "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: reactivating ? "default" : "pointer", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
           >
             {reactivating ? <Loader2 size={16} className="spin" /> : null}
             {t("reactivate_btn")}
           </button>
           <button
             onClick={() => setShowDataRequestScreen(true)}
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 14 }}
+            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid var(--brand-primary)", background: "#fff", color: "var(--brand-primary)", fontWeight: 700, fontSize: 14.5, cursor: "pointer", marginBottom: 14 }}
           >
             {t("account_deleted_request_btn")}
           </button>
           <button
             onClick={handleSignOut}
-            style={{ background: "none", border: "none", color: "#6a7d90", fontWeight: 600, fontSize: 13, cursor: "pointer", textDecoration: "underline" }}
+            style={{ background: "none", border: "none", color: "var(--brand-text-muted)", fontWeight: 600, fontSize: 13, cursor: "pointer", textDecoration: "underline" }}
           >
             {t("back_to_home")}
           </button>
@@ -8263,8 +8368,8 @@ function PoolApp() {
         dans ces deux cas au lieu de laisser croire à un simple chargement. */}
     {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && !cloudConfigReceived && !(viewContext && (poolAccessError || secondaryLoadTimeout)) && (
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f5f8f7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "#0a6ebd" }} />
-        <div style={{ fontSize: 13.5, color: "#4a6480" }}>{t("context_loading")}</div>
+        <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "var(--brand-primary)" }} />
+        <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)" }}>{t("context_loading")}</div>
       </div>
     )}
     {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && !viewContext && (
@@ -8282,16 +8387,16 @@ function PoolApp() {
     {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && viewContext &&
       ((activePools.length === 0 && cloudConfigReceived) || poolAccessError || secondaryLoadTimeout) && (
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f5f8f7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
-        <Droplets size={40} color="#7ab8e8" style={{ marginBottom: 16 }} />
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 }}>
+        <Droplets size={40} color="var(--brand-icon-light)" style={{ marginBottom: 16 }} />
+        <div style={{ fontSize: 16, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 8 }}>
           {t("secondary_pool_unavailable_title")}
         </div>
-        <div style={{ fontSize: 13.5, color: "#6a7d90", marginBottom: 24, maxWidth: 320 }}>
+        <div style={{ fontSize: 13.5, color: "var(--brand-text-muted)", marginBottom: 24, maxWidth: 320 }}>
           {poolAccessError === "denied" ? t("secondary_pool_revoked_desc") : t("secondary_pool_unavailable_desc")}
         </div>
         <button
           onClick={() => switchToContext(null)}
-          style={{ padding: "12px 24px", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
+          style={{ padding: "12px 24px", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
         >
           {t("context_own")}
         </button>
@@ -8312,7 +8417,26 @@ function PoolApp() {
         />
       </div>
     )}
-    <div style={styles.app} className="app">
+    <div
+      style={{
+        ...styles.app,
+        // v1.71.0 — Thème gratuit/premium : variables CSS pilotées par
+        // effectiveIsPremium (déjà utilisé partout ailleurs, gère aussi
+        // correctement le contexte secondaire délégué). Le mur Premium et
+        // les écrans de vente restent en bleu littéral, non thémés (voir
+        // PaywallModal et ProductsView) — seule l'identité visuelle
+        // "ambiante" de l'app bascule ici.
+        "--brand-primary": effectiveIsPremium ? "#0a6ebd" : "#1f6b4a",
+        "--brand-primary-dark": effectiveIsPremium ? "#064a8a" : "#123f2c",
+        "--brand-text-strong": effectiveIsPremium ? "#0d2b4e" : "#173a2b",
+        "--brand-text-secondary": effectiveIsPremium ? "#4a6480" : "#3f6552",
+        "--brand-text-muted": effectiveIsPremium ? "#6a7d90" : "#5c7d6c",
+        "--brand-icon-light": effectiveIsPremium ? "#7ab8e8" : "#7fc7a4",
+        "--brand-header-sub": effectiveIsPremium ? "#a8d4f0" : "#bfe0cf",
+        "--brand-bg-tint": effectiveIsPremium ? "#f0f6fb" : "#eef6f1",
+      }}
+      className="app"
+    >
       <Header
         poolName={activePool?.name}
         location={activePool?.location}
@@ -8462,6 +8586,7 @@ function PoolApp() {
             isPremium={isPremium}
             setIsPremium={setIsPremium}
             onWantDowngrade={() => setShowDowngradeConfirm(true)}
+            onReplayOnboarding={() => setShowOnboarding(true)}
             aiEnabled={aiEnabled}
             setAiEnabled={setAiEnabled}
             calibrationContribution={calibrationContribution}
@@ -8635,6 +8760,10 @@ function PoolApp() {
         <PremiumRevealOverlay onDone={() => setShowPremiumReveal(false)} lang={lang} variant={revealVariant} />
       )}
 
+      {showOnboarding && (
+        <OnboardingWizard onDone={markOnboardingSeen} lang={lang} />
+      )}
+
       {showAddPool && (
         <AddPoolModal onClose={() => setShowAddPool(false)} onSave={addPool} lang={lang} />
       )}
@@ -8668,16 +8797,16 @@ function PoolApp() {
 
       {showPhotoWarning && (
         <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(10,30,60,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 420, width: "100%", boxShadow: "0 8px 32px #0a6ebd22" }}>
+          <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 420, width: "100%", boxShadow: "0 8px 32px var(--brand-primary)22" }}>
             <div style={{ fontSize: 28, textAlign: "center", marginBottom: 8 }}>📸</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#0d2b4e", textAlign: "center", marginBottom: 12 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--brand-text-strong)", textAlign: "center", marginBottom: 12 }}>
               {tFn("photo_warning_title")}
             </div>
-            <div style={{ fontSize: 13, color: "#4a6480", lineHeight: 1.7, background: "#f5f8fc", borderRadius: 10, padding: "12px 14px", marginBottom: 16, whiteSpace: "pre-line" }}>
+            <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", lineHeight: 1.7, background: "#f5f8fc", borderRadius: 10, padding: "12px 14px", marginBottom: 16, whiteSpace: "pre-line" }}>
               {tFn("photo_warning_body")}
             </div>
             <button
-              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
               onClick={() => {
                 setShowPhotoWarning(false);
                 if (photoWarningCallback) { photoWarningCallback(); setPhotoWarningCallback(null); }
@@ -8698,19 +8827,19 @@ function PoolApp() {
       {/* Modale re-acceptation CGU si nouvelle version */}
       {showCguUpdate && !showLogin && (
         <div style={{ position: "fixed", inset: 0, zIndex: 900, background: "rgba(10,30,60,0.8)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 440, width: "100%", boxShadow: "0 8px 32px #0a6ebd22" }}>
+          <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 440, width: "100%", boxShadow: "0 8px 32px var(--brand-primary)22" }}>
             <div style={{ fontSize: 24, textAlign: "center", marginBottom: 8 }}>📋</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#0d2b4e", textAlign: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--brand-text-strong)", textAlign: "center", marginBottom: 8 }}>
               {tFn("cgu_updated_title")}
             </div>
-            <div style={{ fontSize: 13, color: "#4a6480", lineHeight: 1.6, marginBottom: 16, textAlign: "center" }}>
+            <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", lineHeight: 1.6, marginBottom: 16, textAlign: "center" }}>
               {tFn("cgu_updated_body")}
             </div>
             <div style={{ fontSize: 11, color: "#9ab0c4", textAlign: "center", marginBottom: 16 }}>
               CGU {CGU_VERSION}
             </div>
             <button
-              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
               onClick={() => {
                 setAcceptedCguVersion(CGU_VERSION);
                 setCguAcceptedDate(new Date().toISOString());
@@ -8955,15 +9084,15 @@ function Header({ poolName, location, poolPhoto, isPremium, entries, activeEntry
                     setShowSwitcher(false);
                   }}
                 >
-                  <Droplets size={16} color={active ? "#0a6ebd" : "#6a7d90"} />
+                  <Droplets size={16} color={active ? "var(--brand-primary)" : "var(--brand-text-muted)"} />
                   <div style={{ flex: 1, textAlign: "left" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{entry.name}</span>
+                      <span style={{ fontWeight: 700, fontSize: 13.5, color: "var(--brand-text-strong)" }}>{entry.name}</span>
                       {entry.photo && (
                         <img src={entry.photo} alt="" style={styles.poolSwitcherThumbInline} />
                       )}
                     </div>
-                    <div style={{ fontSize: 11.5, color: "#6a7d90" }}>
+                    <div style={{ fontSize: 11.5, color: "var(--brand-text-muted)" }}>
                       {entry.kind === "invited" ? entry.pseudo : entry.location}
                     </div>
                   </div>
@@ -9021,7 +9150,7 @@ function TabBar({ tab, setTab, lang, viewContext }) {
               }}
               style={{
                 ...styles.tabBtn,
-                color: active ? "#0a6ebd" : "#6a7d90",
+                color: active ? "var(--brand-primary)" : "var(--brand-text-muted)",
               }}
             >
               <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
@@ -9163,8 +9292,8 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
 
   const activeSecondaries = secondaries.filter((s) => s.status === "active");
   const activeLinkedPools = (linkedPoolsInfo || []).filter((l) => l.status === "active");
-  const sectionTitleStyle = { fontSize: 13, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 };
-  const subTitleStyle = { fontSize: 12.5, fontWeight: 600, color: "#4a6480", marginBottom: 6 };
+  const sectionTitleStyle = { fontSize: 13, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 8 };
+  const subTitleStyle = { fontSize: 12.5, fontWeight: 600, color: "var(--brand-text-secondary)", marginBottom: 6 };
   const emptyStyle = { fontSize: 12.5, color: "#8a9aa8", marginBottom: 14 };
   const cardStyle = { padding: "10px 12px", border: "1px solid #d8e2ec", borderRadius: 10 };
 
@@ -9185,7 +9314,7 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
             <div key={l.primaryUid} style={cardStyle}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#0d2b4e" }}>{l.poolName || t("secondary_pool_label", { pool: "" })}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--brand-text-strong)" }}>{l.poolName || t("secondary_pool_label", { pool: "" })}</div>
                   <div style={{ fontSize: 11.5, color: "#8a9aa8" }}>{l.pseudo}</div>
                 </div>
                 <button
@@ -9207,7 +9336,7 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
       )}
 
       <div style={sectionTitleStyle}>{t("secondary_section_title")}</div>
-      <div style={{ fontSize: 12, color: "#6a7d90", marginBottom: 12 }}>{t("secondary_section_intro")}</div>
+      <div style={{ fontSize: 12, color: "var(--brand-text-muted)", marginBottom: 12 }}>{t("secondary_section_intro")}</div>
 
       <div style={subTitleStyle}>{t("secondary_active_title")}</div>
       {activeSecondaries.length === 0 ? (
@@ -9217,7 +9346,7 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
           {activeSecondaries.map((s) => (
             <div key={s.secondaryUid} style={{ ...cardStyle, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#0d2b4e" }}>{s.email}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--brand-text-strong)" }}>{s.email}</div>
                 <div style={{ fontSize: 11.5, color: "#8a9aa8" }}>
                   {t("secondary_pool_label", { pool: myPools.find((p) => p.id === s.poolId)?.name || s.poolId })}
                 </div>
@@ -9241,7 +9370,7 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
           {pendingInvitations.map((inv) => (
             <div key={inv.token || (inv.invitedEmail + inv.poolId)} style={{ ...cardStyle, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#0d2b4e" }}>{inv.invitedEmail}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--brand-text-strong)" }}>{inv.invitedEmail}</div>
                 <div style={{ fontSize: 11.5, color: "#8a9aa8" }}>
                   {t("secondary_pool_label", { pool: inv.poolName })} ·{" "}
                   {inv.expired
@@ -9285,7 +9414,7 @@ function DelegationSection({ authUser, lang, linkedPoolsInfo, onRequestRevocatio
           <button
             onClick={handleInviteSend}
             disabled={inviteBusy || !inviteEmail || !invitePoolId}
-            style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 13.5, cursor: inviteBusy ? "not-allowed" : "pointer" }}
+            style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 13.5, cursor: inviteBusy ? "not-allowed" : "pointer" }}
           >
             {t("secondary_invite_send")}
           </button>
@@ -9394,7 +9523,7 @@ Réponds directement en français, sans titre ni introduction.`;
   if (!latest) {
     return (
       <div style={styles.emptyState}>
-        <Droplets size={40} color="#7ab8e8" strokeWidth={1.5} />
+        <Droplets size={40} color="var(--brand-icon-light)" strokeWidth={1.5} />
         <p style={styles.emptyTitle}>{t("no_measure")}</p>
         <p style={styles.emptyText}>{t("no_measure_sub")}</p>
         <button style={styles.primaryBtn} onClick={onAddMeasure}>
@@ -9476,7 +9605,7 @@ Réponds directement en français, sans titre ni introduction.`;
           return (
             <div style={styles.allGoodCard}>
               <CheckCircle2 size={22} color="#1a8fd1" />
-              <span style={{ color: "#0a6ebd", fontWeight: 600, fontSize: 14 }}>
+              <span style={{ color: "var(--brand-primary)", fontWeight: 600, fontSize: 14 }}>
                 {t("all_in_range")}
               </span>
             </div>
@@ -9559,7 +9688,7 @@ Réponds directement en français, sans titre ni introduction.`;
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             width: "100%", boxSizing: "border-box", marginTop: 10,
             padding: "11px 0", borderRadius: 12, border: "1.5px solid #d0e4f5",
-            background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14, cursor: "pointer",
+            background: "#fff", color: "var(--brand-primary)", fontWeight: 700, fontSize: 14, cursor: "pointer",
           }}
         >
           <Plus size={16} /> {t("apply_product_manual")}
@@ -9658,7 +9787,7 @@ function RecoCard({ reco, isLast, manageStock, products, lang }) {
 
       {!isInfo && !!reco.waitHours && (
         <div style={styles.recoWait}>
-          <Clock size={13} color="#0a6ebd" />
+          <Clock size={13} color="var(--brand-primary)" />
           {isLast ? t("measure_after", { h: reco.waitHours }) : t("wait_before_next", { h: reco.waitHours })}
         </div>
       )}
@@ -10511,7 +10640,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
   if (measures.length === 0) {
     return (
       <div style={styles.emptyState}>
-        <History size={40} color="#7ab8e8" strokeWidth={1.5} />
+        <History size={40} color="var(--brand-icon-light)" strokeWidth={1.5} />
         <p style={styles.emptyTitle}>{t("no_history")}</p>
         <p style={styles.emptyText}>{t("no_history_sub")}</p>
         <input
@@ -10524,7 +10653,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
         {apiKey ? (
           <>
             <button
-              style={{ ...styles.validateApplyBtn, background: importLoading ? "#6a7d90" : "#0a6ebd", fontSize: 13, padding: "9px 14px", marginTop: 8 }}
+              style={{ ...styles.validateApplyBtn, background: importLoading ? "var(--brand-text-muted)" : "var(--brand-primary)", fontSize: 13, padding: "9px 14px", marginTop: 8 }}
               onClick={() => importFileRef.current?.click()}
               disabled={importLoading}
             >
@@ -10543,8 +10672,8 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
             )}
           </>
         ) : (
-          <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6a7d90", padding: "8px 12px", background: "#f0f6fb", borderRadius: 10, border: "1px solid #d0e4f5" }}>
-            <Lock size={13} color="#6a7d90" />
+          <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--brand-text-muted)", padding: "8px 12px", background: "var(--brand-bg-tint)", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+            <Lock size={13} color="var(--brand-text-muted)" />
             <span>{t("import_pdf_needs_ai")}</span>
           </div>
         )}
@@ -10565,8 +10694,8 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
           style={{
             ...styles.chip,
             ...styles.chipAll,
-            background: allActive ? "#0a6ebd" : "#f1f4f3",
-            borderColor: allActive ? "#0a6ebd" : "#d0e4f5",
+            background: allActive ? "var(--brand-primary)" : "#f1f4f3",
+            borderColor: allActive ? "var(--brand-primary)" : "#d0e4f5",
             color: allActive ? "#ffffff" : "#2d4a6e",
           }}
         >
@@ -10580,7 +10709,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
               ...styles.chip,
               background: activeParams.includes(cp.key) ? cp.color + "22" : "#f1f4f3",
               borderColor: activeParams.includes(cp.key) ? cp.color : "#d0e4f5",
-              color: activeParams.includes(cp.key) ? cp.color : "#6a7d90",
+              color: activeParams.includes(cp.key) ? cp.color : "var(--brand-text-muted)",
             }}
           >
             {cp.label}
@@ -10625,17 +10754,17 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
                     }
                     return `${d.getDate().toString().padStart(2,"0")}/${(d.getMonth()+1).toString().padStart(2,"0")}`;
                   }}
-                  tick={{ fontSize: 10, fill: "#6a7d90" }}
+                  tick={{ fontSize: 10, fill: "var(--brand-text-muted)" }}
                 />
             <YAxis
               yAxisId="left"
-              tick={{ fontSize: 10, fill: "#6a7d90" }}
+              tick={{ fontSize: 10, fill: "var(--brand-text-muted)" }}
               width={28}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fontSize: 10, fill: "#6a7d90" }}
+              tick={{ fontSize: 10, fill: "var(--brand-text-muted)" }}
               width={28}
             />
             <Tooltip
@@ -10734,7 +10863,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
         {apiKey ? (
           <>
             <button
-              style={{ ...styles.validateApplyBtn, background: importLoading ? "#6a7d90" : "#0a6ebd", fontSize: 13, padding: "9px 14px" }}
+              style={{ ...styles.validateApplyBtn, background: importLoading ? "var(--brand-text-muted)" : "var(--brand-primary)", fontSize: 13, padding: "9px 14px" }}
               onClick={() => importFileRef.current?.click()}
               disabled={importLoading}
             >
@@ -10753,8 +10882,8 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
             )}
           </>
         ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6a7d90", padding: "8px 12px", background: "#f0f6fb", borderRadius: 10, border: "1px solid #d0e4f5" }}>
-            <Lock size={13} color="#6a7d90" />
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--brand-text-muted)", padding: "8px 12px", background: "var(--brand-bg-tint)", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+            <Lock size={13} color="var(--brand-text-muted)" />
             <span>{t("import_pdf_needs_ai")}</span>
           </div>
         )}
@@ -10791,16 +10920,16 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
                 {diagResult.suggestion}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>{t("diag_confidence")} :</span>
+                <span style={{ fontSize: 11, color: "var(--brand-text-muted)", fontWeight: 600 }}>{t("diag_confidence")} :</span>
                 <span style={{ fontSize: 16, letterSpacing: 2 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} style={{ color: i < diagResult.confidence ? "#f59e0b" : "#d1d5db" }}>★</span>
                   ))}
                 </span>
-                <span style={{ fontSize: 11, color: "#6a7d90" }}>({diagResult.confidence}/5)</span>
+                <span style={{ fontSize: 11, color: "var(--brand-text-muted)" }}>({diagResult.confidence}/5)</span>
               </div>
               {diagResult.confidence_reason && (
-                <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 4, fontStyle: "italic" }}>
+                <div style={{ fontSize: 11, color: "var(--brand-text-muted)", marginTop: 4, fontStyle: "italic" }}>
                   {diagResult.confidence_reason}
                 </div>
               )}
@@ -10811,8 +10940,8 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
             <span style={styles.sectionLabel}>{t("diag_history_title")}</span>
           </div>
           {!isPremium ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6a7d90", padding: "8px 12px", background: "#f0f6fb", borderRadius: 10, border: "1px solid #d0e4f5" }}>
-              <Lock size={13} color="#6a7d90" />
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--brand-text-muted)", padding: "8px 12px", background: "var(--brand-bg-tint)", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+              <Lock size={13} color="var(--brand-text-muted)" />
               <span>{t("diag_history_locked")}</span>
             </div>
           ) : diagHistory.length === 0 ? (
@@ -10837,7 +10966,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
                       <td style={styles.diagHistTd}>
                         {d.suggestion}
                         {d.confidence_reason && (
-                          <div style={{ fontSize: 10.5, color: "#6a7d90", marginTop: 4, fontStyle: "italic" }}>
+                          <div style={{ fontSize: 10.5, color: "var(--brand-text-muted)", marginTop: 4, fontStyle: "italic" }}>
                             {d.confidence_reason}
                           </div>
                         )}
@@ -10884,11 +11013,11 @@ function ManualApplicationRow({ app, lang }) {
           <span style={{ fontSize: 10.5, fontWeight: 700, color: "#c4502f", background: "#fff0e8", border: "1px solid #f3d9c8", borderRadius: 99, padding: "2px 8px" }}>
             🔧 {t("reason_manual_maintenance")}
           </span>
-          <span style={{ fontSize: 11.5, color: "#6a7d90" }}>
+          <span style={{ fontSize: 11.5, color: "var(--brand-text-muted)" }}>
             {formatDate(app.appliedAt)} · {new Date(app.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#0d2b4e", marginTop: 4 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--brand-text-strong)", marginTop: 4 }}>
           {app.productName} — {formatDose(app.appliedAmount, app.doseUnit || "g")}
         </div>
       </div>
@@ -10957,14 +11086,14 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
         </div>
         <ChevronRight
           size={16}
-          color="#6a7d90"
+          color="var(--brand-text-muted)"
           style={{ transform: open ? "rotate(90deg)" : "none", transition: "transform .15s" }}
         />
       </button>
       {open && (
         <div style={styles.measureDetails}>
           {photosLoading && (
-            <div style={{ fontSize: 12, color: "#6a7d90", marginBottom: 8 }}>{t("loading")}</div>
+            <div style={{ fontSize: 12, color: "var(--brand-text-muted)", marginBottom: 8 }}>{t("loading")}</div>
           )}
           {/* Photos d'analyse (photomètre/bandelette) */}
           {loadedPhotos?.length > 0 && (
@@ -11026,10 +11155,10 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
                       : <CheckCircle2 size={14} color="#1a8fd1" />}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: s.skipped ? "#9ab0c4" : "#0d2b4e" }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: s.skipped ? "#9ab0c4" : "var(--brand-text-strong)" }}>
                       {s.productName || s.title}
                       {s.appliedAmount && !s.skipped && (
-                        <span style={{ fontWeight: 400, color: "#4a6480", marginLeft: 6 }}>
+                        <span style={{ fontWeight: 400, color: "var(--brand-text-secondary)", marginLeft: 6 }}>
                           — {s.appliedAmount >= 1000 ? `${(s.appliedAmount/1000).toFixed(2)} ${s.doseUnit === "g" ? "kg" : "L"}` : `${s.appliedAmount} ${s.doseUnit || "g"}`}
                         </span>
                       )}
@@ -11042,15 +11171,15 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
                   </div>
                 </div>
               ))}
-              <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: "var(--brand-text-muted)", marginTop: 4 }}>
                 {application.allApplied ? t("wizard_completed") : t("wizard_partial")}
               </div>
             </div>
           ) : (
             !measure.importedFromPdf && (
               activePlan && activePlan.measureId === measure.id ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#0a6ebd", fontWeight: 600, padding: "6px 0" }}>
-                  <Clock size={14} color="#0a6ebd" />
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--brand-primary)", fontWeight: 600, padding: "6px 0" }}>
+                  <Clock size={14} color="var(--brand-primary)" />
                   {t("plan_in_progress")}
                 </div>
               ) : (
@@ -11614,7 +11743,7 @@ function AddMeasureModal({ measure, application, products, manageStock, onSaveAp
         type="datetime-local"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        style={{ ...styles.input, fontWeight: 600, color: "#0a6ebd" }}
+        style={{ ...styles.input, fontWeight: 600, color: "var(--brand-primary)" }}
       />
 
       {isPremium ? (
@@ -11720,18 +11849,18 @@ function AddMeasureModal({ measure, application, products, manageStock, onSaveAp
 
           {/* Hint 30 secondes + compteur */}
           {!analyzing && analyzeTimer === null && (
-            <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 6, textAlign: "center", fontStyle: "italic" }}>
+            <div style={{ fontSize: 11, color: "var(--brand-text-muted)", marginTop: 6, textAlign: "center", fontStyle: "italic" }}>
               {t("ai_timer_hint")}
             </div>
           )}
           {analyzing && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, fontSize: 13, color: "#0a6ebd", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, fontSize: 13, color: "var(--brand-primary)", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
               <Loader2 size={14} className="spin" />
               {analyzeTimer}s
             </div>
           )}
           {!analyzing && analyzeTimer !== null && (
-            <div style={{ fontSize: 12, color: "#6a7d90", marginTop: 6, textAlign: "center" }}>
+            <div style={{ fontSize: 12, color: "var(--brand-text-muted)", marginTop: 6, textAlign: "center" }}>
               ⏱ {analyzeTimer}s
             </div>
           )}
@@ -11750,16 +11879,16 @@ function AddMeasureModal({ measure, application, products, manageStock, onSaveAp
       {analyzeReliability && (
         <div style={{ marginTop: 10, padding: "10px 12px", background: "#f5f8fc", borderRadius: 10, border: "1px solid #d0e4f5" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#0d2b4e" }}>{t("ai_reliability")} :</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--brand-text-strong)" }}>{t("ai_reliability")} :</span>
             <span style={{ fontSize: 16, letterSpacing: 2 }}>
               {Array.from({ length: 5 }, (_, i) => (
                 <span key={i} style={{ color: i < analyzeReliability.score ? "#f5a623" : "#d0d8e0" }}>★</span>
               ))}
             </span>
-            <span style={{ fontSize: 11, color: "#6a7d90" }}>{analyzeReliability.score}/5</span>
+            <span style={{ fontSize: 11, color: "var(--brand-text-muted)" }}>{analyzeReliability.score}/5</span>
           </div>
           {analyzeReliability.reason && (
-            <div style={{ fontSize: 11, color: "#4a6480", lineHeight: 1.5 }}>{analyzeReliability.reason}</div>
+            <div style={{ fontSize: 11, color: "var(--brand-text-secondary)", lineHeight: 1.5 }}>{analyzeReliability.reason}</div>
           )}
         </div>
       )}
@@ -11790,7 +11919,7 @@ function AddMeasureModal({ measure, application, products, manageStock, onSaveAp
       </div>
 
       {tclForcedInfo && (
-        <div style={{ marginTop: 8, padding: "8px 12px", background: "#eaf4fb", border: "1px solid #b0d8f0", borderRadius: 8, fontSize: 12, color: "#0a6ebd", display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ marginTop: 8, padding: "8px 12px", background: "#eaf4fb", border: "1px solid #b0d8f0", borderRadius: 8, fontSize: 12, color: "var(--brand-primary)", display: "flex", alignItems: "center", gap: 6 }}>
           <AlertTriangle size={14} /> {tclForcedInfo}
         </div>
       )}
@@ -11881,7 +12010,7 @@ function AddMeasureModal({ measure, application, products, manageStock, onSaveAp
                         [i]: { ...prev[i], productName: newName, dispValue: value === "" || value == null ? "" : String(value), dispUnit: unit },
                       }));
                     }}
-                    style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff", marginBottom: 8 }}
+                    style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff", marginBottom: 8 }}
                   >
                     {candidates.map((p) => (
                       <option key={p.id || p.name} value={p.name}>{p.name}</option>
@@ -11892,15 +12021,15 @@ function AddMeasureModal({ measure, application, products, manageStock, onSaveAp
                       type="number"
                       value={ev.dispValue}
                       onChange={(e) => setTreatmentEdits((prev) => ({ ...prev, [i]: { ...prev[i], dispValue: e.target.value } }))}
-                      style={{ flex: 1, fontSize: 18, fontWeight: 700, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "8px 10px", textAlign: "center", outline: "none" }}
+                      style={{ flex: 1, fontSize: 18, fontWeight: 700, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "8px 10px", textAlign: "center", outline: "none" }}
                       step={ev.dispUnit === t("unit_galets") ? "1" : "0.01"}
                     />
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#4a6480", minWidth: 32 }}>{ev.dispUnit}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--brand-text-secondary)", minWidth: 32 }}>{ev.dispUnit}</div>
                     <input
                       type="time"
                       value={ev.time}
                       onChange={(e) => setTreatmentEdits((prev) => ({ ...prev, [i]: { ...prev[i], time: e.target.value } }))}
-                      style={{ fontSize: 14, fontWeight: 700, color: "#0a6ebd", border: "2px solid #d0e4f5", borderRadius: 10, padding: "8px 10px", outline: "none" }}
+                      style={{ fontSize: 14, fontWeight: 700, color: "var(--brand-primary)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "8px 10px", outline: "none" }}
                     />
                   </div>
                 </div>
@@ -11955,20 +12084,20 @@ function PlanStatusCard({ plan, onResume, lang }) {
       borderRadius: 12, padding: "12px 14px", marginTop: 8,
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#0d2b4e" }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-text-strong)" }}>
           {t("wizard_partial")} — {doneSteps}/{totalSteps}
         </span>
         <button
-          style={{ background: "#0a6ebd", color: "#fff", border: "none", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+          style={{ background: "var(--brand-primary)", color: "#fff", border: "none", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
           onClick={onResume}
         >
           {t("wizard_resume")}
         </button>
       </div>
       {currentStep && (
-        <div style={{ fontSize: 13, color: "#0d2b4e" }}>
+        <div style={{ fontSize: 13, color: "var(--brand-text-strong)" }}>
           <span style={{ fontWeight: 600 }}>{t("wizard_next_step")} : {currentStep.productName || currentStep.title}</span>
-          <div style={{ fontSize: 12, color: isReady ? "#1a8fd1" : "#4a6480", marginTop: 2, fontWeight: isReady ? 700 : 400 }}>
+          <div style={{ fontSize: 12, color: isReady ? "#1a8fd1" : "var(--brand-text-secondary)", marginTop: 2, fontWeight: isReady ? 700 : 400 }}>
             {remaining !== null
               ? isReady
                 ? t("countdown_done")
@@ -12176,7 +12305,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
     }}>
       <div style={{
         background: isMaintenance ? "#fff" : "#fff7f2",
-        borderTop: isMaintenance ? "5px solid #0a6ebd" : "5px solid #c4502f",
+        borderTop: isMaintenance ? "5px solid var(--brand-primary)" : "5px solid #c4502f",
         borderRadius: "20px 20px 0 0",
         width: "100%", maxWidth: 480,
         padding: "20px 18px 32px", boxSizing: "border-box",
@@ -12184,10 +12313,10 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
       }}>
         {/* En-tête */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>
+          <span style={{ fontSize: 11, color: "var(--brand-text-muted)", fontWeight: 600 }}>
             {t("wizard_step")} {currentIdx + 1} {t("wizard_of")} {totalSteps}
           </span>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#6a7d90", padding: 4 }}>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand-text-muted)", padding: 4 }}>
             <X size={20} />
           </button>
         </div>
@@ -12199,18 +12328,18 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
               flex: 1, height: 4, borderRadius: 4,
               background: s.appliedAt && !s.skipped ? "#1a8fd1"
                 : s.skipped ? "#d0e4f5"
-                : i === currentIdx ? "#0a6ebd"
+                : i === currentIdx ? "var(--brand-primary)"
                 : "#e0ecf5",
             }} />
           ))}
         </div>
 
         {/* Titre étape */}
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#0d2b4e", marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 4 }}>
           {step.productName || step.title}
         </div>
         {step.title && step.productName && step.title !== step.productName && (
-          <div style={{ fontSize: 13, color: "#4a6480", marginBottom: 8 }}>{step.title}</div>
+          <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", marginBottom: 8 }}>{step.title}</div>
         )}
 
         {/* Countdown / horaire */}
@@ -12220,14 +12349,14 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
             marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between",
           }}>
             <div>
-              <div style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600 }}>
+              <div style={{ fontSize: 11, color: "var(--brand-text-muted)", fontWeight: 600 }}>
                 {t(step.action === "chlore" ? "wizard_earliest" : "wizard_scheduled")}
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: "#0a6ebd", fontVariantNumeric: "tabular-nums" }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "var(--brand-primary)", fontVariantNumeric: "tabular-nums" }}>
                 {formatCountdown(remaining)}
               </div>
             </div>
-            <div style={{ textAlign: "right", fontSize: 12, color: "#4a6480" }}>
+            <div style={{ textAlign: "right", fontSize: 12, color: "var(--brand-text-secondary)" }}>
               {t("wizard_at")} {new Date(step.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </div>
           </div>
@@ -12275,7 +12404,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
             : sortedCandidates[0].name;
           return (
             <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 6 }}>
                 {t("product_col")}
               </label>
               <select
@@ -12288,7 +12417,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
                   const { value } = toDisplayUnit(amount, step.doseUnit || "g", newProdObj);
                   setEditAmount(value != null && value !== "" ? String(value) : "");
                 }}
-                style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff" }}
+                style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff" }}
               >
                 {sortedCandidates.map(p => (
                   <option key={p.id || p.name} value={p.name}>
@@ -12313,7 +12442,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
           return (
             <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 12, color: "#c0392b", marginBottom: 8 }}>{t("no_stock_generic_hint")}</div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 6 }}>
                 {t("product_col")}
               </label>
               <select
@@ -12326,7 +12455,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
                   const { value } = toDisplayUnit(amount, step.doseUnit || "g", newProdObj);
                   setEditAmount(value != null && value !== "" ? String(value) : "");
                 }}
-                style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff" }}
+                style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff" }}
               >
                 {genericCandidates.map(p => (
                   <option key={p.id || p.name} value={p.name}>{p.name}</option>
@@ -12347,9 +12476,9 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
                 <button key={m} type="button" onClick={() => setFreeUnitMode(m)}
                   style={{
                     flex: 1, padding: "6px 0", borderRadius: 8, cursor: "pointer",
-                    border: freeUnitMode === m ? "2px solid #0a6ebd" : "1.5px solid #d0e4f5",
+                    border: freeUnitMode === m ? "2px solid var(--brand-primary)" : "1.5px solid #d0e4f5",
                     background: freeUnitMode === m ? "#eaf4fb" : "#fff",
-                    color: "#0d2b4e", fontWeight: 700, fontSize: 13,
+                    color: "var(--brand-text-strong)", fontWeight: 700, fontSize: 13,
                   }}>
                   {t(m === "kg" ? "quantity_unit_mode_kg" : "quantity_unit_mode_units")}
                 </button>
@@ -12359,7 +12488,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
         )}
         {!isMaintenance && baseUnit && (
           <div style={{ marginBottom: 12 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 6 }}>
               {t("quantity_applied")}
             </label>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -12367,10 +12496,10 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
                 type="number"
                 value={editAmount ?? ""}
                 onChange={(e) => setEditAmount(e.target.value)}
-                style={{ flex: 1, fontSize: 22, fontWeight: 700, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", textAlign: "center", outline: "none" }}
+                style={{ flex: 1, fontSize: 22, fontWeight: 700, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", textAlign: "center", outline: "none" }}
                 step={(manageStock && sortedCandidates.length === 0 && genericCandidates.length === 0 && freeUnitMode === "unites") || selectedProductObj?.packagingType === "galets" ? "1" : "0.01"}
               />
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#4a6480", minWidth: 32 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--brand-text-secondary)", minWidth: 32 }}>
                 {manageStock && sortedCandidates.length === 0 && genericCandidates.length === 0
                   ? t(freeUnitMode === "kg" ? "quantity_unit_mode_kg" : "quantity_unit_mode_units")
                   : displayUnit}
@@ -12379,28 +12508,28 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
           </div>
         )}
         {isMaintenance && step.doseText && (
-          <div style={{ background: "#eaf4fb", borderRadius: 10, padding: "12px 14px", marginBottom: 12, fontSize: 14, fontWeight: 700, color: "#0a6ebd" }}>
+          <div style={{ background: "#eaf4fb", borderRadius: 10, padding: "12px 14px", marginBottom: 12, fontSize: 14, fontWeight: 700, color: "var(--brand-primary)" }}>
             {step.doseText}
           </div>
         )}
 
         {/* Heure d'application */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 6 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 6 }}>
             {t("wizard_apply_time")}
           </label>
           <input
             type="time"
             value={editTime}
             onChange={(e) => setEditTime(e.target.value)}
-            style={{ width: "100%", boxSizing: "border-box", fontSize: 18, fontWeight: 700, color: "#0a6ebd", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none" }}
+            style={{ width: "100%", boxSizing: "border-box", fontSize: 18, fontWeight: 700, color: "var(--brand-primary)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none" }}
           />
         </div>
 
         {/* Boutons */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <button
-            style={{ display:"flex",alignItems:"center",justifyContent:"center",gap:8,width:"100%",padding:"14px 0",borderRadius:12,border:"none",background:"#0a6ebd",color:"#fff",fontWeight:700,fontSize:16,cursor:"pointer" }}
+            style={{ display:"flex",alignItems:"center",justifyContent:"center",gap:8,width:"100%",padding:"14px 0",borderRadius:12,border:"none",background:"var(--brand-primary)",color:"#fff",fontWeight:700,fontSize:16,cursor:"pointer" }}
             onClick={handleApply}
           >
             <CheckCircle2 size={18} /> {t("wizard_done")}
@@ -12416,7 +12545,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
           {/* Modifier l'étape précédente */}
           {currentIdx > 0 && plan.steps[currentIdx - 1]?.appliedAt && !editingPrev && (
             <button
-              style={{ background: "none", border: "1px solid #d0e4f5", borderRadius: 8, color: "#4a6480", fontSize: 12, cursor: "pointer", padding: "7px 12px", display: "flex", alignItems: "center", gap: 5 }}
+              style={{ background: "none", border: "1px solid #d0e4f5", borderRadius: 8, color: "var(--brand-text-secondary)", fontSize: 12, cursor: "pointer", padding: "7px 12px", display: "flex", alignItems: "center", gap: 5 }}
               onClick={() => {
                 const prev = plan.steps[currentIdx - 1];
                 const prevUnit = prev.doseUnit || "g";
@@ -12438,31 +12567,31 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
           const prevUnit = prev.doseUnit || "g";
           const { displayUnit: du } = toDisplayUnit(prev.appliedAmount, prevUnit);
           return (
-            <div style={{ marginTop: 14, padding: "12px 14px", background: "#f0f6fb", borderRadius: 12, border: "1px solid #d0e4f5" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#0d2b4e", marginBottom: 10 }}>
+            <div style={{ marginTop: 14, padding: "12px 14px", background: "var(--brand-bg-tint)", borderRadius: 12, border: "1px solid #d0e4f5" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 10 }}>
                 ← {prev.productName || prev.title}
               </div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>{t("quantity_applied")}</label>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 4 }}>{t("quantity_applied")}</label>
               <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
                 <input
                   type="number"
                   value={prevAmount}
                   onChange={(e) => setPrevAmount(e.target.value)}
-                  style={{ flex: 1, fontSize: 18, fontWeight: 700, color: "#0d2b4e", border: "1.5px solid #d0e4f5", borderRadius: 8, padding: "8px 10px", textAlign: "center", outline: "none" }}
+                  style={{ flex: 1, fontSize: 18, fontWeight: 700, color: "var(--brand-text-strong)", border: "1.5px solid #d0e4f5", borderRadius: 8, padding: "8px 10px", textAlign: "center", outline: "none" }}
                   step="0.01"
                 />
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#4a6480" }}>{du}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "var(--brand-text-secondary)" }}>{du}</span>
               </div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#4a6480", display: "block", marginBottom: 4 }}>{t("wizard_apply_time")}</label>
+              <label style={{ fontSize: 11, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 4 }}>{t("wizard_apply_time")}</label>
               <input
                 type="time"
                 value={prevTime}
                 onChange={(e) => setPrevTime(e.target.value)}
-                style={{ width: "100%", boxSizing: "border-box", fontSize: 16, fontWeight: 700, color: "#0a6ebd", border: "1.5px solid #d0e4f5", borderRadius: 8, padding: "8px 10px", outline: "none", marginBottom: 10 }}
+                style={{ width: "100%", boxSizing: "border-box", fontSize: 16, fontWeight: 700, color: "var(--brand-primary)", border: "1.5px solid #d0e4f5", borderRadius: 8, padding: "8px 10px", outline: "none", marginBottom: 10 }}
               />
               <div style={{ display: "flex", gap: 8 }}>
                 <button
-                  style={{ flex: 1, padding: "9px 0", borderRadius: 9, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
+                  style={{ flex: 1, padding: "9px 0", borderRadius: 9, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
                   onClick={() => {
                     const baseU = prev.doseUnit || "g";
                     const { displayUnit: du2 } = toDisplayUnit(prev.appliedAmount, baseU);
@@ -12481,7 +12610,7 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
                   {t("save")}
                 </button>
                 <button
-                  style={{ flex: 1, padding: "9px 0", borderRadius: 9, border: "1px solid #d0e4f5", background: "#fff", color: "#4a6480", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
+                  style={{ flex: 1, padding: "9px 0", borderRadius: 9, border: "1px solid #d0e4f5", background: "#fff", color: "var(--brand-text-secondary)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
                   onClick={() => setEditingPrev(false)}
                 >
                   {t("cancel")}
@@ -12494,12 +12623,12 @@ function TreatmentWizard({ plan, products, manageStock, lang, onApplyStep, onSki
         {/* Aperçu des étapes suivantes */}
         {plan.steps.slice(currentIdx + 1).some((s) => !s.skipped && !s.appliedAt) && (
           <div style={{ marginTop: 16, borderTop: "1px solid #eaf4fb", paddingTop: 12 }}>
-            <div style={{ fontSize: 11, color: "#6a7d90", fontWeight: 600, marginBottom: 8 }}>ÉTAPES SUIVANTES</div>
+            <div style={{ fontSize: 11, color: "var(--brand-text-muted)", fontWeight: 600, marginBottom: 8 }}>ÉTAPES SUIVANTES</div>
             {plan.steps.slice(currentIdx + 1).filter((s) => !s.skipped && !s.appliedAt).map((s, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: "1px solid #f0f6fb" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: "1px solid var(--brand-bg-tint)" }}>
                 <Clock size={13} color="#b0c8e0" />
-                <span style={{ fontSize: 12, color: "#4a6480", flex: 1 }}>{s.productName || s.title}</span>
-                <span style={{ fontSize: 11, color: "#6a7d90" }}>
+                <span style={{ fontSize: 12, color: "var(--brand-text-secondary)", flex: 1 }}>{s.productName || s.title}</span>
+                <span style={{ fontSize: 11, color: "var(--brand-text-muted)" }}>
                   {s.scheduledAt ? new Date(s.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
                 </span>
               </div>
@@ -12566,7 +12695,7 @@ function ManualApplyModal({ products, onClose, onSave, lang }) {
           <select
             value={selectedName}
             onChange={(e) => { setSelectedName(e.target.value); setAmount(""); }}
-            style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff", marginBottom: 14 }}
+            style={{ width: "100%", boxSizing: "border-box", fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", background: "#fff", marginBottom: 14 }}
           >
             {candidates.map((p) => (
               <option key={p.id || p.name} value={p.name}>{p.name}</option>
@@ -12579,10 +12708,10 @@ function ManualApplyModal({ products, onClose, onSave, lang }) {
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              style={{ flex: 1, fontSize: 22, fontWeight: 700, color: "#0d2b4e", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", textAlign: "center", outline: "none" }}
+              style={{ flex: 1, fontSize: 22, fontWeight: 700, color: "var(--brand-text-strong)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", textAlign: "center", outline: "none" }}
               step={isGalets ? "1" : "0.01"}
             />
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#4a6480", minWidth: 32 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "var(--brand-text-secondary)", minWidth: 32 }}>
               {isGalets ? t("unit_galets") : "kg"}
             </div>
           </div>
@@ -12592,11 +12721,11 @@ function ManualApplyModal({ products, onClose, onSave, lang }) {
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            style={{ width: "100%", boxSizing: "border-box", fontSize: 18, fontWeight: 700, color: "#0a6ebd", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", marginBottom: 16 }}
+            style={{ width: "100%", boxSizing: "border-box", fontSize: 18, fontWeight: 700, color: "var(--brand-primary)", border: "2px solid #d0e4f5", borderRadius: 10, padding: "10px 12px", outline: "none", marginBottom: 16 }}
           />
 
           <button
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "14px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer" }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "14px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer" }}
             onClick={handleSubmit}
           >
             <CheckCircle2 size={18} /> {t("wizard_done")}
@@ -12688,15 +12817,15 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
                 alignItems: "center",
                 gap: 12,
                 cursor: "pointer",
-                border: selected[i] ? "2px solid #0a6ebd" : "1.5px solid #d0e4f5",
+                border: selected[i] ? "2px solid var(--brand-primary)" : "1.5px solid #d0e4f5",
                 background: selected[i] ? "#e8f4fd" : "#f8fafd",
                 textAlign: "left",
               }}
             >
               <div style={{
                 width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                border: selected[i] ? "2px solid #0a6ebd" : "2px solid #b0c4d8",
-                background: selected[i] ? "#0a6ebd" : "transparent",
+                border: selected[i] ? "2px solid var(--brand-primary)" : "2px solid #b0c4d8",
+                background: selected[i] ? "var(--brand-primary)" : "transparent",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 {selected[i] && <CheckCircle2 size={14} color="#fff" />}
@@ -12704,7 +12833,7 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
               <div style={{ flex: 1 }}>
                 <div style={styles.applyStepTitle}>{r.title}</div>
                 <div style={styles.applyStepProduct}>{r.productName}</div>
-                {(r.doseText || r.missingTip) && <div style={{ fontSize: 12, color: "#4a6480", marginTop: 2 }}>{r.doseText || r.missingTip}</div>}
+                {(r.doseText || r.missingTip) && <div style={{ fontSize: 12, color: "var(--brand-text-secondary)", marginTop: 2 }}>{r.doseText || r.missingTip}</div>}
               </div>
             </button>
           ))}
@@ -12771,7 +12900,7 @@ function ValidateApplicationModal({ measure, recs, existingApplication, onClose,
         <button style={styles.primaryBtn} onClick={handleSave}>
           {t("validate_btn")}
         </button>
-        <button style={{ ...styles.primaryBtn, background: "#f0f6fb", color: "#0a6ebd", border: "1px solid #d0e4f5" }}
+        <button style={{ ...styles.primaryBtn, background: "var(--brand-bg-tint)", color: "var(--brand-primary)", border: "1px solid #d0e4f5" }}
           onClick={() => setStep("select")}>
           {t("back_btn")}
         </button>
@@ -12788,6 +12917,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
   if (!isPremium) {
     return (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", gap: 16, textAlign: "center" }}>
+        {/* v1.71.0 — Écran de vente Premium : reste en bleu, non thémé, même en mode gratuit (aperçu de ce qu'on achète) */}
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "#f0f6fb", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Lock size={26} color="#0a6ebd" />
         </div>
@@ -12859,7 +12989,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                   <img src={p.photo} alt="" style={styles.productThumb} />
                 ) : (
                   <div style={styles.productThumbPlaceholder}>
-                    <Beaker size={16} color="#7ab8e8" />
+                    <Beaker size={16} color="var(--brand-icon-light)" />
                   </div>
                 )}
                 <div style={{ flex: 1, textAlign: "left" }}>
@@ -12896,10 +13026,10 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                     return (
                       <div style={{ marginTop: 6 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-                          <span style={{ fontSize: 11, color: low ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                          <span style={{ fontSize: 11, color: low ? "#c0392b" : "var(--brand-text-secondary)", fontWeight: 600 }}>
                             {t("stock_label")} {pct} %
                           </span>
-                          <span style={{ fontSize: 11, color: low ? "#c0392b" : "#6a7d90" }}>
+                          <span style={{ fontSize: 11, color: low ? "#c0392b" : "var(--brand-text-muted)" }}>
                             ≈ {displayVal} {cUnit} {t("stock_remaining")}
                           </span>
                         </div>
@@ -12916,7 +13046,7 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
                     );
                   })()}
                 </div>
-                <ChevronRight size={16} color="#6a7d90" />
+                <ChevronRight size={16} color="var(--brand-text-muted)" />
               </button>
             ))}
             {products.length === 0 && (
@@ -13018,7 +13148,7 @@ function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, a
         <button
           type="button"
           onClick={onBack}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#0a6ebd", fontWeight: 700, fontSize: 13, padding: 0, display: "flex", alignItems: "center", gap: 4 }}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand-primary)", fontWeight: 700, fontSize: 13, padding: 0, display: "flex", alignItems: "center", gap: 4 }}
         >
           {t("back_btn")}
         </button>
@@ -13043,7 +13173,7 @@ function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, a
                     <img src={p.photo} alt="" style={styles.productThumb} />
                   ) : (
                     <div style={styles.productThumbPlaceholder}>
-                      <Beaker size={16} color="#7ab8e8" />
+                      <Beaker size={16} color="var(--brand-icon-light)" />
                     </div>
                   )}
                   <div style={{ flex: 1, textAlign: "left" }}>
@@ -13059,7 +13189,7 @@ function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, a
                       ))}
                     </div>
                   </div>
-                  <ChevronRight size={16} color="#6a7d90" />
+                  <ChevronRight size={16} color="var(--brand-text-muted)" />
                 </button>
               ))}
             </div>
@@ -13077,7 +13207,7 @@ function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, a
                 {genericRows.map((dp) => (
                   <div key={dp.id} style={{ ...styles.productRow, cursor: "default" }}>
                     <div style={styles.productThumbPlaceholder}>
-                      <Beaker size={16} color="#7ab8e8" />
+                      <Beaker size={16} color="var(--brand-icon-light)" />
                     </div>
                     <div style={{ flex: 1, textAlign: "left" }}>
                       <div style={styles.productName}>{dp.nameKey ? t(dp.nameKey) : dp.name}</div>
@@ -13085,7 +13215,7 @@ function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, a
                     <button
                       type="button"
                       onClick={() => handleQuickAdd(dp)}
-                      style={{ display: "flex", alignItems: "center", gap: 4, background: "#0a6ebd", color: "#fff", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
+                      style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--brand-primary)", color: "#fff", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
                     >
                       <Plus size={14} /> {t("add_generic_product")}
                     </button>
@@ -13474,7 +13604,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
             </button>
           )}
           {analysisPhotos.length > 0 && !aiEnabled && (
-            <div style={{ fontSize: 11.5, color: "#6a7d90", marginTop: 8, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 11.5, color: "var(--brand-text-muted)", marginTop: 8, lineHeight: 1.5 }}>
               {t("product_ai_hint")}
             </div>
           )}
@@ -13495,7 +13625,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
                     <div style={{ display: "flex", gap: 6 }}>
                       <button
                         type="button"
-                        style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid #0a6ebd", background: "#0a6ebd", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                        style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid var(--brand-primary)", background: "var(--brand-primary)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
                         onClick={() => setCommonMatch({ matchType: "alias", productId: c.productId })}
                       >
                         {t("common_product_same")}
@@ -13505,7 +13635,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
                 ))}
                 <button
                   type="button"
-                  style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid #90c4e8", background: "transparent", color: "#0a6ebd", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                  style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid #90c4e8", background: "transparent", color: "var(--brand-primary)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
                   onClick={() => setCommonMatch({ matchType: "none" })}
                 >
                   {t("common_product_different")}
@@ -13553,7 +13683,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
                     onChange={(e) => setDoseAmount(e.target.value)}
                     placeholder={aiSuggestion?.doseAmount != null ? String(aiSuggestion.doseAmount) : ""}
                   />
-                  <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 20 }}>{doseUnit}</span>
+                  <span style={{ fontSize: 13, color: "var(--brand-text-muted)", minWidth: 20 }}>{doseUnit}</span>
                 </div>
               </div>
               {/* v1.50.0 — Séquestrant/floculant : dose fixe recommandée par
@@ -13571,7 +13701,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
                       onChange={(e) => setEffectAmount(e.target.value)}
                       placeholder={aiSuggestion?.effectAmount != null ? String(aiSuggestion.effectAmount) : ""}
                     />
-                    <span style={{ fontSize: 13, color: "#6a7d90", minWidth: 30 }}>
+                    <span style={{ fontSize: 13, color: "var(--brand-text-muted)", minWidth: 30 }}>
                       {action === "ph-" || action === "ph+" ? "pH" : "mg/L"}
                     </span>
                   </div>
@@ -13677,7 +13807,7 @@ function ProductModal({ product, onClose, onSave, isPremium, onWantPremium, appl
             <div style={styles.stockSliderWrap}>
               <input type="range" min="0" max="100" value={stockPercent}
                 onChange={(e) => setStockPercent(Number(e.target.value))} style={{ flex: 1 }} />
-              <span style={{ ...styles.stockPercentLabel, color: stockPercent <= 20 ? "#c0392b" : "#0d2b4e", fontWeight: 700 }}>
+              <span style={{ ...styles.stockPercentLabel, color: stockPercent <= 20 ? "#c0392b" : "var(--brand-text-strong)", fontWeight: 700 }}>
                 {stockPercent} %
               </span>
             </div>
@@ -13755,8 +13885,8 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 3150, background: "rgba(60,20,20,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", boxShadow: "0 8px 32px #00000033" }}>
-        <div style={{ fontSize: 17, fontWeight: 800, color: "#0d2b4e", marginBottom: 8, textAlign: "center" }}>{t("data_request_title")}</div>
-        <div style={{ fontSize: 13, color: "#4a6480", marginBottom: 18, lineHeight: 1.5, textAlign: "center" }}>{t("data_request_desc")}</div>
+        <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8, textAlign: "center" }}>{t("data_request_title")}</div>
+        <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", marginBottom: 18, lineHeight: 1.5, textAlign: "center" }}>{t("data_request_desc")}</div>
 
         {status !== "sent" && (
           <>
@@ -13766,7 +13896,7 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
                   key={opt.value}
                   style={{
                     display: "flex", alignItems: "center", gap: 10, padding: "12px 14px",
-                    borderRadius: 12, border: action === opt.value ? "1.5px solid #0a6ebd" : "1.5px solid #e6ebe9",
+                    borderRadius: 12, border: action === opt.value ? "1.5px solid var(--brand-primary)" : "1.5px solid #e6ebe9",
                     background: action === opt.value ? "#eaf4fc" : "#fff", cursor: "pointer",
                   }}
                 >
@@ -13777,7 +13907,7 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
                     checked={action === opt.value}
                     onChange={() => setAction(opt.value)}
                   />
-                  <span style={{ fontSize: 13.5, color: "#0d2b4e", fontWeight: 600 }}>{opt.label}</span>
+                  <span style={{ fontSize: 13.5, color: "var(--brand-text-strong)", fontWeight: 600 }}>{opt.label}</span>
                 </label>
               ))}
             </div>
@@ -13789,7 +13919,7 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
             <button
               onClick={handleSubmit}
               disabled={status === "sending"}
-              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: status === "sending" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: status === "sending" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}
             >
               {status === "sending" ? <Loader2 size={16} className="spin" /> : null}
               {status === "sending" ? t("data_request_sending") : t("data_request_submit")}
@@ -13797,7 +13927,7 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
             <button
               onClick={onClose}
               disabled={status === "sending"}
-              style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "none", background: "none", color: "#6a7d90", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
+              style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "none", background: "none", color: "var(--brand-text-muted)", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
             >
               {t("cancel")}
             </button>
@@ -13806,10 +13936,10 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
 
         {status === "sent" && (
           <>
-            <div style={{ fontSize: 13.5, color: "#0d2b4e", marginBottom: 20, textAlign: "center", lineHeight: 1.5 }}>{t("data_request_sent")}</div>
+            <div style={{ fontSize: 13.5, color: "var(--brand-text-strong)", marginBottom: 20, textAlign: "center", lineHeight: 1.5 }}>{t("data_request_sent")}</div>
             <button
               onClick={onClose}
-              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid #0a6ebd", background: "#fff", color: "#0a6ebd", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "1.5px solid var(--brand-primary)", background: "#fff", color: "var(--brand-primary)", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
             >
               {t("close")}
             </button>
@@ -13820,7 +13950,7 @@ function AccountDataRequestScreen({ lang, authUser, onClose, onSubmit }) {
   );
 }
 
-function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, viewContext, onDeleteAllMeasures: onDeleteAllMeasuresRaw, orphanedCount, onRepairOrphanedData, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, onWantDowngrade, aiEnabled, setAiEnabled, calibrationContribution, setCalibrationContribution, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount, dataConsent, onRevokeDataConsent, cguAcceptedDate, myPseudo }) {
+function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitchPool, onWantAddPool, viewContext, onDeleteAllMeasures: onDeleteAllMeasuresRaw, orphanedCount, onRepairOrphanedData, poolMeasureCount, onGenerateReport, onWantPremiumForReport, onWantPremium, isPremium, setIsPremium, onWantDowngrade, onReplayOnboarding, aiEnabled, setAiEnabled, calibrationContribution, setCalibrationContribution, lang, setLang, authUser, onSignOut, onSignIn, onDeleteAccount, dataConsent, onRevokeDataConsent, cguAcceptedDate, myPseudo }) {
   const [editingPool, setEditingPool] = useState(null);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const [pendingLang, setPendingLang] = useState(lang);
@@ -13923,14 +14053,14 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
                   style={{
                     ...styles.langPickerItem,
                     background: pendingLang === opt.value ? "#e8f4fd" : "transparent",
-                    color: pendingLang === opt.value ? "#0a6ebd" : "#0d2b4e",
+                    color: pendingLang === opt.value ? "var(--brand-primary)" : "var(--brand-text-strong)",
                     fontWeight: pendingLang === opt.value ? 700 : 500,
                   }}
                   onClick={() => setPendingLang(opt.value)}
                 >
                   <span>{opt.label}</span>
                   {pendingLang === opt.value && (
-                    <CheckCircle2 size={18} color="#0a6ebd" />
+                    <CheckCircle2 size={18} color="var(--brand-primary)" />
                   )}
                 </button>
               ))}
@@ -13948,16 +14078,34 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
         </div>
       )}
 
+      {/* --- Section Aide (v1.72.0) --- */}
+      <div style={styles.sectionRow}>
+        <span style={styles.sectionLabel}>{t("help_section")}</span>
+      </div>
+      <button
+        type="button"
+        onClick={onReplayOnboarding}
+        style={{
+          display: "flex", alignItems: "center", gap: 8, width: "100%",
+          padding: "12px 14px", borderRadius: 12, border: "1px solid var(--border, #e2e8ef)",
+          background: "#fff", color: "var(--brand-primary)", fontWeight: 600, fontSize: 13.5,
+          cursor: "pointer", marginBottom: 14,
+        }}
+      >
+        <Sparkles size={16} />
+        {t("settings_replay_onboarding")}
+      </button>
+
       {/* --- Section Compte --- */}
       <div style={styles.sectionRow}>
         <span style={styles.sectionLabel}>{t("account_section")}</span>
       </div>
       {authUser ? (
-        <div style={{ background: "#f0f6fb", borderRadius: 12, padding: "14px", marginBottom: 14 }}>
+        <div style={{ background: "var(--brand-bg-tint)", borderRadius: 12, padding: "14px", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#0d2b4e" }}>{authUser.displayName || authUser.email}</div>
-              {authUser.displayName && <div style={{ fontSize: 11.5, color: "#6a7d90", marginTop: 2 }}>{authUser.email}</div>}
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-text-strong)" }}>{authUser.displayName || authUser.email}</div>
+              {authUser.displayName && <div style={{ fontSize: 11.5, color: "var(--brand-text-muted)", marginTop: 2 }}>{authUser.email}</div>}
             </div>
             <button
               style={{ padding: "8px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", background: "#fff", color: "#c0392b", fontWeight: 600, fontSize: 12, cursor: "pointer", flexShrink: 0 }}
@@ -13968,10 +14116,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
           </div>
         </div>
       ) : (
-        <div style={{ background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <div style={{ fontSize: 13, color: "#6a7d90" }}>{t("not_signed_in")}</div>
+        <div style={{ background: "var(--brand-bg-tint)", borderRadius: 12, padding: "12px 14px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ fontSize: 13, color: "var(--brand-text-muted)" }}>{t("not_signed_in")}</div>
           <button
-            style={{ padding: "8px 14px", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }}
+            style={{ padding: "8px 14px", borderRadius: 10, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }}
             onClick={onSignIn}
           >
             {t("sign_in")}
@@ -13981,7 +14129,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
 
       {authUser && (
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 }}>{t("pseudo_label")}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("pseudo_label")}</div>
           <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
             <input
               type="text"
@@ -13992,7 +14140,7 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
               maxLength={24}
             />
             <button
-              style={{ padding: "0 16px", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0 }}
+              style={{ padding: "0 16px", borderRadius: 10, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0 }}
               onClick={handleSavePseudo}
               disabled={pseudoBusy || !pseudoInput.trim()}
             >
@@ -14014,12 +14162,12 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
 
       <div style={styles.testPremiumCard}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Crown size={18} color={isPremium ? "#a8721a" : "#5b7691"} />
+          <Crown size={18} color={isPremium ? "#a8721a" : "var(--brand-primary)"} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>
+            <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--brand-text-strong)" }}>
               {isPremium ? t("unlimited_active") : t("free_mode")}
             </div>
-            <div style={{ fontSize: 11.5, color: "#6a7d90" }}>
+            <div style={{ fontSize: 11.5, color: "var(--brand-text-muted)" }}>
               {t("premium_test")}
             </div>
           </div>
@@ -14057,24 +14205,24 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
             key={p.id}
             style={{
               ...styles.poolListRow,
-              borderColor: p.id === activePoolId ? "#0a6ebd" : "#e6ebe9",
+              borderColor: p.id === activePoolId ? "var(--brand-primary)" : "#e6ebe9",
             }}
           >
             <button style={styles.poolListMain} onClick={() => onSwitchPool(p.id)}>
               {p.photo ? (
                 <img src={p.photo} alt="" style={styles.poolSwitcherThumb} />
               ) : (
-                <Droplets size={16} color={p.id === activePoolId ? "#0a6ebd" : "#7ab8e8"} />
+                <Droplets size={16} color={p.id === activePoolId ? "var(--brand-primary)" : "var(--brand-icon-light)"} />
               )}
               <div style={{ flex: 1, textAlign: "left" }}>
-                <div style={{ fontWeight: 700, fontSize: 13.5, color: "#0d2b4e" }}>{p.name}</div>
-                <div style={{ fontSize: 11.5, color: "#6a7d90" }}>{p.location} · {p.volume} m³</div>
+                <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--brand-text-strong)" }}>{p.name}</div>
+                <div style={{ fontSize: 11.5, color: "var(--brand-text-muted)" }}>{p.location} · {p.volume} m³</div>
               </div>
               {p.id === activePoolId && <CheckCircle2 size={16} color="#1a8fd1" />}
             </button>
             {!viewContext && (
               <button
-                style={{ background: "none", border: "none", color: "#0a6ebd", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "0 8px", flexShrink: 0 }}
+                style={{ background: "none", border: "none", color: "var(--brand-primary)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "0 8px", flexShrink: 0 }}
                 onClick={() => setEditingPool(p)}
               >
                 <Settings2 size={14} />
@@ -14090,10 +14238,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       </div>
 
       {isPremium && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 8, marginTop: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--brand-bg-tint)", borderRadius: 12, padding: "12px 14px", marginBottom: 8, marginTop: 8 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#0d2b4e" }}>{t("manage_stock_label")}</div>
-            <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 2 }}>{t("manage_stock_desc")}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)" }}>{t("manage_stock_label")}</div>
+            <div style={{ fontSize: 11, color: "var(--brand-text-muted)", marginTop: 2 }}>{t("manage_stock_desc")}</div>
           </div>
           <ToggleSwitch
             checked={!!activePool?.manageStock}
@@ -14107,10 +14255,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       </div>
 
       {/* Toggle activer l'analyse IA — réservé premium */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--brand-bg-tint)", borderRadius: 12, padding: "12px 14px", marginBottom: 8 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#0d2b4e" }}>{t("ai_toggle_label")}</div>
-          <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 2 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)" }}>{t("ai_toggle_label")}</div>
+          <div style={{ fontSize: 11, color: "var(--brand-text-muted)", marginTop: 2 }}>
             {isPremium ? t("ai_toggle_desc") : t("analyze_locked")}
           </div>
         </div>
@@ -14132,10 +14280,10 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
       </div>
 
       {/* v1.36.0 — Lot B : opt-out contribution calibration (CGU clause 11) */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f0f6fb", borderRadius: 12, padding: "12px 14px", marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--brand-bg-tint)", borderRadius: 12, padding: "12px 14px", marginBottom: 8 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#0d2b4e" }}>{t("calibration_toggle_label")}</div>
-          <div style={{ fontSize: 11, color: "#6a7d90", marginTop: 2 }}>{t("calibration_toggle_desc")}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--brand-text-strong)" }}>{t("calibration_toggle_label")}</div>
+          <div style={{ fontSize: 11, color: "var(--brand-text-muted)", marginTop: 2 }}>{t("calibration_toggle_desc")}</div>
         </div>
         <ToggleSwitch
           checked={calibrationContribution}
@@ -14204,12 +14352,12 @@ function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAll
       <div style={styles.sectionRow}>
         <span style={styles.sectionLabel}>{t("legal_notices")}</span>
       </div>
-      <div style={{ background: "#f5f8fc", borderRadius: 10, padding: "10px 14px", marginBottom: 12, fontSize: 12, color: "#4a6480" }}>
+      <div style={{ background: "#f5f8fc", borderRadius: 10, padding: "10px 14px", marginBottom: 12, fontSize: 12, color: "var(--brand-text-secondary)" }}>
         <div>{t("cgu_version_label")} : <strong>CGU {CGU_VERSION}</strong></div>
         {cguAcceptedDate && <div>{t("cgu_accepted_on")} : {new Date(cguAcceptedDate).toLocaleDateString()}</div>}
       </div>
       <button
-        style={{ width: "100%", padding: "10px 0", borderRadius: 10, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 20 }}
+        style={{ width: "100%", padding: "10px 0", borderRadius: 10, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 20 }}
         onClick={() => setShowLegalModal(true)}
       >
         {t("legal_notices")}
@@ -14219,21 +14367,21 @@ function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAll
         <div style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(10,30,60,0.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
           <div style={{ background: "#fff", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 480, padding: "20px 18px 32px", boxSizing: "border-box", maxHeight: "90dvh", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#0d2b4e" }}>{t("legal_notices")} — CGU {CGU_VERSION}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "var(--brand-text-strong)" }}>{t("legal_notices")} — CGU {CGU_VERSION}</span>
               <button onClick={() => setShowLegalModal(false)} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={20} /></button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", fontSize: 12, color: "#2d4a6e", lineHeight: 1.7, background: "#f5f8fc", borderRadius: 10, padding: "12px 14px" }}>
               {/* Éditeur */}
-              <div style={{ fontWeight: 700, color: "#0d2b4e", marginBottom: 2 }}>{t("lcen_editor")}</div>
+              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_editor")}</div>
               <div style={{ marginBottom: 12 }}>{t("lcen_editor_val")}</div>
-              <div style={{ fontWeight: 700, color: "#0d2b4e", marginBottom: 2 }}>{t("lcen_contact")}</div>
-              <div style={{ marginBottom: 12 }}><a href={`mailto:${t("lcen_contact_val")}`} style={{ color: "#0a6ebd" }}>{t("lcen_contact_val")}</a></div>
+              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_contact")}</div>
+              <div style={{ marginBottom: 12 }}><a href={`mailto:${t("lcen_contact_val")}`} style={{ color: "var(--brand-primary)" }}>{t("lcen_contact_val")}</a></div>
               {/* Hébergement */}
-              <div style={{ fontWeight: 700, color: "#0d2b4e", marginBottom: 2 }}>{t("lcen_host")}</div>
+              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_host")}</div>
               <div style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>{t("lcen_host_val")}</div>
               {/* CGU */}
-              <div style={{ fontWeight: 700, color: "#0d2b4e", marginTop: 8, marginBottom: 4 }}>{t("lcen_cgu_title")} — CGU {CGU_VERSION}</div>
-              <div style={{ marginBottom: 10, fontSize: 11, color: "#4a6480" }}>
+              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginTop: 8, marginBottom: 4 }}>{t("lcen_cgu_title")} — CGU {CGU_VERSION}</div>
+              <div style={{ marginBottom: 10, fontSize: 11, color: "var(--brand-text-secondary)" }}>
                 {[
                   { title: t("lcen_ai_title"), body: t("lcen_ai_val") },
                   { title: t("lcen_photos_title"), body: t("lcen_photos_val") },
@@ -14242,7 +14390,7 @@ function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAll
                   { title: t("lcen_photocontrib_title"), body: t("lcen_photocontrib_val") },
                 ].map((s, i) => (
                   <div key={i} style={{ marginBottom: 10 }}>
-                    <div style={{ fontWeight: 700, color: "#0d2b4e", marginBottom: 2 }}>{i+1}. {s.title}</div>
+                    <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{i+1}. {s.title}</div>
                     <div style={{ lineHeight: 1.6 }}>{s.body}</div>
                   </div>
                 ))}
@@ -14284,7 +14432,7 @@ function ToggleSwitch({ checked, onChange }) {
         height: 26,
         borderRadius: 99,
         border: "none",
-        background: checked ? "#0a6ebd" : "#d8e2df",
+        background: checked ? "var(--brand-primary)" : "#d8e2df",
         position: "relative",
         cursor: "pointer",
         flexShrink: 0,
@@ -14314,7 +14462,7 @@ function DeleteReauthModal({ onClose, onConfirm, busy, error, lang }) {
   const [password, setPassword] = useState("");
   return (
     <ModalShell onClose={onClose} title={t("delete_account")}>
-      <p style={{ fontSize: 13, color: "#4a6480", lineHeight: 1.5, marginTop: 0 }}>
+      <p style={{ fontSize: 13, color: "var(--brand-text-secondary)", lineHeight: 1.5, marginTop: 0 }}>
         {t("reauth_required")}
       </p>
       <FieldLabel required>{t("password")}</FieldLabel>
@@ -14339,12 +14487,83 @@ function DeleteReauthModal({ onClose, onConfirm, busy, error, lang }) {
       </button>
       <button
         type="button"
-        style={{ width: "100%", padding: "11px 0", background: "none", border: "none", color: "#6a7d90", fontSize: 13, cursor: "pointer", marginTop: 8 }}
+        style={{ width: "100%", padding: "11px 0", background: "none", border: "none", color: "var(--brand-text-muted)", fontSize: 13, cursor: "pointer", marginTop: 8 }}
         onClick={onClose}
       >
         {t("cancel")}
       </button>
     </ModalShell>
+  );
+}
+
+// v1.72.0 — Wizard d'accueil, affiché une seule fois après la création du
+// premier bassin (et rejouable depuis Réglages via "Revoir la présentation").
+// "Passer" est disponible à chaque étape ; les deux issues (Passer / dernière
+// étape) appellent onDone, qui marque l'onboarding comme vu côté appelant.
+function OnboardingWizard({ onDone, lang }) {
+  const t = useT(lang || "fr");
+  const [step, setStep] = useState(0);
+  const steps = [
+    { icon: <Droplets size={28} color="#fff" />, iconBg: "rgba(255,255,255,0.18)",
+      title: t("onboarding_step1_title"), text: t("onboarding_step1_text"), dark: true },
+    { icon: <Camera size={26} color="var(--brand-primary)" />, iconBg: "var(--brand-bg-tint)",
+      title: t("onboarding_step2_title"), text: t("onboarding_step2_text") },
+    { icon: <CheckCircle2 size={26} color="#1a8fd1" />, iconBg: "#e1f5ee",
+      title: t("onboarding_step3_title"), text: t("onboarding_step3_text"), legend: true },
+    { icon: <Sparkles size={26} color="#a8721a" />, iconBg: "#fdf6e6",
+      title: t("onboarding_step4_title"), text: t("onboarding_step4_text"), last: true },
+  ];
+  const s = steps[step];
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 1900, background: "rgba(13,43,78,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ width: "100%", maxWidth: 360, background: "#fff", borderRadius: 20, overflow: "hidden" }}>
+        <div style={{
+          padding: s.dark ? "32px 24px 28px" : "28px 24px 8px",
+          textAlign: "center",
+          background: s.dark ? "linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark))" : "transparent",
+          color: s.dark ? "#fff" : "#0d2b4e",
+        }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            {s.icon}
+          </div>
+          <div style={{ fontWeight: 700, fontSize: s.dark ? 19 : 17, marginBottom: 8 }}>{s.title}</div>
+          <div style={{ fontSize: 13.5, opacity: s.dark ? 0.85 : 1, color: s.dark ? "#fff" : "#4a6480", lineHeight: 1.5 }}>{s.text}</div>
+          {s.legend && (
+            <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 12, marginTop: 14, color: "#4a6480" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#1a8fd1", display: "inline-block" }} />
+                {t("in_range")}
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#c4502f", display: "inline-block" }} />
+                {t("too_high")}
+              </span>
+            </div>
+          )}
+        </div>
+        <div style={{ padding: "20px 24px 24px" }}>
+          <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 20 }}>
+            {steps.map((_, i) => (
+              <div key={i} style={{ width: 20, height: 4, borderRadius: 2, background: i === step ? "var(--brand-primary)" : "#e2e8ef" }} />
+            ))}
+          </div>
+          <button
+            style={styles.primaryBtn}
+            onClick={() => (s.last ? onDone() : setStep((v) => v + 1))}
+          >
+            {s.last ? t("onboarding_start") : t("onboarding_next")}
+          </button>
+          {!s.last && (
+            <button
+              style={{ width: "100%", padding: "10px 0", marginTop: 4, border: "none", background: "transparent", color: "#6a7d90", fontSize: 13, cursor: "pointer" }}
+              onClick={onDone}
+            >
+              {t("onboarding_skip")}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -14370,6 +14589,8 @@ function PaywallModal({ onClose, onActivate, lang, source }) {
   return (
     <ModalShell onClose={onClose} title={t("paywall_title")}>
       {hasContext && (
+        // v1.71.0 — Reste en bleu littéral : le mur Premium n'est jamais thémé
+        // en vert, même consulté depuis le mode gratuit (aperçu de l'achat).
         <p style={{ fontSize: 13.5, color: "#4a6480", margin: "0 0 4px", lineHeight: 1.4 }}>
           {contextText}
         </p>
@@ -14387,7 +14608,7 @@ function PaywallModal({ onClose, onActivate, lang, source }) {
           </div>
         ))}
       </div>
-      <button style={styles.primaryBtn} onClick={onActivate}>
+      <button style={{ ...styles.primaryBtn, background: "#0a6ebd" }} onClick={onActivate}>
         {t("paywall_btn")}
       </button>
       <p style={{ ...styles.helpText, textAlign: "center" }}>
@@ -14415,7 +14636,7 @@ function PremiumDowngradeConfirmModal({ onClose, onConfirm, lang }) {
   ];
   return (
     <ModalShell onClose={onClose} title={t("premium_downgrade_confirm_title")}>
-      <p style={{ fontSize: 13.5, color: "#4a6480", margin: "0 0 12px", lineHeight: 1.4 }}>
+      <p style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", margin: "0 0 12px", lineHeight: 1.4 }}>
         {t("premium_downgrade_confirm_desc")}
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "0 2px 20px" }}>
@@ -14455,8 +14676,9 @@ function PremiumDowngradeConfirmModal({ onClose, onConfirm, lang }) {
 // désormais visible dès le départ (fondu rapide en 220ms) et les bulles
 // montent librement sur toute la durée de l'overlay (3s au total, inchangé).
 // v1.70.0 — variant "downgrade" : même effet, rejoué à la désactivation du
-// Premium, avec la palette gratuite/désaturée validée (#5b7691/#3f5a73) au
-// lieu du bleu Premium, pour ne jamais confondre les deux transitions.
+// v1.71.0 — Palette gratuit/verrouillé et gratuit/downgrade suivent
+// désormais le thème global (var CSS pilotées par effectiveIsPremium),
+// remplacé par du vert à la demande d'Arnaud (cf v1.71.0).
 function PremiumRevealOverlay({ onDone, lang, variant = "activate" }) {
   const t = useT(lang || "fr");
   const reduceMotion = typeof window !== "undefined" && window.matchMedia
@@ -14490,9 +14712,14 @@ function PremiumRevealOverlay({ onDone, lang, variant = "activate" }) {
   }, []);
 
   const isDowngrade = variant === "downgrade";
-  const gradient = isDowngrade
-    ? "linear-gradient(135deg, #5b7691, #3f5a73)"
-    : "linear-gradient(135deg, #0a6ebd, #064a8a)";
+  // v1.73.0 — La transition part désormais de la couleur du contexte QUITTÉ
+  // vers celle du contexte REJOINT (et non plus une couleur fixe pour toute
+  // la durée), dans les deux sens : gratuit→premium passe du vert au bleu,
+  // premium→gratuit passe du bleu au vert.
+  const BLUE_GRADIENT = "linear-gradient(135deg, #0a6ebd, #064a8a)";
+  const GREEN_GRADIENT = "linear-gradient(135deg, #1f6b4a, #123f2c)";
+  const fromGradient = isDowngrade ? BLUE_GRADIENT : GREEN_GRADIENT;
+  const toGradient = isDowngrade ? GREEN_GRADIENT : BLUE_GRADIENT;
   const titleKey = isDowngrade ? "premium_downgrade_title" : "premium_reveal_title";
   const subKey = isDowngrade ? "premium_downgrade_sub" : "premium_reveal_sub";
 
@@ -14501,13 +14728,25 @@ function PremiumRevealOverlay({ onDone, lang, variant = "activate" }) {
       onClick={onDone}
       style={{
         position: "fixed", inset: 0, zIndex: 2000, overflow: "hidden",
-        background: gradient,
+        background: fromGradient,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         cursor: "pointer",
         opacity: reduceMotion ? 1 : (phase === "enter" ? 0 : 1),
         transition: reduceMotion ? "none" : "opacity 220ms ease-out",
       }}
     >
+      {/* v1.73.0 — Calque de la couleur d'arrivée, fondu au-dessus du calque
+          de départ sur la quasi-totalité des 3s, pour un vrai morph visible
+          plutôt qu'un changement de couleur instantané. */}
+      <div
+        style={{
+          position: "absolute", inset: 0,
+          background: toGradient,
+          opacity: reduceMotion ? 1 : (phase === "enter" ? 0 : 1),
+          transition: reduceMotion ? "none" : "opacity 2600ms ease-in-out",
+          pointerEvents: "none",
+        }}
+      />
       <style>{`
         @keyframes premiumBubbleRise {
           0% { transform: translateY(0) scale(1); opacity: 0.9; }
@@ -14662,7 +14901,7 @@ function LocationAutocomplete({ value, onChange, lang, placeholder }) {
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             width: 44, borderRadius: 11, border: "1.5px solid #d0e4f5",
-            background: "#fafcfb", color: "#0a6ebd", cursor: gpsLoading ? "default" : "pointer",
+            background: "#fafcfb", color: "var(--brand-primary)", cursor: gpsLoading ? "default" : "pointer",
             flexShrink: 0,
           }}
         >
@@ -14676,7 +14915,7 @@ function LocationAutocomplete({ value, onChange, lang, placeholder }) {
           boxShadow: "0 6px 18px rgba(10,50,90,0.14)", zIndex: 50, overflow: "hidden",
         }}>
           {searching && (
-            <div style={{ padding: "10px 12px", fontSize: 12.5, color: "#6a7d90", display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ padding: "10px 12px", fontSize: 12.5, color: "var(--brand-text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
               <Loader2 size={13} className="spin" /> {t("location_searching")}
             </div>
           )}
@@ -14684,7 +14923,7 @@ function LocationAutocomplete({ value, onChange, lang, placeholder }) {
             <div style={{ padding: "10px 12px", fontSize: 12.5, color: "#b23b3b" }}>{t("location_search_error")}</div>
           )}
           {!searching && !searchError && results.length === 0 && (
-            <div style={{ padding: "10px 12px", fontSize: 12.5, color: "#6a7d90" }}>{t("location_no_results")}</div>
+            <div style={{ padding: "10px 12px", fontSize: 12.5, color: "var(--brand-text-muted)" }}>{t("location_no_results")}</div>
           )}
           {!searching && results.map((r, i) => (
             <div
@@ -14692,12 +14931,12 @@ function LocationAutocomplete({ value, onChange, lang, placeholder }) {
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(r)}
               style={{
-                padding: "10px 12px", fontSize: 13.5, color: "#0d2b4e", cursor: "pointer",
+                padding: "10px 12px", fontSize: 13.5, color: "var(--brand-text-strong)", cursor: "pointer",
                 borderTop: i > 0 ? "1px solid #eef3f6" : "none",
                 display: "flex", alignItems: "center", gap: 7,
               }}
             >
-              <MapPin size={13} color="#0a6ebd" />
+              <MapPin size={13} color="var(--brand-primary)" />
               {r.label}
             </div>
           ))}
@@ -14775,7 +15014,7 @@ function AddPoolModal({ onClose, onSave, lang, existingPool, forced }) {
   return (
     <ModalShell onClose={onClose} title={isEdit ? t("edit_pool") : forced ? t("first_pool_title") : t("add_pool_title")} forced={forced}>
       {forced && (
-        <div style={{ fontSize: 13, color: "#4a6480", marginBottom: 16, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", marginBottom: 16, lineHeight: 1.5 }}>
           {t("first_pool_intro")}
         </div>
       )}
@@ -15566,7 +15805,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         </button>
         <button
           className="no-print"
-          style={{ ...styles.reportPrintBtn, background: pdfLoading ? "#6a7d90" : "#0d7a3e", opacity: pdfLoading ? 0.7 : 1 }}
+          style={{ ...styles.reportPrintBtn, background: pdfLoading ? "var(--brand-text-muted)" : "#0d7a3e", opacity: pdfLoading ? 0.7 : 1 }}
           onClick={handleSharePdf}
           disabled={pdfLoading}
         >
@@ -15607,8 +15846,8 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
             style={{
               ...styles.chip,
               ...styles.chipAll,
-              background: allReportActive ? "#0a6ebd" : "#f1f4f3",
-              borderColor: allReportActive ? "#0a6ebd" : "#d0e4f5",
+              background: allReportActive ? "var(--brand-primary)" : "#f1f4f3",
+              borderColor: allReportActive ? "var(--brand-primary)" : "#d0e4f5",
               color: allReportActive ? "#ffffff" : "#2d4a6e",
             }}
           >
@@ -15622,7 +15861,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                 ...styles.chip,
                 background: activeReportParams.includes(cp.key) ? cp.color + "22" : "#f1f4f3",
                 borderColor: activeReportParams.includes(cp.key) ? cp.color : "#d0e4f5",
-                color: activeReportParams.includes(cp.key) ? cp.color : "#6a7d90",
+                color: activeReportParams.includes(cp.key) ? cp.color : "var(--brand-text-muted)",
               }}
             >
               {cp.label}
@@ -15634,7 +15873,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
           <span style={styles.axisLegendItem}>{t("axis_legend_u")}</span>
           <span style={styles.axisLegendItem}>{t("axis_legend_d")}</span>
         </p>
-        <label className="no-print" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#4a6480", marginBottom: 8, cursor: "pointer", userSelect: "none" }}>
+        <label className="no-print" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--brand-text-secondary)", marginBottom: 8, cursor: "pointer", userSelect: "none" }}>
           <input type="checkbox" checked={showValues} onChange={(e) => setShowValues(e.target.checked)} />
           <span>{t("show_values")}</span>
         </label>
@@ -15742,16 +15981,16 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                   const prod = products.find((p) => p.name === a.productName);
                   return [(
                     <tr key={`manual-${a.id}`} style={{ background: i % 2 === 0 ? "#f8fafd" : "#ffffff" }}>
-                      <td colSpan={12} style={{ ...styles.reportTdCell, fontWeight: 600, color: "#0d2b4e" }}>
+                      <td colSpan={12} style={{ ...styles.reportTdCell, fontWeight: 600, color: "var(--brand-text-strong)" }}>
                         {formatDate(a.appliedAt)} · <span style={{ fontStyle: "italic", color: "#c4502f" }}>🔧 {t("reason_manual_maintenance")}</span>
                       </td>
                       <td style={styles.reportTdCell}>{a.productName}</td>
-                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>—</td>
-                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "#0a6ebd" }}>{formatDose(a.appliedAmount, a.doseUnit || "g")}</td>
-                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
+                      <td style={{ ...styles.reportTdCell, color: "var(--brand-text-secondary)" }}>—</td>
+                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: "var(--brand-primary)" }}>{formatDose(a.appliedAmount, a.doseUnit || "g")}</td>
+                      <td style={{ ...styles.reportTdCell, color: "var(--brand-text-secondary)" }}>
                         {new Date(a.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </td>
-                      {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                      {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "var(--brand-text-secondary)", fontWeight: 600 }}>
                         {prod ? formatDose(Math.round((prod.stockPercent ?? 100) / 100 * (prod.containerAmount ?? 1) * 10) / 10, prod.containerUnit || "kg") : "—"}
                       </td>}
                     </tr>
@@ -15773,7 +16012,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                     <tr key={`${i}-${j}`} style={{ background: i % 2 === 0 ? "#f8fafd" : "#ffffff" }}>
                       {j === 0 && (
                         <>
-                          <td style={{ ...styles.reportTdCell, fontWeight: 600, color: "#0d2b4e" }} rowSpan={totalRowSpan}>{formatDate(measure.date)}</td>
+                          <td style={{ ...styles.reportTdCell, fontWeight: 600, color: "var(--brand-text-strong)" }} rowSpan={totalRowSpan}>{formatDate(measure.date)}</td>
                           <td style={styles.reportTdCell} rowSpan={totalRowSpan}>{measure.pH ?? "—"}</td>
                           <td style={styles.reportTdCell} rowSpan={totalRowSpan}>{measure.fCl != null && measure.fCl !== "" ? `${measure.fCl}` : "—"}</td>
                           <td style={styles.reportTdCell} rowSpan={totalRowSpan}>{measure.tCl != null && measure.tCl !== "" ? `${measure.tCl}` : "—"}</td>
@@ -15789,21 +16028,21 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                       )}
                       <td style={styles.reportTdCell}>
                         {step ? (step.skipped ? <span style={{ color: "#9ab0c4" }}>⊘ {step.productName}</span> : step.productName)
-                          : rec ? <span style={{ color: "#6a7d90", fontStyle: "italic" }}>{rec.productName}</span>
+                          : rec ? <span style={{ color: "var(--brand-text-muted)", fontStyle: "italic" }}>{rec.productName}</span>
                           : "—"}
                       </td>
-                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
+                      <td style={{ ...styles.reportTdCell, color: "var(--brand-text-secondary)" }}>
                         {step && !step.skipped ? formatDose(step.computedDoseAmount ?? step.appliedAmount, step.doseUnit || "g")
                           : rec ? formatDose(rec.computedDoseAmount, rec.doseUnit || "g")
                           : "—"}
                       </td>
-                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: step?.skipped ? "#9ab0c4" : "#0a6ebd" }}>
+                      <td style={{ ...styles.reportTdCell, fontWeight: 700, color: step?.skipped ? "#9ab0c4" : "var(--brand-primary)" }}>
                         {step && !step.skipped ? formatDose(step.appliedAmount, step.doseUnit || "g") : "—"}
                       </td>
-                      <td style={{ ...styles.reportTdCell, color: "#4a6480" }}>
+                      <td style={{ ...styles.reportTdCell, color: "var(--brand-text-secondary)" }}>
                         {step?.appliedAt ? new Date(step.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}
                       </td>
-                      {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "#4a6480", fontWeight: 600 }}>
+                      {manageStock && <td style={{ ...styles.reportTdCell, color: prod && (prod.stockPercent ?? 100) <= 20 ? "#c0392b" : "var(--brand-text-secondary)", fontWeight: 600 }}>
                         {prod ? formatDose(Math.round((prod.stockPercent ?? 100) / 100 * (prod.containerAmount ?? 1) * 10) / 10, prod.containerUnit || "kg") : "—"}
                       </td>}
                     </tr>
@@ -15812,8 +16051,8 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
 
                 // Ligne note fusionnée
                 const noteRow = hasNote ? (
-                  <tr key={`${i}-note`} style={{ background: i % 2 === 0 ? "#f0f6fb" : "#f8fafd" }}>
-                    <td colSpan={prodColSpan} style={{ ...styles.reportTdCell, fontStyle: "italic", color: "#4a6480", fontSize: 11, paddingLeft: 10 }}>
+                  <tr key={`${i}-note`} style={{ background: i % 2 === 0 ? "var(--brand-bg-tint)" : "#f8fafd" }}>
+                    <td colSpan={prodColSpan} style={{ ...styles.reportTdCell, fontStyle: "italic", color: "var(--brand-text-secondary)", fontSize: 11, paddingLeft: 10 }}>
                       📝 {measure.note}
                     </td>
                   </tr>
@@ -15826,8 +16065,8 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         )}
 
         {/* Légende des abréviations et cibles */}
-        <div style={{ marginTop: 16, padding: "10px 14px", background: "#f0f6fb", borderRadius: 10, border: "1px solid #d0e4f5" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#0d2b4e", marginBottom: 6 }}>{t("legend_title")}</div>
+        <div style={{ marginTop: 16, padding: "10px 14px", background: "var(--brand-bg-tint)", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 6 }}>{t("legend_title")}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px" }}>
             {[
               { abbr: "pH",   label: t("param_ph_long"),   target: "7.2 – 7.4",       unit: "" },
@@ -15842,10 +16081,10 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
               { abbr: "Fe",   label: t("param_fe_long"),   target: "0 – 0.1",          unit: "mg/L" },
               { abbr: "°C",   label: t("param_temp_long"), target: "24 – 30",          unit: "°C" },
             ].map(({ abbr, label, target, unit }) => (
-              <div key={abbr} style={{ fontSize: 10, color: "#4a6480", minWidth: 180 }}>
-                <span style={{ fontWeight: 700, color: "#0a6ebd" }}>{abbr}</span>
+              <div key={abbr} style={{ fontSize: 10, color: "var(--brand-text-secondary)", minWidth: 180 }}>
+                <span style={{ fontWeight: 700, color: "var(--brand-primary)" }}>{abbr}</span>
                 {" = "}{label}
-                <span style={{ color: "#6a7d90" }}> · cible : {target}{unit ? " " + unit : ""}</span>
+                <span style={{ color: "var(--brand-text-muted)" }}> · cible : {target}{unit ? " " + unit : ""}</span>
               </div>
             ))}
           </div>
@@ -15872,7 +16111,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                       <td style={styles.diagHistTd}>
                         {d.suggestion}
                         {d.confidence_reason && (
-                          <div style={{ fontSize: 10.5, color: "#6a7d90", marginTop: 4, fontStyle: "italic" }}>
+                          <div style={{ fontSize: 10.5, color: "var(--brand-text-muted)", marginTop: 4, fontStyle: "italic" }}>
                             {d.confidence_reason}
                           </div>
                         )}
@@ -15900,7 +16139,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
               if (!allPhotos.length) return null;
               return (
                 <div key={i} style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#4a6480", marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", marginBottom: 6 }}>
                     {formatDate(measure.date)}
                   </div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -15981,7 +16220,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "14px 16px",
-    background: "#064a8a",
+    background: "var(--brand-primary-dark)",
     zIndex: 5,
   },
   reportCloseBtn: {
@@ -16021,7 +16260,7 @@ const styles = {
     margin: "0 auto",
     padding: "24px 20px 60px",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
   },
   reportHeader: {
     display: "flex",
@@ -16029,24 +16268,24 @@ const styles = {
     gap: 12,
     paddingBottom: 16,
     marginBottom: 18,
-    borderBottom: "2px solid #0a6ebd",
+    borderBottom: "2px solid var(--brand-primary)",
   },
   reportHeaderIcon: {
     width: 36,
     height: 36,
     borderRadius: 9,
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
-  reportTitle: { fontSize: 18, fontWeight: 800, color: "#0d2b4e" },
-  reportSubtitle: { fontSize: 12.5, color: "#6a7d90", marginTop: 2 },
+  reportTitle: { fontSize: 18, fontWeight: 800, color: "var(--brand-text-strong)" },
+  reportSubtitle: { fontSize: 12.5, color: "var(--brand-text-muted)", marginTop: 2 },
   reportSectionTitle: {
     fontSize: 14,
     fontWeight: 800,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     textTransform: "uppercase",
     letterSpacing: 0.4,
     marginTop: 26,
@@ -16060,7 +16299,7 @@ const styles = {
     boxSizing: "border-box",
   },
   reportRow: { marginBottom: 18 },
-  reportRowDate: { fontSize: 14, fontWeight: 700, color: "#0d2b4e", marginBottom: 8 },
+  reportRowDate: { fontSize: 14, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 8 },
   reportTable: { width: "100%", borderCollapse: "collapse", marginBottom: 10 },
   diagHistTable: { width: "100%", borderCollapse: "collapse", marginTop: 10, tableLayout: "fixed" },
   diagHistTh: {
@@ -16068,7 +16307,7 @@ const styles = {
     textAlign: "left",
     fontSize: 10,
     fontWeight: 700,
-    color: "#6a7d90",
+    color: "var(--brand-text-muted)",
     textTransform: "uppercase",
     borderBottom: "2px solid #e2d9f3",
   },
@@ -16085,7 +16324,7 @@ const styles = {
     textAlign: "left",
     fontSize: 10,
     fontWeight: 700,
-    color: "#6a7d90",
+    color: "var(--brand-text-muted)",
     textTransform: "uppercase",
     borderBottom: "2px solid #d0e4f5",
     whiteSpace: "nowrap",
@@ -16103,16 +16342,16 @@ const styles = {
     textAlign: "left",
     verticalAlign: "top",
   },
-  reportTableCellLabel: { fontSize: 10.5, color: "#6a7d90", textTransform: "uppercase" },
-  reportTableCellValue: { fontSize: 13, fontWeight: 700, color: "#0d2b4e", marginTop: 1 },
+  reportTableCellLabel: { fontSize: 10.5, color: "var(--brand-text-muted)", textTransform: "uppercase" },
+  reportTableCellValue: { fontSize: 13, fontWeight: 700, color: "var(--brand-text-strong)", marginTop: 1 },
   reportSubLabel: {
     fontSize: 11.5,
     fontWeight: 700,
-    color: "#6a7d90",
+    color: "var(--brand-text-muted)",
     textTransform: "uppercase",
     marginBottom: 5,
   },
-  reportConseilText: { fontSize: 12.5, color: "#6a7d90", fontStyle: "italic" },
+  reportConseilText: { fontSize: 12.5, color: "var(--brand-text-muted)", fontStyle: "italic" },
   reportConseilList: { margin: 0, paddingLeft: 18 },
   reportConseilItem: { fontSize: 12.5, color: "#2d4a6e", lineHeight: 1.6 },
   reportAppliedTag: { color: "#1a8fd1", fontWeight: 600 },
@@ -16121,12 +16360,12 @@ const styles = {
   app: {
     fontFamily:
       "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    background: "#f0f6fb",
+    background: "var(--brand-bg-tint)",
     maxWidth: "100vw",
     margin: "0 auto",
     display: "flex",
     flexDirection: "column",
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     height: "100dvh",
     overflow: "hidden",
   },
@@ -16135,7 +16374,7 @@ const styles = {
     alignItems: "center",
     gap: 12,
     padding: "20px 18px 16px",
-    background: "linear-gradient(135deg, #0a6ebd, #064a8a)",
+    background: "linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark))",
   },
   headerIcon: {
     width: 38,
@@ -16161,7 +16400,7 @@ const styles = {
     gap: 4,
   },
   headerTitle: { color: "#ffffff", fontSize: 17, fontWeight: 700, letterSpacing: -0.2 },
-  headerSub: { color: "#a8d4f0", fontSize: 12.5, marginTop: 1 },
+  headerSub: { color: "var(--brand-header-sub)", fontSize: 12.5, marginTop: 1 },
   premiumBadge: {
     display: "flex",
     alignItems: "center",
@@ -16194,7 +16433,7 @@ const styles = {
   poolSwitcherTitle: {
     fontSize: 11.5,
     fontWeight: 800,
-    color: "#6a7d90",
+    color: "var(--brand-text-muted)",
     textTransform: "uppercase",
     letterSpacing: 0.4,
     padding: "6px 10px 8px",
@@ -16233,7 +16472,7 @@ const styles = {
     padding: "10px 0",
     borderRadius: 11,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#fff",
     fontWeight: 700,
     fontSize: 13,
@@ -16243,7 +16482,7 @@ const styles = {
     display: "inline-block",
     fontSize: 11.5,
     fontWeight: 700,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     background: "#e9f6f1",
     padding: "4px 10px",
     borderRadius: 99,
@@ -16290,7 +16529,7 @@ const styles = {
     margin: "4px 2px 10px",
   },
   sectionLabel: { fontSize: 13, fontWeight: 700, color: "#2d4a6e", textTransform: "uppercase", letterSpacing: 0.4 },
-  sectionDate: { fontSize: 12.5, color: "#6a7d90" },
+  sectionDate: { fontSize: 12.5, color: "var(--brand-text-muted)" },
   grid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -16307,8 +16546,8 @@ const styles = {
   paramTop: { display: "flex", alignItems: "center", justifyContent: "space-between" },
   paramLabel: { fontSize: 12, color: "#5d6e6a", fontWeight: 600 },
   paramDot: { width: 8, height: 8, borderRadius: 99 },
-  paramValue: { fontSize: 24, fontWeight: 800, marginTop: 4, color: "#0d2b4e" },
-  paramUnit: { fontSize: 12, fontWeight: 600, color: "#6a7d90", marginLeft: 3 },
+  paramValue: { fontSize: 24, fontWeight: 800, marginTop: 4, color: "var(--brand-text-strong)" },
+  paramUnit: { fontSize: 12, fontWeight: 600, color: "var(--brand-text-muted)", marginLeft: 3 },
   paramStatus: { fontSize: 12, fontWeight: 700, marginTop: 2 },
   paramRange: { fontSize: 11, color: "#9aa9a5", marginTop: 2 },
   addMeasureBtn: {
@@ -16320,7 +16559,7 @@ const styles = {
     padding: "11px 0",
     borderRadius: 12,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#fff",
     fontWeight: 700,
     fontSize: 13.5,
@@ -16335,11 +16574,12 @@ const styles = {
     gap: 7,
     padding: "11px 0",
     borderRadius: 12,
-    // v1.70.0 — Palette gratuit/verrouillé validée (dérivée de #5b7691),
-    // pour ne plus réutiliser l'or (réservé au Premium actif).
-    border: "1.5px solid #d6dde3",
-    background: "#eef1f4",
-    color: "#3f5a73",
+    // v1.71.0 — Suit désormais le thème gratuit/premium global (var CSS)
+    // au lieu d'une palette fixe, pour rester cohérent avec le reste de
+    // l'app quand la teinte change.
+    border: "1.5px solid var(--brand-bg-tint)",
+    background: "var(--brand-bg-tint)",
+    color: "var(--brand-text-secondary)",
     fontWeight: 700,
     fontSize: 13.5,
     marginBottom: 22,
@@ -16387,7 +16627,7 @@ const styles = {
     marginTop: 4,
     borderRadius: 12,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#fff",
     fontWeight: 700,
     fontSize: 13.5,
@@ -16402,7 +16642,7 @@ const styles = {
     padding: "9px 0",
     borderRadius: 10,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#fff",
     fontWeight: 600,
     fontSize: 12.5,
@@ -16417,7 +16657,7 @@ const styles = {
     borderRadius: 12,
     padding: "11px 14px",
     fontSize: 12.5,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     fontWeight: 600,
     marginTop: 4,
   },
@@ -16464,7 +16704,7 @@ const styles = {
     justifyContent: "center",
     flexShrink: 0,
   },
-  recoParamInfo: { fontSize: 13.5, fontWeight: 700, color: "#2d5a78" },
+  recoParamInfo: { fontSize: 13.5, fontWeight: 700, color: "var(--brand-text-strong)" },
   recoTiming: {
     display: "flex",
     alignItems: "center",
@@ -16494,7 +16734,7 @@ const styles = {
   recoProduct: {
     fontSize: 13,
     fontWeight: 600,
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     marginBottom: 2,
     display: "flex",
     alignItems: "center",
@@ -16519,7 +16759,7 @@ const styles = {
     gap: 5,
     fontSize: 12,
     fontWeight: 600,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     marginTop: 7,
   },
   // v1.66.1 — Ligne "recontrôle recommandé" des cartes informatives, en
@@ -16537,7 +16777,7 @@ const styles = {
     padding: "5px 8px",
     marginTop: 7,
   },
-  recoNote: { fontSize: 11.5, color: "#6a7d90", marginTop: 6, lineHeight: 1.4 },
+  recoNote: { fontSize: 11.5, color: "var(--brand-text-muted)", marginTop: 6, lineHeight: 1.4 },
   emptyState: {
     display: "flex",
     flexDirection: "column",
@@ -16547,7 +16787,7 @@ const styles = {
     gap: 8,
   },
   emptyTitle: { fontSize: 16, fontWeight: 700, marginTop: 6 },
-  emptyText: { fontSize: 13.5, color: "#6a7d90", lineHeight: 1.5, maxWidth: 280 },
+  emptyText: { fontSize: 13.5, color: "var(--brand-text-muted)", lineHeight: 1.5, maxWidth: 280 },
   dangerLinkBtn: {
     display: "flex",
     alignItems: "center",
@@ -16571,8 +16811,8 @@ const styles = {
     padding: "12px 14px",
     borderRadius: 12,
     border: "1.5px solid #d0e4f5",
-    background: "#f0f6fb",
-    color: "#0d2b4e",
+    background: "var(--brand-bg-tint)",
+    color: "var(--brand-text-strong)",
     fontSize: 14,
     fontWeight: 600,
     cursor: "pointer",
@@ -16598,7 +16838,7 @@ const styles = {
   langPickerTitle: {
     fontSize: 16,
     fontWeight: 700,
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     marginBottom: 14,
     textAlign: "center",
   },
@@ -16638,7 +16878,7 @@ const styles = {
     padding: "13px 0",
     borderRadius: 13,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#ffffff",
     fontWeight: 700,
     fontSize: 14.5,
@@ -16683,7 +16923,7 @@ const styles = {
     height: 28,
     borderRadius: 99,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#fff",
     display: "flex",
     alignItems: "center",
@@ -16706,7 +16946,7 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-  measureDate: { fontSize: 13.5, fontWeight: 600, color: "#0d2b4e" },
+  measureDate: { fontSize: 13.5, fontWeight: 600, color: "var(--brand-text-strong)" },
   measureDetails: { padding: "0 14px 14px" },
   measureChips: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 },
   measureChip: {
@@ -16717,7 +16957,7 @@ const styles = {
     border: "1px solid",
     background: "#fafcfb",
   },
-  measureNote: { fontSize: 12, color: "#6a7d90", marginBottom: 8, fontStyle: "italic" },
+  measureNote: { fontSize: 12, color: "var(--brand-text-muted)", marginBottom: 8, fontStyle: "italic" },
   deleteBtn: {
     display: "flex",
     alignItems: "center",
@@ -16734,7 +16974,7 @@ const styles = {
     alignItems: "center",
     gap: 5,
     fontSize: 12,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     background: "transparent",
     border: "none",
     padding: 0,
@@ -16746,13 +16986,13 @@ const styles = {
     gap: 4,
     fontSize: 12,
     fontWeight: 600,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     background: "transparent",
     border: "none",
     padding: 0,
     cursor: "pointer",
   },
-  helpText: { fontSize: 12, color: "#6a7d90", lineHeight: 1.5, margin: "4px 2px 14px" },
+  helpText: { fontSize: 12, color: "var(--brand-text-muted)", lineHeight: 1.5, margin: "4px 2px 14px" },
   productRow: {
     display: "flex",
     alignItems: "center",
@@ -16764,8 +17004,8 @@ const styles = {
     cursor: "pointer",
     textAlign: "left",
   },
-  productName: { fontSize: 14, fontWeight: 700, color: "#0d2b4e" },
-  productMeta: { fontSize: 11.5, color: "#6a7d90", marginTop: 2 },
+  productName: { fontSize: 14, fontWeight: 700, color: "var(--brand-text-strong)" },
+  productMeta: { fontSize: 11.5, color: "var(--brand-text-muted)", marginTop: 2 },
   productThumb: {
     width: 40,
     height: 40,
@@ -16798,7 +17038,7 @@ const styles = {
     fontSize: 9.5,
     color: "#b0bec8",
     padding: "3px 0 1px",
-    background: "#f0f6fb",
+    background: "var(--brand-bg-tint)",
     letterSpacing: 0.3,
     maxWidth: 480,
     margin: "0 auto",
@@ -16841,7 +17081,7 @@ const styles = {
     top: 0,
     background: "#ffffff",
   },
-  modalTitle: { fontSize: 16, fontWeight: 800, color: "#0d2b4e" },
+  modalTitle: { fontSize: 16, fontWeight: 800, color: "var(--brand-text-strong)" },
   modalCloseBtn: {
     width: 30,
     height: 30,
@@ -16881,8 +17121,8 @@ const styles = {
     padding: "12px 14px",
     border: "1px solid #e6ebe9",
   },
-  applyStepTitle: { fontSize: 13.5, fontWeight: 700, color: "#0d2b4e", marginBottom: 2 },
-  applyStepProduct: { fontSize: 12.5, color: "#6a7d90", marginBottom: 8 },
+  applyStepTitle: { fontSize: 13.5, fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 },
+  applyStepProduct: { fontSize: 12.5, color: "var(--brand-text-muted)", marginBottom: 8 },
   unitTag: {
     display: "flex",
     alignItems: "center",
@@ -16901,10 +17141,10 @@ const styles = {
     gap: 9,
     marginTop: 16,
     fontSize: 13.5,
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     fontWeight: 500,
   },
-  helpTextSmall: { fontSize: 12.5, color: "#6a7d90", lineHeight: 1.5 },
+  helpTextSmall: { fontSize: 12.5, color: "var(--brand-text-muted)", lineHeight: 1.5 },
   segmentedControl: {
     display: "flex",
     background: "#edf4fb",
@@ -16919,7 +17159,7 @@ const styles = {
     border: "none",
     borderRadius: 10,
     background: "transparent",
-    color: "#4a6480",
+    color: "var(--brand-text-secondary)",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -16927,7 +17167,7 @@ const styles = {
   },
   segmentedBtnActive: {
     background: "#ffffff",
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     boxShadow: "0 1px 4px rgba(10,30,28,.14)",
   },
   apiKeyRow: {
@@ -16944,8 +17184,8 @@ const styles = {
     justifyContent: "center",
     borderRadius: 9,
     border: "1px solid #d0e4f5",
-    background: "#f0f6fb",
-    color: "#4a6480",
+    background: "var(--brand-bg-tint)",
+    color: "var(--brand-text-secondary)",
     cursor: "pointer",
   },
   aiSection: {
@@ -16992,7 +17232,7 @@ const styles = {
     borderRadius: 10,
     border: "1px solid #e2d9f3",
     fontSize: 13.5,
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     lineHeight: 1.65,
     whiteSpace: "pre-wrap",
   },
@@ -17023,7 +17263,7 @@ const styles = {
     cursor: "pointer",
   },
   treatmentOptionActive: {
-    border: "1.5px solid #0a6ebd",
+    border: "1.5px solid var(--brand-primary)",
     background: "#eaf5fd",
   },
   treatmentOptionTop: {
@@ -17035,11 +17275,11 @@ const styles = {
   treatmentOptionLabel: {
     fontSize: 14,
     fontWeight: 700,
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
   },
   treatmentOptionDesc: {
     fontSize: 12,
-    color: "#6a7d90",
+    color: "var(--brand-text-muted)",
     lineHeight: 1.4,
   },
   treatmentOptionParams: {
@@ -17053,23 +17293,23 @@ const styles = {
     borderRadius: 10,
     border: "1.5px solid #d0e4f5",
     background: "#ffffff",
-    color: "#4a6480",
+    color: "var(--brand-text-secondary)",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
     textAlign: "center",
   },
   filtrationOptionActive: {
-    border: "1.5px solid #0a6ebd",
+    border: "1.5px solid var(--brand-primary)",
     background: "#eaf5fd",
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
   },
   stripHint: {
     fontSize: 12.5,
-    color: "#6a7d90",
+    color: "var(--brand-text-muted)",
     lineHeight: 1.5,
     padding: "8px 12px",
-    background: "#f0f6fb",
+    background: "var(--brand-bg-tint)",
     borderRadius: 9,
     border: "1px solid #e6ebe9",
     marginBottom: 4,
@@ -17083,7 +17323,7 @@ const styles = {
     fontSize: 14,
     fontFamily: "inherit",
     background: "#fafcfb",
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     outline: "none",
   },
   photoCaptureBtnRow: {
@@ -17099,8 +17339,8 @@ const styles = {
     padding: "13px 0",
     borderRadius: 12,
     border: "1.5px dashed #90c4e8",
-    background: "#f0f6fb",
-    color: "#0a6ebd",
+    background: "var(--brand-bg-tint)",
+    color: "var(--brand-primary)",
     fontWeight: 600,
     fontSize: 13,
     cursor: "pointer",
@@ -17116,7 +17356,7 @@ const styles = {
     borderRadius: 12,
     border: "1.5px dashed #90c4e8",
     background: "#f5f9f8",
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     fontWeight: 600,
     fontSize: 13.5,
     cursor: "pointer",
@@ -17143,7 +17383,7 @@ const styles = {
     borderRadius: 10,
     border: "1.5px solid #90c4e8",
     background: "#e8f4fd",
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     fontWeight: 600,
     fontSize: 13,
     cursor: "pointer",
@@ -17157,7 +17397,7 @@ const styles = {
     borderRadius: 10,
     background: "#e8f4fd",
     border: "1px solid #90c4e8",
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
     fontSize: 13,
     lineHeight: 1.5,
     marginBottom: 10,
@@ -17205,14 +17445,14 @@ const styles = {
     background: "#e8f4fd",
     border: "1px solid #90c4e8",
     fontSize: 13.5,
-    color: "#0d2b4e",
+    color: "var(--brand-text-strong)",
   },
   confirmYesBtn: {
     flex: 1,
     padding: "9px 0",
     borderRadius: 9,
     border: "none",
-    background: "#0a6ebd",
+    background: "var(--brand-primary)",
     color: "#fff",
     fontWeight: 700,
     fontSize: 13,
@@ -17228,7 +17468,7 @@ const styles = {
     borderRadius: 9,
     border: "1px solid #90c4e8",
     background: "#fff",
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     fontWeight: 600,
     fontSize: 13,
     cursor: "pointer",
@@ -17237,7 +17477,7 @@ const styles = {
     marginBottom: 10,
     padding: "9px 13px",
     borderRadius: 10,
-    background: "#f0f6fb",
+    background: "var(--brand-bg-tint)",
     border: "1px solid #d0e4f5",
   },
   latestNoteText: {
@@ -17255,8 +17495,8 @@ const styles = {
     padding: "10px 0",
     borderRadius: 10,
     border: "1.5px solid #d0e4f5",
-    background: "#f0f6fb",
-    color: "#0a6ebd",
+    background: "var(--brand-bg-tint)",
+    color: "var(--brand-primary)",
     fontWeight: 600,
     fontSize: 13,
     cursor: "pointer",
@@ -17284,7 +17524,7 @@ const styles = {
   stockNotManagedBox: {
     padding: "12px 14px",
     borderRadius: 10,
-    background: "#f0f6fb",
+    background: "var(--brand-bg-tint)",
     border: "1px solid #d0e4f5",
     fontSize: 13,
     color: "#2d4a6e",
@@ -17296,7 +17536,7 @@ const styles = {
   stockActivateLink: {
     background: "none",
     border: "none",
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
     fontWeight: 700,
     fontSize: 13,
     cursor: "pointer",
@@ -17309,17 +17549,17 @@ const styles = {
     alignItems: "center",
     padding: "6px 10px",
     borderRadius: 8,
-    background: "#f0f6fb",
+    background: "var(--brand-bg-tint)",
     border: "1px solid #d0e4f5",
   },
   consumptionDate: {
     fontSize: 12,
-    color: "#4a6480",
+    color: "var(--brand-text-secondary)",
   },
   consumptionAmt: {
     fontSize: 12,
     fontWeight: 700,
-    color: "#0a6ebd",
+    color: "var(--brand-primary)",
   },
   photoLockedBtn: {
     display: "flex",
@@ -17329,11 +17569,10 @@ const styles = {
     width: "100%",
     padding: "13px 0",
     borderRadius: 12,
-    // v1.70.0 — Palette gratuit/verrouillé validée (dérivée de #5b7691),
-    // pour ne plus réutiliser l'or (réservé au Premium actif).
-    border: "1.5px solid #d6dde3",
-    background: "#eef1f4",
-    color: "#3f5a73",
+    // v1.71.0 — Suit désormais le thème gratuit/premium global (var CSS).
+    border: "1.5px solid var(--brand-bg-tint)",
+    background: "var(--brand-bg-tint)",
+    color: "var(--brand-text-secondary)",
     fontWeight: 600,
     fontSize: 13.5,
     cursor: "pointer",
@@ -17379,8 +17618,8 @@ const styles = {
     padding: "14px 0 6px",
     textAlign: "center",
   },
-  paywallPrice: { fontSize: 22, fontWeight: 800, color: "#0d2b4e", marginTop: 6 },
-  paywallPriceSub: { fontSize: 12.5, color: "#6a7d90" },
+  paywallPrice: { fontSize: 22, fontWeight: 800, color: "#0d2b4e", marginTop: 6 }, // v1.71.0 — usage exclusif PaywallModal : reste bleu, non thémé
+  paywallPriceSub: { fontSize: 12.5, color: "#6a7d90" }, // v1.71.0 — idem
   paywallPerk: {
     display: "flex",
     alignItems: "center",
@@ -17398,15 +17637,15 @@ const styles = {
     <defs>
       <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#1a8fd1"/>
-        <stop offset="100%" stop-color="#064a8a"/>
+        <stop offset="100%" stop-color="var(--brand-primary-dark)"/>
       </linearGradient>
       <clipPath id="rnd"><rect width="512" height="512" rx="115"/></clipPath>
     </defs>
     <!-- fond dégradé bleu -->
     <rect width="512" height="512" rx="115" fill="url(#bg)"/>
     <!-- vague de fond -->
-    <path d="M0 340 Q128 290 256 330 Q384 370 512 310 L512 512 L0 512Z" fill="#0a6ebd" opacity="0.55" clip-path="url(#rnd)"/>
-    <path d="M0 380 Q128 340 256 375 Q384 410 512 360 L512 512 L0 512Z" fill="#064a8a" opacity="0.6" clip-path="url(#rnd)"/>
+    <path d="M0 340 Q128 290 256 330 Q384 370 512 310 L512 512 L0 512Z" fill="var(--brand-primary)" opacity="0.55" clip-path="url(#rnd)"/>
+    <path d="M0 380 Q128 340 256 375 Q384 410 512 360 L512 512 L0 512Z" fill="var(--brand-primary-dark)" opacity="0.6" clip-path="url(#rnd)"/>
     <!-- goutte principale -->
     <path d="M256 110 C256 110 176 222 176 286 C176 330 212 366 256 366 C300 366 336 330 336 286 C336 222 256 110 256 110Z" fill="white" opacity="0.95"/>
     <!-- reflet interne goutte -->
@@ -17422,7 +17661,7 @@ const styles = {
   });
   const meta = document.querySelector('meta[name="theme-color"]') || document.createElement("meta");
   meta.name = "theme-color";
-  meta.content = "#064a8a";
+  meta.content = "var(--brand-primary-dark)";
   if (!meta.parentNode) document.head.appendChild(meta);
 })();
 
