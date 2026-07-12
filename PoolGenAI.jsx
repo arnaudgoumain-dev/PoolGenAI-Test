@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.68.0";
+const APP_VERSION = "1.69.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -569,6 +569,8 @@ const TRANSLATIONS = {
     paywall_perk6: "Gestion du stock de produits",
     paywall_perk7: "Bassins et invitations sans limite",
     paywall_test_note: "Ceci est une version de test. Aucun paiement réel n'est effectué.",
+    premium_reveal_title: "Premium activé",
+    premium_reveal_sub: "Bassins, invitations et mesures sans limite",
     report_print_btn: "Imprimer / Enregistrer en PDF",
     share_report: "Partager le rapport",
     report_email_subject: "Rapport PoolGenAI — {pool}",
@@ -1234,6 +1236,8 @@ const TRANSLATIONS = {
     paywall_perk6: "Product stock management",
     paywall_perk7: "Unlimited pools and invitations",
     paywall_test_note: "This is a test version. No real payment is made.",
+    premium_reveal_title: "Premium activated",
+    premium_reveal_sub: "Unlimited pools, invitations and readings",
     report_print_btn: "Print / Save as PDF",
     share_report: "Share report",
     report_email_subject: "PoolGenAI report — {pool}",
@@ -1898,6 +1902,8 @@ const TRANSLATIONS = {
     paywall_perk6: "Produktlagerverwaltung",
     paywall_perk7: "Unbegrenzte Becken und Einladungen",
     paywall_test_note: "Dies ist eine Testversion. Es wird keine echte Zahlung vorgenommen.",
+    premium_reveal_title: "Premium aktiviert",
+    premium_reveal_sub: "Unbegrenzte Pools, Einladungen und Messungen",
     report_print_btn: "Drucken / Als PDF speichern",
     share_report: "Bericht teilen",
     report_email_subject: "PoolGenAI-Bericht — {pool}",
@@ -2558,6 +2564,8 @@ const TRANSLATIONS = {
     paywall_perk6: "Gestione stock prodotti",
     paywall_perk7: "Vasche e inviti illimitati",
     paywall_test_note: "Questa è una versione di test. Nessun pagamento reale viene effettuato.",
+    premium_reveal_title: "Premium attivato",
+    premium_reveal_sub: "Piscine, inviti e misurazioni senza limiti",
     report_print_btn: "Stampa / Salva come PDF",
     share_report: "Condividi il rapporto",
     report_email_subject: "Rapporto PoolGenAI — {pool}",
@@ -3218,6 +3226,8 @@ const TRANSLATIONS = {
     paywall_perk6: "Gestión de stock de productos",
     paywall_perk7: "Piscinas e invitaciones ilimitadas",
     paywall_test_note: "Esta es una versión de prueba. No se realiza ningún pago real.",
+    premium_reveal_title: "Premium activado",
+    premium_reveal_sub: "Piscinas, invitaciones y mediciones sin límite",
     report_print_btn: "Imprimir / Guardar como PDF",
     share_report: "Compartir informe",
     report_email_subject: "Informe PoolGenAI — {pool}",
@@ -3875,6 +3885,8 @@ const TRANSLATIONS = {
     paywall_perk6: "Gestão de stock de produtos",
     paywall_perk7: "Piscinas e convites ilimitados",
     paywall_test_note: "Esta é uma versão de teste. Nenhum pagamento real é efetuado.",
+    premium_reveal_title: "Premium ativado",
+    premium_reveal_sub: "Piscinas, convites e medições sem limite",
     report_print_btn: "Imprimir / Salvar como PDF",
     share_report: "Partilhar relatório",
     report_email_subject: "Relatório PoolGenAI — {pool}",
@@ -6235,6 +6247,9 @@ function PoolApp() {
   // temps que la mesure depuis l'écran "Modifier" de l'historique.
   const [editingApplication, setEditingApplication] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  // v1.69.0 — Écran plein cadre joué à l'activation du Premium (effet
+  // effervescent), avant que l'app ne se ré-affiche déjà débloquée.
+  const [showPremiumReveal, setShowPremiumReveal] = useState(false);
   const [paywallSource, setPaywallSource] = useState(null);
   function openPaywall(source) {
     track("paywall_shown", { source: source || "unknown" });
@@ -8491,9 +8506,17 @@ function PoolApp() {
                 )
               );
             }
+            // v1.69.0 — L'activation réelle est déjà faite ci-dessus (donc pas
+            // de flash/incohérence si l'utilisateur ferme l'overlay tôt) ;
+            // l'overlay masque juste la transition le temps de l'effet.
             setShowPaywall(false);
+            setShowPremiumReveal(true);
           }}
         />
+      )}
+
+      {showPremiumReveal && (
+        <PremiumRevealOverlay onDone={() => setShowPremiumReveal(false)} lang={lang} />
       )}
 
       {showAddPool && (
@@ -14253,6 +14276,98 @@ function PaywallModal({ onClose, onActivate, lang, source }) {
         {t("paywall_test_note")}
       </p>
     </ModalShell>
+  );
+}
+
+// v1.69.0 — Écran plein cadre joué à l'activation du Premium : bulles
+// montantes qui révèlent l'écran "Premium activé" (1,5s), puis un reflet
+// lumineux qui redescend pour sceller la transition (1,5s). L'activation
+// réelle (isPremium, stock, etc.) est déjà faite avant l'affichage de cet
+// overlay — il ne fait que masquer/habiller la transition visuellement.
+function PremiumRevealOverlay({ onDone, lang }) {
+  const t = useT(lang || "fr");
+  const reduceMotion = typeof window !== "undefined" && window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    : false;
+  const [phase, setPhase] = useState("rise"); // "rise" -> "shimmer" -> "done"
+
+  const bubbles = useMemo(() => {
+    if (reduceMotion) return [];
+    return Array.from({ length: 26 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      size: 8 + Math.random() * 22,
+      delay: Math.random() * 900,
+      duration: 1050 + Math.random() * 750,
+    }));
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      const doneTimer = setTimeout(onDone, 500);
+      return () => clearTimeout(doneTimer);
+    }
+    const shimmerTimer = setTimeout(() => setPhase("shimmer"), 1500);
+    const doneTimer = setTimeout(onDone, 3000);
+    return () => { clearTimeout(shimmerTimer); clearTimeout(doneTimer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      onClick={onDone}
+      style={{
+        position: "fixed", inset: 0, zIndex: 2000, overflow: "hidden",
+        background: "linear-gradient(135deg, #0a6ebd, #064a8a)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        cursor: "pointer",
+        clipPath: reduceMotion ? "inset(0 0 0 0)" : (phase === "rise" ? "inset(100% 0 0 0)" : "inset(0 0 0 0)"),
+        transition: reduceMotion ? "none" : "clip-path 1500ms ease-in",
+      }}
+    >
+      <style>{`
+        @keyframes premiumBubbleRise {
+          0% { transform: translateY(0) scale(1); opacity: 0.9; }
+          100% { transform: translateY(-110vh) scale(1.15); opacity: 0; }
+        }
+        @keyframes premiumShimmerSweep {
+          0% { top: -80px; opacity: 1; }
+          85% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+      `}</style>
+
+      {!reduceMotion && bubbles.map((b) => (
+        <div
+          key={b.id}
+          style={{
+            position: "absolute", bottom: -20, left: `${b.left}%`,
+            width: b.size, height: b.size, borderRadius: "50%",
+            background: "rgba(255,255,255,0.55)",
+            boxShadow: "inset -2px -2px 4px rgba(0,0,0,0.08), inset 2px 2px 3px rgba(255,255,255,0.6)",
+            animation: `premiumBubbleRise ${b.duration}ms cubic-bezier(.3,.6,.4,1) ${b.delay}ms forwards`,
+            pointerEvents: "none",
+          }}
+        />
+      ))}
+
+      {!reduceMotion && phase === "shimmer" && (
+        <div
+          style={{
+            position: "absolute", left: 0, right: 0, height: 70,
+            background: "linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0))",
+            animation: "premiumShimmerSweep 1500ms ease-in-out forwards",
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      <div style={{ position: "relative", textAlign: "center", color: "#fff", padding: 24 }}>
+        <Crown size={48} color="#f5d999" style={{ marginBottom: 14 }} />
+        <div style={{ fontSize: 21, fontWeight: 800, marginBottom: 6 }}>{t("premium_reveal_title")}</div>
+        <div style={{ fontSize: 13.5, opacity: 0.85 }}>{t("premium_reveal_sub")}</div>
+      </div>
+    </div>
   );
 }
 
