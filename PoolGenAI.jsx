@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.67.0";
+const APP_VERSION = "1.68.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -223,6 +223,10 @@ const TRANSLATIONS = {
     products_formula: "Le dosage est calculé selon : {quantité produit} pour faire varier le paramètre de {effet} sur {volume de référence} m³. Ces produits sont propres à ce bassin.",
     products_to_buy: "Mes produits à acheter",
     products_to_buy_empty: "Rien à acheter pour le moment — tous les stocks sont suffisants.",
+    generic_products_section: "Produits recommandés manquants",
+    generic_products_hint: "D'après le type de traitement de ce bassin, ces produits ne sont pas encore dans ta liste.",
+    add_generic_product: "Ajouter",
+    generic_product_added: "Ajouté à tes produits",
     reason_low_stock: "Stock bas",
     reason_insufficient_plan: "Insuffisant pour le plan en cours",
     apply_product_manual: "Appliquer un produit",
@@ -592,7 +596,7 @@ const TRANSLATIONS = {
     subscription: "Abonnement",
     unlimited_active: "Mode illimité actif",
     free_mode: "Version gratuite",
-    api_section: "Clé API (analyse IA)",
+    api_section: "ANALYSE IA",
     ai_toggle_label: "Activer l'analyse IA",
     ai_toggle_desc: "Permet d'analyser les photos de mesure par intelligence artificielle.",
     calibration_toggle_label: "Contribuer à l'amélioration collective",
@@ -892,6 +896,10 @@ const TRANSLATIONS = {
     products_formula: "Dosage calculated as: {quantity} to change parameter by {effect} per {volume} m³. These products are specific to this pool.",
     products_to_buy: "Products to buy",
     products_to_buy_empty: "Nothing to buy right now — all stock levels are sufficient.",
+    generic_products_section: "Missing recommended products",
+    generic_products_hint: "Based on this pool's treatment type, these products aren't in your list yet.",
+    add_generic_product: "Add",
+    generic_product_added: "Added to your products",
     reason_low_stock: "Low stock",
     reason_insufficient_plan: "Not enough for the current plan",
     apply_product_manual: "Apply a product",
@@ -1253,7 +1261,7 @@ const TRANSLATIONS = {
     subscription: "Subscription",
     unlimited_active: "Unlimited mode active",
     free_mode: "Free version",
-    api_section: "API Key (AI analysis)",
+    api_section: "AI ANALYSIS",
     ai_toggle_label: "Enable AI analysis",
     ai_toggle_desc: "Allows analyzing measurement photos using artificial intelligence.",
     calibration_toggle_label: "Contribute to collective improvement",
@@ -1550,6 +1558,10 @@ const TRANSLATIONS = {
     products_formula: "Dosierung berechnet als: {Menge} um Parameter um {Effekt} pro {Volumen} m³ zu ändern.",
     products_to_buy: "Einkaufsliste",
     products_to_buy_empty: "Aktuell nichts zu kaufen — alle Bestände sind ausreichend.",
+    generic_products_section: "Fehlende empfohlene Produkte",
+    generic_products_hint: "Basierend auf der Behandlungsart dieses Pools fehlen diese Produkte noch in deiner Liste.",
+    add_generic_product: "Hinzufügen",
+    generic_product_added: "Zu deinen Produkten hinzugefügt",
     reason_low_stock: "Niedriger Bestand",
     reason_insufficient_plan: "Nicht genug für den laufenden Plan",
     apply_product_manual: "Produkt anwenden",
@@ -1913,7 +1925,7 @@ const TRANSLATIONS = {
     subscription: "Abonnement",
     unlimited_active: "Unbegrenzter Modus aktiv",
     free_mode: "Kostenlose Version",
-    api_section: "API-Schlüssel (KI-Analyse)",
+    api_section: "KI-ANALYSE",
     ai_toggle_label: "KI-Analyse aktivieren",
     ai_toggle_desc: "Ermöglicht die Analyse von Messfotos mit künstlicher Intelligenz.",
     calibration_toggle_label: "Zur kollektiven Verbesserung beitragen",
@@ -2209,6 +2221,10 @@ const TRANSLATIONS = {
     products_formula: "Il dosaggio è calcolato come: {quantità} per variare il parametro di {effetto} per {volume} m³.",
     products_to_buy: "Prodotti da acquistare",
     products_to_buy_empty: "Niente da acquistare al momento — le scorte sono sufficienti.",
+    generic_products_section: "Prodotti consigliati mancanti",
+    generic_products_hint: "In base al tipo di trattamento di questa piscina, questi prodotti non sono ancora nella tua lista.",
+    add_generic_product: "Aggiungi",
+    generic_product_added: "Aggiunto ai tuoi prodotti",
     reason_low_stock: "Scorta bassa",
     reason_insufficient_plan: "Insufficiente per il piano in corso",
     apply_product_manual: "Applica un prodotto",
@@ -2569,7 +2585,7 @@ const TRANSLATIONS = {
     subscription: "Abbonamento",
     unlimited_active: "Modalità illimitata attiva",
     free_mode: "Versione gratuita",
-    api_section: "Chiave API (analisi IA)",
+    api_section: "ANALISI IA",
     ai_toggle_label: "Attiva analisi IA",
     ai_toggle_desc: "Permette di analizzare le foto di misura con intelligenza artificiale.",
     calibration_toggle_label: "Contribuisci al miglioramento collettivo",
@@ -2865,6 +2881,10 @@ const TRANSLATIONS = {
     products_formula: "El dosaje se calcula como: {cantidad} para variar el parámetro en {efecto} por {volumen} m³.",
     products_to_buy: "Productos por comprar",
     products_to_buy_empty: "Nada que comprar por ahora — todas las existencias son suficientes.",
+    generic_products_section: "Productos recomendados que faltan",
+    generic_products_hint: "Según el tipo de tratamiento de esta piscina, estos productos aún no están en tu lista.",
+    add_generic_product: "Añadir",
+    generic_product_added: "Añadido a tus productos",
     reason_low_stock: "Stock bajo",
     reason_insufficient_plan: "Insuficiente para el plan en curso",
     apply_product_manual: "Aplicar un producto",
@@ -3225,7 +3245,7 @@ const TRANSLATIONS = {
     subscription: "Suscripción",
     unlimited_active: "Modo ilimitado activo",
     free_mode: "Versión gratuita",
-    api_section: "Clave API (análisis IA)",
+    api_section: "ANÁLISIS IA",
     ai_toggle_label: "Activar análisis IA",
     ai_toggle_desc: "Permite analizar fotos de medición con inteligencia artificial.",
     calibration_toggle_label: "Contribuir a la mejora colectiva",
@@ -3521,6 +3541,10 @@ const TRANSLATIONS = {
     products_formula: "A dosagem é calculada como: {quantidade} para variar o parâmetro em {efeito} por {volume} m³.",
     products_to_buy: "Produtos a comprar",
     products_to_buy_empty: "Nada a comprar por agora — todos os stocks são suficientes.",
+    generic_products_section: "Produtos recomendados em falta",
+    generic_products_hint: "Com base no tipo de tratamento desta piscina, estes produtos ainda não estão na tua lista.",
+    add_generic_product: "Adicionar",
+    generic_product_added: "Adicionado aos teus produtos",
     reason_low_stock: "Stock baixo",
     reason_insufficient_plan: "Insuficiente para o plano em curso",
     apply_product_manual: "Aplicar um produto",
@@ -3878,7 +3902,7 @@ const TRANSLATIONS = {
     subscription: "Assinatura",
     unlimited_active: "Modo ilimitado ativo",
     free_mode: "Versão gratuita",
-    api_section: "Chave API (análise IA)",
+    api_section: "ANÁLISE IA",
     ai_toggle_label: "Ativar análise IA",
     ai_toggle_desc: "Permite analisar fotos de medição com inteligência artificial.",
     calibration_toggle_label: "Contribuir para a melhoria coletiva",
@@ -4080,6 +4104,28 @@ function getEffectiveTargets(treatmentType) {
 function getActiveParams(treatmentType) {
   const tt = TREATMENT_TYPES.find((t) => t.value === treatmentType) || TREATMENT_TYPES[0];
   return tt.params; // conserve la casse d'origine ex: "pH", "fCl", "tCl"
+}
+
+// v1.68.0 — Actions produit pertinentes pour un type de traitement donné,
+// utilisé pour proposer les produits génériques manquants (DEFAULT_PRODUCTS)
+// dans "Mes produits à acheter". ph-/ph+/tac+/tac-/sequestrant/floculant
+// sont communs à tous les types (entretien général, indépendant du mode de
+// désinfection).
+function getRelevantActionsForTreatment(treatmentType) {
+  const common = ["ph-", "ph+", "tac+", "tac-", "sequestrant", "floculant"];
+  switch (treatmentType) {
+    case "sel":
+      return [...common, "chlore", "chlore-stabilise", "hard+", "phos-", "sel"];
+    case "brome":
+      return [...common, "brome"];
+    case "o2":
+      return [...common, "o2"];
+    case "autre":
+      return [...common, "chlore"];
+    case "chlore":
+    default:
+      return [...common, "chlore", "chlore-stabilise", "hard+", "phos-"];
+  }
 }
 
 const DEFAULT_PRODUCTS = [
@@ -8226,6 +8272,8 @@ function PoolApp() {
             lang={lang}
             manageStock={!!activePool?.manageStock}
             poolName={activePool?.name}
+            treatmentType={activePool?.treatmentType}
+            onQuickAddProduct={(dp) => saveProduct({ ...dp, stockPercent: 0, isDefault: false, photo: null })}
             onBack={() => setShowProductsToBuy(false)}
             onEditProduct={(p) => {
               setEditingProduct(p);
@@ -12762,8 +12810,25 @@ function remainingInDoseUnit(prod, doseUnit) {
   return remaining;
 }
 
-function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, activeParamKeys, lang, manageStock, poolName, onBack, onEditProduct }) {
+function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, activeParamKeys, lang, manageStock, poolName, treatmentType, onBack, onEditProduct, onQuickAddProduct }) {
   const t = useT(lang || "fr");
+  const [addedIds, setAddedIds] = useState([]);
+
+  // v1.68.0 — Produits génériques (DEFAULT_PRODUCTS) pertinents pour le type
+  // de traitement du bassin, et absents de la liste de produits réels de
+  // l'utilisateur (aucun produit existant ne couvre déjà cette action).
+  const genericRows = useMemo(() => {
+    const relevantActions = getRelevantActionsForTreatment(treatmentType);
+    const ownedActions = new Set((products || []).map((p) => p.action));
+    return DEFAULT_PRODUCTS.filter(
+      (dp) => relevantActions.includes(dp.action) && !ownedActions.has(dp.action) && !addedIds.includes(dp.id)
+    );
+  }, [products, treatmentType, addedIds]);
+
+  function handleQuickAdd(dp) {
+    onQuickAddProduct(dp);
+    setAddedIds((prev) => [...prev, dp.id]);
+  }
 
   const rows = useMemo(() => {
     if (!manageStock || !products) return [];
@@ -12827,36 +12892,70 @@ function ProductsToBuyView({ products, plan, latest, volume, effectiveTargets, a
         <div style={styles.stockNotManagedBox}>
           <span>{t("stock_not_managed")}</span>
         </div>
-      ) : rows.length === 0 ? (
-        <p style={styles.emptyText}>{t("products_to_buy_empty")}</p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {rows.map(({ product: p, reasons }) => (
-            <button key={p.id} style={styles.productRow} onClick={() => onEditProduct(p)}>
-              {p.photo ? (
-                <img src={p.photo} alt="" style={styles.productThumb} />
-              ) : (
-                <div style={styles.productThumbPlaceholder}>
-                  <Beaker size={16} color="#7ab8e8" />
-                </div>
-              )}
-              <div style={{ flex: 1, textAlign: "left" }}>
-                <div style={styles.productName}>{p.name}</div>
-                <div style={{ fontSize: 11, color: "#c0392b", fontWeight: 600, marginTop: 3 }}>
-                  {t("stock_label")} {p.stockPercent ?? 100} %
-                </div>
-                <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
-                  {reasons.map((r) => (
-                    <span key={r} style={{ fontSize: 10.5, fontWeight: 700, color: "#c4502f", background: "#fff0e8", border: "1px solid #f3d9c8", borderRadius: 99, padding: "3px 8px" }}>
-                      {t(r === "low_stock" ? "reason_low_stock" : "reason_insufficient_plan")}
-                    </span>
-                  ))}
-                </div>
+        <>
+          {rows.length === 0 ? (
+            <p style={styles.emptyText}>{t("products_to_buy_empty")}</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {rows.map(({ product: p, reasons }) => (
+                <button key={p.id} style={styles.productRow} onClick={() => onEditProduct(p)}>
+                  {p.photo ? (
+                    <img src={p.photo} alt="" style={styles.productThumb} />
+                  ) : (
+                    <div style={styles.productThumbPlaceholder}>
+                      <Beaker size={16} color="#7ab8e8" />
+                    </div>
+                  )}
+                  <div style={{ flex: 1, textAlign: "left" }}>
+                    <div style={styles.productName}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: "#c0392b", fontWeight: 600, marginTop: 3 }}>
+                      {t("stock_label")} {p.stockPercent ?? 100} %
+                    </div>
+                    <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+                      {reasons.map((r) => (
+                        <span key={r} style={{ fontSize: 10.5, fontWeight: 700, color: "#c4502f", background: "#fff0e8", border: "1px solid #f3d9c8", borderRadius: 99, padding: "3px 8px" }}>
+                          {t(r === "low_stock" ? "reason_low_stock" : "reason_insufficient_plan")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <ChevronRight size={16} color="#6a7d90" />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* v1.68.0 — Produits génériques recommandés pour le type de
+              traitement du bassin, absents de la liste de l'utilisateur. */}
+          {genericRows.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <div style={styles.sectionRow}>
+                <span style={styles.sectionLabel}>{t("generic_products_section")}</span>
               </div>
-              <ChevronRight size={16} color="#6a7d90" />
-            </button>
-          ))}
-        </div>
+              <p style={styles.helpTextSmall}>{t("generic_products_hint")}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {genericRows.map((dp) => (
+                  <div key={dp.id} style={{ ...styles.productRow, cursor: "default" }}>
+                    <div style={styles.productThumbPlaceholder}>
+                      <Beaker size={16} color="#7ab8e8" />
+                    </div>
+                    <div style={{ flex: 1, textAlign: "left" }}>
+                      <div style={styles.productName}>{dp.nameKey ? t(dp.nameKey) : dp.name}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickAdd(dp)}
+                      style={{ display: "flex", alignItems: "center", gap: 4, background: "#0a6ebd", color: "#fff", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
+                    >
+                      <Plus size={14} /> {t("add_generic_product")}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -14680,8 +14779,9 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
       sectionTitle(t("params_evolution"));
       const gH = 45;
       const gAxisW = 9; // v1.66.2 — marge réservée aux libellés d'échelle gauche/droite
+      const topPad = showValues ? 4 : 0; // v1.68.0 — place pour les valeurs au-dessus des points
       const gW = cW - gAxisW * 2;
-      const gX = mL + gAxisW, gY = y;
+      const gX = mL + gAxisW, gY = y + topPad;
       const leftAxisMax = 10, rightAxisMax = 110;
 
       // Fond graphique
@@ -14732,9 +14832,17 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
           // Point
           pdf.setFillColor(r,g,b);
           pdf.circle(px, clampedPy, 0.8, "F");
+          // v1.68.0 — Valeur au-dessus du point, si "Afficher les valeurs" est coché.
+          if (showValues) {
+            pdf.setFontSize(5);
+            pdf.setTextColor(r, g, b);
+            const labelY = Math.max(clampedPy - 1.4, gY - topPad + 2.5);
+            pdf.text(String(pt.v), px, labelY, { align: "center" });
+          }
           prev = { px, py: clampedPy };
         });
       });
+      pdf.setTextColor(0,0,0);
 
       // Légende
       y = gY + gH + 2;
@@ -15044,6 +15152,52 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         pdf.line(mL, y, mL+cW, y);
       });
       y += 5;
+    }
+
+    // ── Photos des mesures ── (v1.68.0, triées par date décroissante)
+    const photoRows = [...rows].reverse();
+    const hasAnyReportPhotos = photoRows.some(({ measure }) => {
+      const fetched = fetchedPhotosByMeasureId[measure.id];
+      const analysisPhotos = measure.photos?.length ? measure.photos : (measure.photo ? [measure.photo] : (fetched?.photos || []));
+      const poolPhotos = measure.poolPhotos?.length ? measure.poolPhotos : (fetched?.poolPhotos || []);
+      return (analysisPhotos.length + poolPhotos.length) > 0;
+    });
+
+    if (hasAnyReportPhotos) {
+      sectionTitle(t("photos_section"));
+      const thumbSize = 24, gap = 3;
+      const perRow = Math.max(1, Math.floor((cW + gap) / (thumbSize + gap)));
+
+      photoRows.forEach(({ measure }) => {
+        const fetched = fetchedPhotosByMeasureId[measure.id];
+        const analysisPhotos = measure.photos?.length ? measure.photos : (measure.photo ? [measure.photo] : (fetched?.photos || []));
+        const poolPhotos = measure.poolPhotos?.length ? measure.poolPhotos : (fetched?.poolPhotos || []);
+        const allPhotos = [...analysisPhotos, ...poolPhotos];
+        if (!allPhotos.length) return;
+
+        const rowsNeeded = Math.ceil(allPhotos.length / perRow);
+        const blockH = 5 + rowsNeeded * (thumbSize + gap);
+        checkPage(blockH);
+
+        pdf.setFontSize(7.5); pdf.setFont("helvetica","bold"); pdf.setTextColor(45,74,110);
+        pdf.text(formatDate(measure.date), mL, y + 3);
+        pdf.setTextColor(0,0,0);
+        y += 5;
+
+        let px = mL, col = 0;
+        allPhotos.forEach((src) => {
+          try {
+            pdf.addImage(src, "JPEG", px, y, thumbSize, thumbSize, undefined, "FAST");
+          } catch(e) { /* photo invalide, on ignore */ }
+          pdf.setDrawColor(208,228,245); pdf.setLineWidth(0.15);
+          pdf.rect(px, y, thumbSize, thumbSize);
+          col++;
+          if (col >= perRow) { col = 0; px = mL; y += thumbSize + gap; }
+          else { px += thumbSize + gap; }
+        });
+        if (col !== 0) y += thumbSize + gap;
+        y += 3;
+      });
     }
 
     // Footer toutes pages
@@ -15437,7 +15591,10 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         {rows.some(({ measure }) => (measure.photoCount || measure.poolPhotoCount || measure.photos?.length || measure.photo || measure.poolPhotos?.length)) && (
           <div style={{ marginTop: 24 }}>
             <div style={styles.reportSectionTitle}>{t("photos_section")}</div>
-            {rows.map(({ measure }, i) => {
+            {/* v1.68.0 — Photos triées par date décroissante (le plus récent
+                en premier), sur demande d'Arnaud. "rows" reste croissant
+                (utilisé pour le graphique) : on inverse juste ici, en copie. */}
+            {[...rows].reverse().map(({ measure }, i) => {
               const fetched = fetchedPhotosByMeasureId[measure.id];
               const analysisPhotos = measure.photos?.length ? measure.photos : (measure.photo ? [measure.photo] : (fetched?.photos || []));
               const poolPhotos = measure.poolPhotos?.length ? measure.poolPhotos : (fetched?.poolPhotos || []);
