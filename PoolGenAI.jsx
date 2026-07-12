@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.66.1";
+const APP_VERSION = "1.67.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -10484,42 +10484,21 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
         <span style={styles.sectionLabel}>{t("journal")}</span>
       </div>
 
-      {/* Bouton import PDF */}
+      {/* v1.66.2 — Bouton "Générer le rapport" déplacé en haut du Journal
+          (à la place de l'import PDF, désormais en bas de la liste), sur
+          demande d'Arnaud : c'est l'action la plus utilisée depuis cet écran. */}
       <div style={{ marginBottom: 8 }}>
-        <input
-          ref={importFileRef}
-          type="file"
-          accept="application/pdf,image/jpeg,image/png,image/webp"
-          style={{ display: "none" }}
-          onChange={handleImportFile}
-        />
-        {apiKey ? (
-          <>
-            <button
-              style={{ ...styles.validateApplyBtn, background: importLoading ? "#6a7d90" : "#0a6ebd", fontSize: 13, padding: "9px 14px" }}
-              onClick={() => importFileRef.current?.click()}
-              disabled={importLoading}
-            >
-              {importLoading ? <Loader2 size={15} className="spin" /> : <FileText size={15} />}
-              {importLoading ? t("import_pdf_analyzing") : t("import_pdf_btn")}
-            </button>
-            {importError && (
-              <div style={{ marginTop: 6, fontSize: 12, color: "#c0392b", padding: "6px 10px", background: "#fdf0ef", borderRadius: 8 }}>
-                <AlertTriangle size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />{importError}
-              </div>
-            )}
-            {importInfo && (
-              <div style={{ marginTop: 6, fontSize: 12, color: "#5b3fa0", padding: "6px 10px", background: "#f3effa", borderRadius: 8 }}>
-                {importInfo}
-              </div>
-            )}
-          </>
+        {isPremium ? (
+          <button style={styles.validateApplyBtn} onClick={onGenerateReport}>
+            <FileText size={16} /> {t("generate_report")}
+          </button>
         ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6a7d90", padding: "8px 12px", background: "#f0f6fb", borderRadius: 10, border: "1px solid #d0e4f5" }}>
-            <Lock size={13} color="#6a7d90" />
-            <span>{t("import_pdf_needs_ai")}</span>
-          </div>
+          <button style={styles.photoLockedBtn} onClick={onWantPremiumForReport}>
+            <Lock size={16} />
+            <span>{t("report_locked")}</span>
+          </button>
         )}
+        <p style={styles.helpTextSmall}>{t("report_desc")}</p>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -10556,20 +10535,43 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ni après.`;
         })()}
       </div>
 
-      <div style={{ ...styles.sectionRow, marginTop: 18 }}>
-        <span style={styles.sectionLabel}>{t("report")}</span>
+      {/* Bouton import PDF — déplacé en bas (v1.66.2) */}
+      <div style={{ marginTop: 18 }}>
+        <input
+          ref={importFileRef}
+          type="file"
+          accept="application/pdf,image/jpeg,image/png,image/webp"
+          style={{ display: "none" }}
+          onChange={handleImportFile}
+        />
+        {apiKey ? (
+          <>
+            <button
+              style={{ ...styles.validateApplyBtn, background: importLoading ? "#6a7d90" : "#0a6ebd", fontSize: 13, padding: "9px 14px" }}
+              onClick={() => importFileRef.current?.click()}
+              disabled={importLoading}
+            >
+              {importLoading ? <Loader2 size={15} className="spin" /> : <FileText size={15} />}
+              {importLoading ? t("import_pdf_analyzing") : t("import_pdf_btn")}
+            </button>
+            {importError && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#c0392b", padding: "6px 10px", background: "#fdf0ef", borderRadius: 8 }}>
+                <AlertTriangle size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />{importError}
+              </div>
+            )}
+            {importInfo && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#5b3fa0", padding: "6px 10px", background: "#f3effa", borderRadius: 8 }}>
+                {importInfo}
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6a7d90", padding: "8px 12px", background: "#f0f6fb", borderRadius: 10, border: "1px solid #d0e4f5" }}>
+            <Lock size={13} color="#6a7d90" />
+            <span>{t("import_pdf_needs_ai")}</span>
+          </div>
+        )}
       </div>
-      {isPremium ? (
-        <button style={styles.validateApplyBtn} onClick={onGenerateReport}>
-          <FileText size={16} /> {t("generate_report")}
-        </button>
-      ) : (
-        <button style={styles.photoLockedBtn} onClick={onWantPremiumForReport}>
-          <Lock size={16} />
-          <span>{t("report_locked")}</span>
-        </button>
-      )}
-      <p style={styles.helpTextSmall}>{t("report_desc")}</p>
 
       {apiKey && (
         <div style={{ marginTop: 20 }}>
@@ -14539,6 +14541,19 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     { key: "temp",   color: "#e0578a", label: t("temp_col"),                                 axis: "right" },
   ];
 
+  // v1.66.2 — Sélection des paramètres affichés sur le graphique du rapport
+  // (aperçu HTML et PDF), même mécanisme de puces que le graphique de
+  // l'onglet Historique. Tous actifs par défaut.
+  const [activeReportParams, setActiveReportParams] = useState(() => chartParams.map((cp) => cp.key));
+  const allReportKeys = chartParams.map((cp) => cp.key);
+  const allReportActive = allReportKeys.every((k) => activeReportParams.includes(k));
+  function toggleReportParam(key) {
+    setActiveReportParams((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  }
+  function toggleAllReportParams() {
+    setActiveReportParams(allReportActive ? [] : allReportKeys);
+  }
+
   const rows = useMemo(() => {
     const repTargets = getEffectiveTargets(pool?.treatmentType || "chlore");
     const repParams = getActiveParams(pool?.treatmentType || "chlore");
@@ -14663,8 +14678,11 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
     // ── Graphique simplifié ──
     if (chartData.length >= 2) {
       sectionTitle(t("params_evolution"));
-      const gH = 45, gW = cW;
-      const gX = mL, gY = y;
+      const gH = 45;
+      const gAxisW = 9; // v1.66.2 — marge réservée aux libellés d'échelle gauche/droite
+      const gW = cW - gAxisW * 2;
+      const gX = mL + gAxisW, gY = y;
+      const leftAxisMax = 10, rightAxisMax = 110;
 
       // Fond graphique
       pdf.setFillColor(250,252,251);
@@ -14672,27 +14690,36 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
       pdf.setDrawColor(200,210,220); pdf.setLineWidth(0.15);
       pdf.rect(gX, gY, gW, gH);
 
-      // Grille horizontale (5 lignes)
+      // Grille horizontale (5 lignes) + libellés d'échelle gauche/droite
       pdf.setDrawColor(220,228,234); pdf.setLineWidth(0.1);
       for (let i = 1; i <= 4; i++) {
         const gy = gY + (gH / 5) * i;
         pdf.line(gX, gy, gX + gW, gy);
       }
+      pdf.setFontSize(6); pdf.setFont("helvetica", "normal"); pdf.setTextColor(100,112,124);
+      for (let i = 0; i <= 5; i++) {
+        const ty = gY + (gH / 5) * i;
+        const leftVal = Math.round(leftAxisMax - (leftAxisMax / 5) * i);
+        const rightVal = Math.round(rightAxisMax - (rightAxisMax / 5) * i);
+        pdf.text(String(leftVal), gX - 1.5, ty + 1, { align: "right" });
+        pdf.text(String(rightVal), gX + gW + 1.5, ty + 1, { align: "left" });
+      }
+      pdf.setTextColor(0,0,0);
 
       const timestamps = chartData.map(d => d.timestamp);
       const tMin = Math.min(...timestamps), tMax = Math.max(...timestamps);
       const tRange = tMax - tMin || 1;
 
       // Dessiner chaque paramètre
-      chartParams.forEach(cp => {
+      chartParams.filter((cp) => activeReportParams.includes(cp.key)).forEach(cp => {
         const pts = chartData.map((d, i) => {
           const v = d[cp.key];
           return v == null ? null : { x: i, t: d.timestamp, v };
         }).filter(Boolean);
         if (pts.length < 1) return;
 
-        // Normalise selon axe (left: 0-8, right: 0-100)
-        const vMax = cp.axis === "left" ? 10 : 110;
+        // Normalise selon axe (left: 0-10, right: 0-110)
+        const vMax = cp.axis === "left" ? leftAxisMax : rightAxisMax;
         const [r,g,b] = hexToRgb(cp.color);
         pdf.setDrawColor(r,g,b); pdf.setLineWidth(0.5);
 
@@ -14713,7 +14740,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
       y = gY + gH + 2;
       let lx = mL;
       pdf.setFontSize(6.5); pdf.setFont("helvetica","normal");
-      chartParams.forEach(cp => {
+      chartParams.filter((cp) => activeReportParams.includes(cp.key)).forEach(cp => {
         const hasData = chartData.some(d => d[cp.key] != null);
         if (!hasData) return;
         const [r,g,b] = hexToRgb(cp.color);
@@ -15122,6 +15149,39 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
         </div>
 
         <div style={styles.reportSectionTitle}>{t("params_evolution")}</div>
+        <div className="no-print" style={styles.chipsRow}>
+          <button
+            onClick={toggleAllReportParams}
+            style={{
+              ...styles.chip,
+              ...styles.chipAll,
+              background: allReportActive ? "#0a6ebd" : "#f1f4f3",
+              borderColor: allReportActive ? "#0a6ebd" : "#d0e4f5",
+              color: allReportActive ? "#ffffff" : "#2d4a6e",
+            }}
+          >
+            {allReportActive ? t("hide_all_params") : t("show_all_params")}
+          </button>
+          {chartParams.map((cp) => (
+            <button
+              key={cp.key}
+              onClick={() => toggleReportParam(cp.key)}
+              style={{
+                ...styles.chip,
+                background: activeReportParams.includes(cp.key) ? cp.color + "22" : "#f1f4f3",
+                borderColor: activeReportParams.includes(cp.key) ? cp.color : "#d0e4f5",
+                color: activeReportParams.includes(cp.key) ? cp.color : "#6a7d90",
+              }}
+            >
+              {cp.label}
+              <span style={styles.chipAxisTag}>{cp.axis === "left" ? "ᴜ" : "ᴅ"}</span>
+            </button>
+          ))}
+        </div>
+        <p className="no-print" style={styles.axisLegend}>
+          <span style={styles.axisLegendItem}>{t("axis_legend_u")}</span>
+          <span style={styles.axisLegendItem}>{t("axis_legend_d")}</span>
+        </p>
         <label className="no-print" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#4a6480", marginBottom: 8, cursor: "pointer", userSelect: "none" }}>
           <input type="checkbox" checked={showValues} onChange={(e) => setShowValues(e.target.checked)} />
           <span>{t("show_values")}</span>
@@ -15158,7 +15218,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
                 tick={{ fontSize: 12, fill: "#2d4a6e" }}
                 width={30}
               />
-              {chartParams.map((cp) => (
+              {chartParams.filter((cp) => activeReportParams.includes(cp.key)).map((cp) => (
                 <Line
                   key={cp.key}
                   yAxisId={cp.axis}
@@ -15180,7 +15240,7 @@ function ReportView({ pool, measures, applications, products, onClose, manageSto
             </ResponsiveContainer>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px 16px", marginTop: 8, padding: "0 8px" }}>
-            {chartParams.filter(cp => chartData.some(d => d[cp.key] != null)).map((cp) => (
+            {chartParams.filter(cp => activeReportParams.includes(cp.key) && chartData.some(d => d[cp.key] != null)).map((cp) => (
               <div key={cp.key} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#2d4a6e" }}>
                 <svg width="16" height="4"><line x1="0" y1="2" x2="16" y2="2" stroke={cp.color} strokeWidth="2"/><circle cx="8" cy="2" r="2" fill={cp.color}/></svg>
                 {cp.label}
