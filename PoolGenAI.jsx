@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.81.0";
+const APP_VERSION = "1.82.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -8200,8 +8200,25 @@ function PoolGenAIApp() {
     setShowAddPool(true);
   }
 
+  // v1.82.0 — BUG : ces variables n'étaient posées que sur le <div className="app">
+  // interne, alors que plusieurs écrans (vérification email, compte suspendu/supprimé,
+  // bassin introuvable, premier bassin forcé...) sont rendus AVANT ce div, dans un
+  // Fragment <> qui ne peut porter aucun style. Ces écrans utilisaient donc
+  // var(--brand-primary) non définie → fond/texte transparents, boutons invisibles
+  // ("blanc sur blanc"). Calculées une fois ici et appliquées au vrai conteneur racine.
+  const themeVars = {
+    "--brand-primary": effectiveIsPremium ? "#1ca7d1" : "#4a9b82",
+    "--brand-primary-dark": effectiveIsPremium ? "#0c7a9e" : "#2a6553",
+    "--brand-text-strong": effectiveIsPremium ? "#0d2b4e" : "#173a2b",
+    "--brand-text-secondary": effectiveIsPremium ? "#4a6480" : "#3f6552",
+    "--brand-text-muted": effectiveIsPremium ? "#6a7d90" : "#5c7d6c",
+    "--brand-icon-light": effectiveIsPremium ? "#7ab8e8" : "#7fc7a4",
+    "--brand-header-sub": effectiveIsPremium ? "#a8d4f0" : "#bfe0cf",
+    "--brand-bg-tint": effectiveIsPremium ? "#f0f6fb" : "#eef6f1",
+  };
+
   return (
-    <>
+    <div style={themeVars}>
     {verifyLinkStatus && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3200, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
@@ -8585,20 +8602,11 @@ function PoolGenAIApp() {
     <div
       style={{
         ...styles.app,
-        // v1.71.0 — Thème gratuit/premium : variables CSS pilotées par
-        // effectiveIsPremium (déjà utilisé partout ailleurs, gère aussi
-        // correctement le contexte secondaire délégué). Le mur Premium et
-        // les écrans de vente restent en bleu littéral, non thémés (voir
-        // PaywallModal et ProductsView) — seule l'identité visuelle
-        // "ambiante" de l'app bascule ici.
-        "--brand-primary": effectiveIsPremium ? "#1ca7d1" : "#4a9b82",
-        "--brand-primary-dark": effectiveIsPremium ? "#0c7a9e" : "#2a6553",
-        "--brand-text-strong": effectiveIsPremium ? "#0d2b4e" : "#173a2b",
-        "--brand-text-secondary": effectiveIsPremium ? "#4a6480" : "#3f6552",
-        "--brand-text-muted": effectiveIsPremium ? "#6a7d90" : "#5c7d6c",
-        "--brand-icon-light": effectiveIsPremium ? "#7ab8e8" : "#7fc7a4",
-        "--brand-header-sub": effectiveIsPremium ? "#a8d4f0" : "#bfe0cf",
-        "--brand-bg-tint": effectiveIsPremium ? "#f0f6fb" : "#eef6f1",
+        // v1.82.0 — themeVars calculé une fois en tête du composant (voir plus
+        // haut) et réappliqué ici aussi ; redondant avec le conteneur racine
+        // mais inoffensif, et évite de casser un éventuel style CSS ciblant
+        // spécifiquement .app pour d'autres besoins.
+        ...themeVars,
       }}
       className="app"
     >
@@ -9079,7 +9087,7 @@ function PoolGenAIApp() {
         <PhotoLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
       )}
     </div>
-    </>
+    </div>
   );
 }
 
