@@ -395,7 +395,19 @@
   // directement à accounts.google.com via postMessage, sans passer par ce domaine
   // intermédiaire : on récupère un access_token, qu'on échange ensuite contre une
   // session Firebase via signInWithCredential.
-  const GOOGLE_WEB_CLIENT_ID = "781764586143-pb34a19vgc6sgj1aqq50a93npap12k0r.apps.googleusercontent.com";
+  // v1.85.0 — BUG : ce Client ID était unique et codé en dur sur celui de PROD
+  // (préfixe 781764586143 = messagingSenderId de poolapp-ago), utilisé pour TOUS
+  // les environnements. Résultat : Firebase Auth de test/dev rejetait toujours la
+  // connexion Google ("access_token audience is not for this project"), quel que
+  // soit le réglage des origines JavaScript autorisées côté GCP — ce n'était
+  // structurellement pas le bon client. Un Client ID par environnement, sélectionné
+  // via __env (déjà calculé plus haut pour FIREBASE_CONFIGS).
+  const GOOGLE_WEB_CLIENT_IDS = {
+    prod: "781764586143-pb34a19vgc6sgj1aqq50a93npap12k0r.apps.googleusercontent.com",
+    test: "29427727408-gs9bu3mfbqt1eb4usclem214sf1t6bdo.apps.googleusercontent.com",
+    dev: "1059394562193-8qliq2i8jf2tjehoabej6rgffibpb974.apps.googleusercontent.com",
+  };
+  const GOOGLE_WEB_CLIENT_ID = GOOGLE_WEB_CLIENT_IDS[__env] || GOOGLE_WEB_CLIENT_IDS.prod;
 
   window._fbSignInWithPopup = async (auth, provider) => {
     if (!window.google?.accounts?.oauth2) {
