@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.82.0";
+const APP_VERSION = "1.83.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -117,6 +117,8 @@ const TRANSLATIONS = {
     cgu_accepted_on: "Acceptées le",
     cgu_updated_title: "Mise à jour des conditions",
     cgu_updated_body: "Les conditions d'utilisation ont été mises à jour. Merci de les relire et de les accepter pour continuer.",
+    cgu_required_title: "Conditions d'utilisation",
+    cgu_required_body: "Merci de valider nos conditions d'utilisation pour continuer.",
     applied_col: "Appliqué",
     disclaimer_title: "Mentions légales & Conditions d'utilisation",
     disclaimer_cgu: "J'accepte les conditions générales d'utilisation et la politique de confidentialité",
@@ -823,6 +825,8 @@ const TRANSLATIONS = {
     cgu_accepted_on: "Accepted on",
     cgu_updated_title: "Terms updated",
     cgu_updated_body: "The terms of use have been updated. Please read and accept them to continue.",
+    cgu_required_title: "Terms of use",
+    cgu_required_body: "Please accept our terms of use to continue.",
     applied_col: "Applied",
     disclaimer_title: "Legal Notice & Terms of Use",
     disclaimer_cgu: "I accept the terms of use and privacy policy",
@@ -1516,6 +1520,8 @@ const TRANSLATIONS = {
     cgu_accepted_on: "Akzeptiert am",
     cgu_updated_title: "AGB aktualisiert",
     cgu_updated_body: "Die Nutzungsbedingungen wurden aktualisiert. Bitte lesen und akzeptieren Sie sie.",
+    cgu_required_title: "Nutzungsbedingungen",
+    cgu_required_body: "Bitte akzeptiere unsere Nutzungsbedingungen, um fortzufahren.",
     applied_col: "Angewendet",
     disclaimer_title: "Rechtliche Hinweise & Nutzungsbedingungen",
     disclaimer_cgu: "Ich akzeptiere die Nutzungsbedingungen und Datenschutzrichtlinie",
@@ -2210,6 +2216,8 @@ const TRANSLATIONS = {
     cgu_accepted_on: "Accettato il",
     cgu_updated_title: "Termini aggiornati",
     cgu_updated_body: "I termini di utilizzo sono stati aggiornati. Si prega di rileggerli e accettarli.",
+    cgu_required_title: "Termini di utilizzo",
+    cgu_required_body: "Accetta i nostri termini di utilizzo per continuare.",
     applied_col: "Applicato",
     disclaimer_title: "Note legali & Condizioni d'uso",
     disclaimer_cgu: "Accetto i termini di utilizzo e la politica sulla privacy",
@@ -2901,6 +2909,8 @@ const TRANSLATIONS = {
     cgu_accepted_on: "Aceptado el",
     cgu_updated_title: "Términos actualizados",
     cgu_updated_body: "Los términos de uso han sido actualizados. Por favor léalos y acéptelos.",
+    cgu_required_title: "Términos de uso",
+    cgu_required_body: "Acepta nuestros términos de uso para continuar.",
     applied_col: "Aplicado",
     disclaimer_title: "Aviso legal & Condiciones de uso",
     disclaimer_cgu: "Acepto los términos de uso y la política de privacidad",
@@ -3592,6 +3602,8 @@ const TRANSLATIONS = {
     cgu_accepted_on: "Aceito em",
     cgu_updated_title: "Termos atualizados",
     cgu_updated_body: "Os termos de uso foram atualizados. Por favor leia e aceite-os.",
+    cgu_required_title: "Termos de uso",
+    cgu_required_body: "Aceita os nossos termos de uso para continuar.",
     applied_col: "Aplicado",
     disclaimer_title: "Aviso legal & Termos de uso",
     disclaimer_cgu: "Aceito os termos de uso e a política de privacidade",
@@ -6531,7 +6543,10 @@ function PoolGenAIApp() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [acceptedCguVersion, setAcceptedCguVersion] = useState(null);
   const [cguAcceptedDate, setCguAcceptedDate] = useState(null);
-  const [showCguUpdate, setShowCguUpdate] = useState(false);
+  // v1.83.0 — Dérivé (pas un flag manuel) : couvre à la fois "jamais accepté"
+  // (comptes Google, cguVersion cloud absent) et "version dépassée" (re-acceptation).
+  // Se recalcule automatiquement dès que acceptedCguVersion change (ex: rapatriement
+  // cloud après connexion), contrairement à l'ancien setShowCguUpdate posé une seule fois.
   const detectedLang = (() => {
     const nav = (navigator.language || navigator.userLanguage || "fr").toLowerCase().slice(0, 2);
     return ["fr","en","de","it","es","pt"].includes(nav) ? nav : "fr";
@@ -7108,6 +7123,14 @@ function PoolGenAIApp() {
         try {
           const data = await FB.getUser(user.uid);
           if (data?.isPremium !== undefined) setIsPremium(data.isPremium);
+          // v1.83.0 — Le cloud (Firestore users/{uid}) fait foi pour l'acceptation
+          // CGU, plus le cache local seul : un compte Google n'a jamais eu ce champ
+          // écrit (handleGoogle ne collecte aucun consentement) et un compte email
+          // sur un nouvel appareil n'a pas encore ce champ en cache local. Sans ce
+          // rapatriement, acceptedCguVersion reste indéfiniment null/périmé et
+          // l'écran de validation ne se déclenche jamais pour ces cas.
+          setAcceptedCguVersion(data?.cguVersion || null);
+          setCguAcceptedDate(data?.cguAcceptedDate || null);
         } catch (e) {}
         FB.saveUser(user.uid, { email: user.email, lastSeen: new Date().toISOString() }).catch(() => {});
         if (!resolved) { resolved = true; setAuthResolved(true); }
@@ -7151,6 +7174,12 @@ function PoolGenAIApp() {
   const needsEmailVerification =
     !!authUser && !isGoogleUser &&
     (emailVerifiedNow !== null ? !emailVerifiedNow : authUser.emailVerified === false);
+  // v1.83.0 — Couvre le compte jamais passé par l'acceptation CGU (acceptedCguVersion
+  // null — cas Google, cf. handleGoogle qui ne collecte aucun consentement) ET le
+  // compte dont la version acceptée est dépassée (re-acceptation après mise à jour).
+  const cguNeverAccepted = !!authUser && !acceptedCguVersion;
+  const needsCguAcceptance =
+    !!authUser && (cguNeverAccepted || acceptedCguVersion < CGU_VERSION);
 
   async function handleCheckEmailVerified() {
     if (!window._fbAuth?.currentUser) return;
@@ -7282,10 +7311,7 @@ function PoolGenAIApp() {
         const dc = await window.storage.get(STORAGE_KEYS.dataConsent);
         if (dc?.value === "true") setDataConsent(true);
         const cv = await window.storage.get(STORAGE_KEYS.cguVersion);
-        if (cv?.value) {
-          setAcceptedCguVersion(cv.value);
-          if (cv.value < CGU_VERSION) setShowCguUpdate(true);
-        }
+        if (cv?.value) setAcceptedCguVersion(cv.value);
         const cd = await window.storage.get(STORAGE_KEYS.cguAcceptedDate);
         if (cd?.value) setCguAcceptedDate(cd.value);
         const pr = await window.storage.get(STORAGE_KEYS.premium);
@@ -8430,7 +8456,7 @@ function PoolGenAIApp() {
         </div>
       </div>
     )}
-    {needsEmailVerification && !forceUpdate && (
+    {needsEmailVerification && !forceUpdate && !needsCguAcceptance && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3050, background: "rgba(10,60,50,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px #00000033" }}>
           <div style={{ fontSize: 34, marginBottom: 10 }}>📧</div>
@@ -8548,13 +8574,13 @@ function PoolGenAIApp() {
         (poolAccessError) ou si 5s se sont écoulées sans résolution
         (secondaryLoadTimeout) : l'écran "Bassin introuvable" prend le relais
         dans ces deux cas au lieu de laisser croire à un simple chargement. */}
-    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && !cloudConfigReceived && !(viewContext && (poolAccessError || secondaryLoadTimeout)) && (
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && !needsCguAcceptance && !cloudConfigReceived && !(viewContext && (poolAccessError || secondaryLoadTimeout)) && (
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f5f8f7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <Loader2 size={34} className="spin" style={{ marginBottom: 10, color: "var(--brand-primary)" }} />
         <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)" }}>{t("context_loading")}</div>
       </div>
     )}
-    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && activePools.length === 0 && cloudConfigReceived && !viewContext && (
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && !needsCguAcceptance && activePools.length === 0 && cloudConfigReceived && !viewContext && (
       <AddPoolModal forced onSave={addPool} lang={lang} />
     )}
     {/* v1.57.3 — En contexte secondaire, activePools peut être vide un court
@@ -8566,7 +8592,7 @@ function PoolGenAIApp() {
         v1.70.0 — Se déclenche aussi sur poolAccessError (refus confirmé) ou
         secondaryLoadTimeout (5s sans résolution), pas seulement quand
         cloudConfigReceived est déjà arrivé avec un tableau de bassins vide. */}
-    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && viewContext &&
+    {loaded && authUser && !suspended && !accountDeleted && !forceUpdate && !needsEmailVerification && !needsCguAcceptance && viewContext &&
       ((activePools.length === 0 && cloudConfigReceived) || poolAccessError || secondaryLoadTimeout) && (
       <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#f5f8f7", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
         <Droplets size={40} color="var(--brand-icon-light)" style={{ marginBottom: 16 }} />
@@ -9014,16 +9040,18 @@ function PoolGenAIApp() {
         </div>
       )}
 
-      {/* Modale re-acceptation CGU si nouvelle version */}
-      {showCguUpdate && !showLogin && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 900, background: "rgba(10,30,60,0.8)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      {/* v1.83.0 — Écran bloquant CGU : jamais accepté (comptes Google, jamais
+          passés par la case CGU du signup email) ou version dépassée (re-acceptation).
+          zIndex 3060 > 3050 (vérification email) : la CGU prime toujours. */}
+      {needsCguAcceptance && !showLogin && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 3060, background: "rgba(10,30,60,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 440, width: "100%", boxShadow: "0 8px 32px var(--brand-primary)22" }}>
             <div style={{ fontSize: 24, textAlign: "center", marginBottom: 8 }}>📋</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "var(--brand-text-strong)", textAlign: "center", marginBottom: 8 }}>
-              {tFn("cgu_updated_title")}
+              {tFn(cguNeverAccepted ? "cgu_required_title" : "cgu_updated_title")}
             </div>
             <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", lineHeight: 1.6, marginBottom: 16, textAlign: "center" }}>
-              {tFn("cgu_updated_body")}
+              {tFn(cguNeverAccepted ? "cgu_required_body" : "cgu_updated_body")}
             </div>
             <div style={{ fontSize: 11, color: "#9ab0c4", textAlign: "center", marginBottom: 16 }}>
               CGU {CGU_VERSION}
@@ -9031,11 +9059,11 @@ function PoolGenAIApp() {
             <button
               style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
               onClick={() => {
+                const now = new Date().toISOString();
                 setAcceptedCguVersion(CGU_VERSION);
-                setCguAcceptedDate(new Date().toISOString());
-                setShowCguUpdate(false);
+                setCguAcceptedDate(now);
                 if (authUser?.uid) {
-                  FB.saveUser(authUser.uid, { cguVersion: CGU_VERSION, cguAcceptedDate: new Date().toISOString() }).catch(() => {});
+                  FB.saveUser(authUser.uid, { cguVersion: CGU_VERSION, cguAcceptedDate: now }).catch(() => {});
                 }
               }}
             >
