@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.85.0";
+const APP_VERSION = "1.86.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -119,6 +119,8 @@ const TRANSLATIONS = {
     cgu_updated_body: "Les conditions d'utilisation ont été mises à jour. Merci de les relire et de les accepter pour continuer.",
     cgu_required_title: "Conditions d'utilisation",
     cgu_required_body: "Merci de valider nos conditions d'utilisation pour continuer.",
+    cgu_read_full_text: "Lire le texte complet",
+    cgu_hide_full_text: "Masquer le texte",
     applied_col: "Appliqué",
     disclaimer_title: "Mentions légales & Conditions d'utilisation",
     disclaimer_cgu: "J'accepte les conditions générales d'utilisation et la politique de confidentialité",
@@ -827,6 +829,8 @@ const TRANSLATIONS = {
     cgu_updated_body: "The terms of use have been updated. Please read and accept them to continue.",
     cgu_required_title: "Terms of use",
     cgu_required_body: "Please accept our terms of use to continue.",
+    cgu_read_full_text: "Read the full text",
+    cgu_hide_full_text: "Hide text",
     applied_col: "Applied",
     disclaimer_title: "Legal Notice & Terms of Use",
     disclaimer_cgu: "I accept the terms of use and privacy policy",
@@ -1522,6 +1526,8 @@ const TRANSLATIONS = {
     cgu_updated_body: "Die Nutzungsbedingungen wurden aktualisiert. Bitte lesen und akzeptieren Sie sie.",
     cgu_required_title: "Nutzungsbedingungen",
     cgu_required_body: "Bitte akzeptiere unsere Nutzungsbedingungen, um fortzufahren.",
+    cgu_read_full_text: "Vollständigen Text lesen",
+    cgu_hide_full_text: "Text ausblenden",
     applied_col: "Angewendet",
     disclaimer_title: "Rechtliche Hinweise & Nutzungsbedingungen",
     disclaimer_cgu: "Ich akzeptiere die Nutzungsbedingungen und Datenschutzrichtlinie",
@@ -2218,6 +2224,8 @@ const TRANSLATIONS = {
     cgu_updated_body: "I termini di utilizzo sono stati aggiornati. Si prega di rileggerli e accettarli.",
     cgu_required_title: "Termini di utilizzo",
     cgu_required_body: "Accetta i nostri termini di utilizzo per continuare.",
+    cgu_read_full_text: "Leggi il testo completo",
+    cgu_hide_full_text: "Nascondi il testo",
     applied_col: "Applicato",
     disclaimer_title: "Note legali & Condizioni d'uso",
     disclaimer_cgu: "Accetto i termini di utilizzo e la politica sulla privacy",
@@ -2911,6 +2919,8 @@ const TRANSLATIONS = {
     cgu_updated_body: "Los términos de uso han sido actualizados. Por favor léalos y acéptelos.",
     cgu_required_title: "Términos de uso",
     cgu_required_body: "Acepta nuestros términos de uso para continuar.",
+    cgu_read_full_text: "Leer el texto completo",
+    cgu_hide_full_text: "Ocultar el texto",
     applied_col: "Aplicado",
     disclaimer_title: "Aviso legal & Condiciones de uso",
     disclaimer_cgu: "Acepto los términos de uso y la política de privacidad",
@@ -3604,6 +3614,8 @@ const TRANSLATIONS = {
     cgu_updated_body: "Os termos de uso foram atualizados. Por favor leia e aceite-os.",
     cgu_required_title: "Termos de uso",
     cgu_required_body: "Aceita os nossos termos de uso para continuar.",
+    cgu_read_full_text: "Ler o texto completo",
+    cgu_hide_full_text: "Ocultar o texto",
     applied_col: "Aplicado",
     disclaimer_title: "Aviso legal & Termos de uso",
     disclaimer_cgu: "Aceito os termos de uso e a política de privacidade",
@@ -5700,8 +5712,16 @@ const FB = {
   onConfig: (uid, cb, errCb) => {
     if (!window._fbDb || !window._fbOnSnapshot) return () => {};
     const ref = window._fbDoc(window._fbDb, "users", uid, "config", "main");
+    // v1.85.0 — BUG : cb() n'était appelé QUE si le document existait déjà.
+    // Pour un compte tout neuf (aucune écriture cloud encore effectuée),
+    // config/main n'existe pas → cb() n'était jamais invoqué → cloudConfigReceived
+    // restait bloqué à false indéfiniment → spinner "Chargement du bassin"
+    // permanent, écran de création du premier bassin jamais atteint. Masqué
+    // jusqu'ici sur test/prod car leurs comptes de test avaient déjà un doc
+    // config/main d'une session antérieure. Tous les accès aux champs dans le
+    // callback (config.pools?.length, etc.) tolèrent déjà un objet vide.
     return window._fbOnSnapshot(ref, (snap) => {
-      if (snap.exists()) cb(snap.data());
+      cb(snap.exists() ? snap.data() : {});
     }, (err) => { if (errCb) errCb(err); });
   },
   // ── Calibration Lot B — collection RACINE, create-only, sans uid (cf.
@@ -6542,6 +6562,10 @@ function PoolGenAIApp() {
   const [dataConsent, setDataConsent] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [acceptedCguVersion, setAcceptedCguVersion] = useState(null);
+  // v1.85.0 — Permet de consulter le texte complet des CGU directement depuis
+  // l'écran de validation obligatoire (needsCguAcceptance), plutôt que de forcer
+  // une acceptation sans possibilité de lecture.
+  const [showFullCguInGate, setShowFullCguInGate] = useState(false);
   const [cguAcceptedDate, setCguAcceptedDate] = useState(null);
   // v1.83.0 — Dérivé (pas un flag manuel) : couvre à la fois "jamais accepté"
   // (comptes Google, cguVersion cloud absent) et "version dépassée" (re-acceptation).
@@ -9045,7 +9069,7 @@ function PoolGenAIApp() {
           zIndex 3060 > 3050 (vérification email) : la CGU prime toujours. */}
       {needsCguAcceptance && !showLogin && (
         <div style={{ position: "fixed", inset: 0, zIndex: 3060, background: "rgba(10,30,60,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 440, width: "100%", boxShadow: "0 8px 32px var(--brand-primary)22" }}>
+          <div style={{ background: "#fff", borderRadius: 20, padding: 24, maxWidth: 440, width: "100%", maxHeight: "90dvh", overflowY: "auto", boxSizing: "border-box", boxShadow: "0 8px 32px var(--brand-primary)22" }}>
             <div style={{ fontSize: 24, textAlign: "center", marginBottom: 8 }}>📋</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "var(--brand-text-strong)", textAlign: "center", marginBottom: 8 }}>
               {tFn(cguNeverAccepted ? "cgu_required_title" : "cgu_updated_title")}
@@ -9056,6 +9080,17 @@ function PoolGenAIApp() {
             <div style={{ fontSize: 11, color: "#9ab0c4", textAlign: "center", marginBottom: 16 }}>
               CGU {CGU_VERSION}
             </div>
+            <button
+              style={{ width: "100%", background: "none", border: "none", color: "var(--brand-primary)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", textAlign: "center", marginBottom: 14, textDecoration: "underline" }}
+              onClick={() => setShowFullCguInGate((v) => !v)}
+            >
+              {tFn(showFullCguInGate ? "cgu_hide_full_text" : "cgu_read_full_text")}
+            </button>
+            {showFullCguInGate && (
+              <div style={{ maxHeight: 260, overflowY: "auto", fontSize: 11.5, color: "#2d4a6e", lineHeight: 1.6, background: "#f5f8fc", borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
+                <CguLegalContent lang={lang} />
+              </div>
+            )}
             <button
               style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
               onClick={() => {
@@ -14553,6 +14588,39 @@ function SettingsView({ pools, activePoolId, onUpdatePool, onDeletePool, onSwitc
 // v1.59.1 — Zone sensible (suppression mesures/compte) extraite de SettingsView
 // pour être rendue après SecondaryUsersSection : demande explicite de la
 // positionner tout en bas de la page Réglages (loin des actions courantes).
+// v1.85.0 — Extrait de DangerZoneSection pour être réutilisable depuis l'écran
+// de validation CGU obligatoire (needsCguAcceptance) : jusqu'ici ce texte
+// n'était consultable que depuis Réglages, donc invisible au moment où on
+// demandait justement de l'accepter.
+function CguLegalContent({ lang }) {
+  const t = useT(lang);
+  return (
+    <>
+      <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_editor")}</div>
+      <div style={{ marginBottom: 12 }}>{t("lcen_editor_val")}</div>
+      <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_contact")}</div>
+      <div style={{ marginBottom: 12 }}><a href={`mailto:${t("lcen_contact_val")}`} style={{ color: "var(--brand-primary)" }}>{t("lcen_contact_val")}</a></div>
+      <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_host")}</div>
+      <div style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>{t("lcen_host_val")}</div>
+      <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginTop: 8, marginBottom: 4 }}>{t("lcen_cgu_title")} — CGU {CGU_VERSION}</div>
+      <div style={{ marginBottom: 10, fontSize: 11, color: "var(--brand-text-secondary)" }}>
+        {[
+          { title: t("lcen_ai_title"), body: t("lcen_ai_val") },
+          { title: t("lcen_photos_title"), body: t("lcen_photos_val") },
+          { title: t("lcen_gdpr"), body: t("lcen_gdpr_val") },
+          { title: t("lcen_calibration_title"), body: t("lcen_calibration_val") },
+          { title: t("lcen_photocontrib_title"), body: t("lcen_photocontrib_val") },
+        ].map((s, i) => (
+          <div key={i} style={{ marginBottom: 10 }}>
+            <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{i+1}. {s.title}</div>
+            <div style={{ lineHeight: 1.6 }}>{s.body}</div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAllMeasures, authUser, onDeleteAccount, cguAcceptedDate }) {
   const t = useT(lang);
   const [showLegalModal, setShowLegalModal] = useState(false);
@@ -14589,30 +14657,7 @@ function DangerZoneSection({ lang, activePoolName, poolMeasureCount, onDeleteAll
               <button onClick={() => setShowLegalModal(false)} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={20} /></button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", fontSize: 12, color: "#2d4a6e", lineHeight: 1.7, background: "#f5f8fc", borderRadius: 10, padding: "12px 14px" }}>
-              {/* Éditeur */}
-              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_editor")}</div>
-              <div style={{ marginBottom: 12 }}>{t("lcen_editor_val")}</div>
-              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_contact")}</div>
-              <div style={{ marginBottom: 12 }}><a href={`mailto:${t("lcen_contact_val")}`} style={{ color: "var(--brand-primary)" }}>{t("lcen_contact_val")}</a></div>
-              {/* Hébergement */}
-              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{t("lcen_host")}</div>
-              <div style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>{t("lcen_host_val")}</div>
-              {/* CGU */}
-              <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginTop: 8, marginBottom: 4 }}>{t("lcen_cgu_title")} — CGU {CGU_VERSION}</div>
-              <div style={{ marginBottom: 10, fontSize: 11, color: "var(--brand-text-secondary)" }}>
-                {[
-                  { title: t("lcen_ai_title"), body: t("lcen_ai_val") },
-                  { title: t("lcen_photos_title"), body: t("lcen_photos_val") },
-                  { title: t("lcen_gdpr"), body: t("lcen_gdpr_val") },
-                  { title: t("lcen_calibration_title"), body: t("lcen_calibration_val") },
-                  { title: t("lcen_photocontrib_title"), body: t("lcen_photocontrib_val") },
-                ].map((s, i) => (
-                  <div key={i} style={{ marginBottom: 10 }}>
-                    <div style={{ fontWeight: 700, color: "var(--brand-text-strong)", marginBottom: 2 }}>{i+1}. {s.title}</div>
-                    <div style={{ lineHeight: 1.6 }}>{s.body}</div>
-                  </div>
-                ))}
-              </div>
+              <CguLegalContent lang={lang} />
             </div>
           </div>
         </div>
