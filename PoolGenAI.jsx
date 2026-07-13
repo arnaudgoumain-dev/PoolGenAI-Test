@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.77.0";
+const APP_VERSION = "1.79.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -5224,7 +5224,26 @@ Règles strictes :
 // v1.48.0 — Trois routes ajoutées côté Worker (voir poolgenai-proxy.js) :
 // lookup (par code-barre puis recherche floue), create (nouvelle fiche),
 // use (incrément callCount + re-vérification web au multiple de 50).
-const PROXY_BASE_URL = "https://poolgenai-proxy.support-poolgenai.workers.dev";
+// v1.79.0 — Séparation dev/test/prod : le Worker Cloudflare (proxy IA) est
+// choisi selon le hostname, même logique que la config Firebase dans
+// index.html. TEST/DEV retombent sur le Worker prod tant que les Workers
+// dédiés (poolgenai-proxy-test / poolgenai-proxy-dev) ne sont pas créés et
+// leurs URLs renseignées ci-dessous.
+const PROXY_URLS = {
+  prod: "https://poolgenai-proxy.support-poolgenai.workers.dev",
+  // TODO : remplacer par l'URL réelle une fois le Worker "poolgenai-proxy-test" déployé
+  test: null,
+  // TODO : remplacer par l'URL réelle une fois le Worker "poolgenai-proxy-dev" déployé
+  dev: null,
+};
+function detectPoolGenAIEnv() {
+  if (typeof window !== "undefined" && window.__poolgenaiEnv) return window.__poolgenaiEnv;
+  const h = typeof window !== "undefined" ? window.location.hostname : "";
+  if (h === "app.poolgenai.com") return "prod";
+  if (h === "test.poolgenai.com") return "test";
+  return "dev";
+}
+const PROXY_BASE_URL = PROXY_URLS[detectPoolGenAIEnv()] || PROXY_URLS.prod;
 
 async function lookupCommonProduct({ idToken, barcode, name, activeSubstance }) {
   const res = await fetch(`${PROXY_BASE_URL}/product-lookup`, {
@@ -5785,7 +5804,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
         }).catch(() => {});
         if (onConsentChange) onConsentChange({ gdpr: true, data: dataAccepted, cguVersion: CGU_VERSION, cguDate: new Date().toISOString() });
         setMode("done");
-        // onAuthStateChanged se déclenchera et appellera onSuccess via PoolApp
+        // onAuthStateChanged se déclenchera et appellera onSuccess via PoolGenAIApp
       } else {
         await FB.signIn(email, pwd);
         // onAuthStateChanged se déclenchera automatiquement
@@ -6148,7 +6167,7 @@ By creating an account, the user acknowledges having read this document in full 
 }
 
 
-function PoolApp() {
+function PoolGenAIApp() {
   const [authUser, setAuthUser] = useState(undefined); // undefined=loading, null=anonymous, object=logged in
   const [showLogin, setShowLogin] = useState(false);
   const [showDeleteReauth, setShowDeleteReauth] = useState(false);
@@ -8584,6 +8603,18 @@ function PoolApp() {
       }}
       className="app"
     >
+      {typeof window !== "undefined" && window.__poolgenaiEnv && window.__poolgenaiEnv !== "prod" && (
+        <div
+          style={{
+            position: "fixed", top: 0, left: 0, right: 0, zIndex: 5000,
+            textAlign: "center", padding: "4px 0", fontSize: 11, fontWeight: 700,
+            letterSpacing: 0.5, color: "#fff",
+            background: window.__poolgenaiEnv === "test" ? "#c98a1f" : "#7a3fb0",
+          }}
+        >
+          {window.__poolgenaiEnv === "test" ? "🧪 ENVIRONNEMENT TEST" : "🛠️ ENVIRONNEMENT DEV"}
+        </div>
+      )}
       <Header
         poolName={activePool?.name}
         location={activePool?.location}
@@ -17831,6 +17862,6 @@ const styles = {
 })();
 
 const __root = ReactDOM.createRoot(document.getElementById("root"));
-__root.render(React.createElement(PoolApp));
+__root.render(React.createElement(PoolGenAIApp));
 const __loader = document.getElementById("boot-loader");
 if (__loader) __loader.remove();

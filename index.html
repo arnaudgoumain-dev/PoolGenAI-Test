@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="PoolApp" />
+<meta name="apple-mobile-web-app-title" content="PoolGenAI" />
 
 <style>
   html, body {
@@ -281,15 +281,51 @@
   import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, getDocs, addDoc, onSnapshot, writeBatch, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAnalytics, logEvent, setUserId, setUserProperties } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCZNXi1UPt6B69EVhd8nbTbh3YzM89Yo1s",
-    authDomain: "poolapp-ago.firebaseapp.com",
-    projectId: "poolapp-ago",
-    storageBucket: "poolapp-ago.firebasestorage.app",
-    messagingSenderId: "781764586143",
-    appId: "1:781764586143:web:23bda828e4907607f1d0aa",
-    measurementId: "G-0T8XX2SYTS"
+  // v1.79.0 — Séparation dev/test/prod : la config Firebase est choisie selon
+  // le hostname. PROD (app.poolgenai.com) reste sur poolapp-ago, inchangé.
+  // TEST (test.poolgenai.com) et DEV (tout le reste, dont localhost) ont des
+  // configs à COMPLÉTER une fois les projets poolgenai-test / poolgenai-dev
+  // créés sur la Console Firebase (Ajouter une Web App → copier le bloc
+  // affiché ici). Tant que ce n'est pas fait, TEST/DEV retombent sur
+  // poolapp-ago par défaut (comportement actuel, aucune régression).
+  const FIREBASE_CONFIGS = {
+    prod: {
+      apiKey: "AIzaSyCZNXi1UPt6B69EVhd8nbTbh3YzM89Yo1s",
+      authDomain: "poolapp-ago.firebaseapp.com",
+      projectId: "poolapp-ago",
+      storageBucket: "poolapp-ago.firebasestorage.app",
+      messagingSenderId: "781764586143",
+      appId: "1:781764586143:web:23bda828e4907607f1d0aa",
+      measurementId: "G-0T8XX2SYTS",
+    },
+    test: {
+      // TODO : remplacer par la config du projet Firebase "poolgenai-test"
+      // une fois créé (Console Firebase → poolgenai-test → Ajouter une Web App).
+      apiKey: null,
+    },
+    dev: {
+      // TODO : remplacer par la config du projet Firebase "poolgenai-dev"
+      // une fois créé.
+      apiKey: null,
+    },
   };
+
+  function detectEnv() {
+    const h = window.location.hostname;
+    if (h === "app.poolgenai.com") return "prod";
+    if (h === "test.poolgenai.com") return "test";
+    return "dev"; // localhost et tout hostname non reconnu
+  }
+
+  const __env = detectEnv();
+  // Filet de sécurité : si la config de l'environnement détecté n'est pas
+  // encore renseignée (apiKey null), on retombe sur prod plutôt que de
+  // planter au chargement — évite de casser test/dev tant que les projets
+  // Firebase ne sont pas créés.
+  const firebaseConfig = FIREBASE_CONFIGS[__env]?.apiKey
+    ? FIREBASE_CONFIGS[__env]
+    : FIREBASE_CONFIGS.prod;
+  window.__poolgenaiEnv = __env;
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -403,7 +439,7 @@
 
 <!-- Composant principal : on attend que Firebase soit prêt avant de charger l'app -->
 <script>
-  function loadPoolApp() {
+  function loadPoolGenAIApp() {
     fetch("PoolGenAI.jsx")
       .then((res) => {
         if (!res.ok) throw new Error("Impossible de charger PoolGenAI.jsx (HTTP " + res.status + ")");
@@ -427,7 +463,7 @@
   var _fbWait = 0;
   function waitForFirebase() {
     if (window._fbAuth || _fbWait > 100) {
-      loadPoolApp();
+      loadPoolGenAIApp();
     } else {
       _fbWait++;
       setTimeout(waitForFirebase, 50);
