@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.76.0";
+const APP_VERSION = "1.77.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -149,6 +149,8 @@ const TRANSLATIONS = {
     update_required_title: "Nouvelle version disponible",
     update_required_desc: "Une nouvelle version de PoolGenAI a été déployée. Mets à jour l'application pour continuer.",
     update_required_btn: "Mettre à jour maintenant",
+    update_in_progress_title: "Mise à jour en cours",
+    update_in_progress_desc: "Ça ne prend que quelques instants, l'application va se recharger automatiquement.",
     diag_off_topic: "Cette question ne concerne pas le traitement de l'eau de bassin. Je ne peux répondre qu'aux questions liées à la chimie de l'eau, aux produits de traitement et aux équipements de piscine.",
             diag_error: "Analyse impossible",
     import_pdf_btn: "Importer un rapport PDF",
@@ -853,6 +855,8 @@ const TRANSLATIONS = {
     update_required_title: "New version available",
     update_required_desc: "A new version of PoolGenAI has been released. Update the app to continue.",
     update_required_btn: "Update now",
+    update_in_progress_title: "Update in progress",
+    update_in_progress_desc: "This only takes a moment, the app will reload automatically.",
     diag_off_topic: "This question is not related to pool water treatment. I can only answer questions about water chemistry, treatment products and pool equipment.",
             diag_error: "Analysis failed",
     import_pdf_btn: "Import PDF report",
@@ -1544,6 +1548,8 @@ const TRANSLATIONS = {
     update_required_title: "Neue Version verfügbar",
     update_required_desc: "Eine neue Version von PoolGenAI wurde veröffentlicht. Aktualisiere die App, um fortzufahren.",
     update_required_btn: "Jetzt aktualisieren",
+    update_in_progress_title: "Aktualisierung läuft",
+    update_in_progress_desc: "Das dauert nur einen Moment, die App wird automatisch neu geladen.",
     diag_off_topic: "Diese Frage betrifft nicht die Wasserbehandlung. Ich beantworte nur Fragen zur Wasserchemie, Behandlungsprodukten und Poolausrüstung.",
             diag_error: "Analyse fehlgeschlagen",
     import_pdf_btn: "PDF-Bericht importieren",
@@ -2236,6 +2242,8 @@ const TRANSLATIONS = {
     update_required_title: "Nuova versione disponibile",
     update_required_desc: "È stata rilasciata una nuova versione di PoolGenAI. Aggiorna l'app per continuare.",
     update_required_btn: "Aggiorna ora",
+    update_in_progress_title: "Aggiornamento in corso",
+    update_in_progress_desc: "Ci vuole solo un attimo, l'app si ricaricherà automaticamente.",
     diag_off_topic: "Questa domanda non riguarda il trattamento dell'acqua della piscina. Rispondo solo a domande sulla chimica dell'acqua, sui prodotti di trattamento e sulle attrezzature per piscine.",
             diag_error: "Analisi impossibile",
     import_pdf_btn: "Importa rapporto PDF",
@@ -2925,6 +2933,8 @@ const TRANSLATIONS = {
     update_required_title: "Nueva versión disponible",
     update_required_desc: "Se ha publicado una nueva versión de PoolGenAI. Actualiza la aplicación para continuar.",
     update_required_btn: "Actualizar ahora",
+    update_in_progress_title: "Actualización en curso",
+    update_in_progress_desc: "Solo tardará un momento, la aplicación se recargará automáticamente.",
     diag_off_topic: "Esta pregunta no está relacionada con el tratamiento del agua de piscina. Solo respondo preguntas sobre química del agua, productos de tratamiento y equipos de piscina.",
             diag_error: "Análisis fallido",
     import_pdf_btn: "Importar informe PDF",
@@ -3614,6 +3624,8 @@ const TRANSLATIONS = {
     update_required_title: "Nova versão disponível",
     update_required_desc: "Uma nova versão do PoolGenAI foi lançada. Atualize o aplicativo para continuar.",
     update_required_btn: "Atualizar agora",
+    update_in_progress_title: "Atualização em curso",
+    update_in_progress_desc: "Demora apenas um instante, a aplicação vai recarregar automaticamente.",
     diag_off_topic: "Esta pergunta não está relacionada com o tratamento da água da piscina. Só respondo a perguntas sobre química da água, produtos de tratamento e equipamentos de piscina.",
             diag_error: "Análise impossível",
     import_pdf_btn: "Importar relatório PDF",
@@ -6524,6 +6536,11 @@ function PoolApp() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(false);
+  // v1.77.0 — Écran d'attente affiché après clic sur "Mettre à jour" : au
+  // lieu de recharger immédiatement (risque de tomber en plein milieu d'un
+  // déploiement GitHub Pages pas encore propagé), on poll version.json
+  // jusqu'à obtenir une valeur stable, puis seulement là on recharge.
+  const [updating, setUpdating] = useState(false);
   const [suspended, setSuspended] = useState(false);
   const [suspendReason, setSuspendReason] = useState("");
   const [erasingData, setErasingData] = useState(false);
@@ -6582,6 +6599,44 @@ function PoolApp() {
     // en plus du nettoyage du Service Worker ci-dessus)
     const base = window.location.origin + window.location.pathname;
     window.location.href = `${base}?_r=${Date.now()}`;
+  }
+
+  // v1.77.0 — Poll version.json jusqu'à 2 lectures consécutives identiques
+  // (déploiement stabilisé, plus en cours de propagation) avant de vraiment
+  // recharger. Garde-fou à 45s : si ça ne se stabilise jamais (souci réseau
+  // persistant), on recharge quand même plutôt que de bloquer l'utilisateur
+  // indéfiniment sur l'écran d'attente.
+  function startUpdatePolling() {
+    setUpdating(true);
+    const startedAt = Date.now();
+    let lastVersion = null;
+    let stableCount = 0;
+    async function poll() {
+      try {
+        const res = await fetch(`version.json?t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.version && data.version === lastVersion) {
+            stableCount += 1;
+          } else {
+            stableCount = 0;
+            lastVersion = data?.version || null;
+          }
+          if (stableCount >= 2) {
+            forceReloadApp();
+            return;
+          }
+        }
+      } catch (e) {
+        // Erreur réseau : on continue simplement à réessayer.
+      }
+      if (Date.now() - startedAt > 45000) {
+        forceReloadApp();
+        return;
+      }
+      setTimeout(poll, 3000);
+    }
+    poll();
   }
 
   // ── Statut de suspension du compte — écoute temps réel ──
@@ -8318,15 +8373,25 @@ function PoolApp() {
     {forceUpdate && (
       <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(10,30,60,0.94)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ background: "#fff", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%", textAlign: "center", boxShadow: "0 8px 32px var(--brand-primary)33" }}>
-          <div style={{ fontSize: 34, marginBottom: 10 }}>🔄</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("update_required_title")}</div>
-          <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 20, lineHeight: 1.5 }}>{t("update_required_desc")}</div>
-          <button
-            onClick={forceReloadApp}
-            style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
-          >
-            {t("update_required_btn")}
-          </button>
+          {updating ? (
+            <>
+              <Loader2 size={34} className="spin" style={{ color: "var(--brand-primary)", marginBottom: 14 }} />
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("update_in_progress_title")}</div>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", lineHeight: 1.5 }}>{t("update_in_progress_desc")}</div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>🔄</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--brand-text-strong)", marginBottom: 8 }}>{t("update_required_title")}</div>
+              <div style={{ fontSize: 13.5, color: "var(--brand-text-secondary)", marginBottom: 20, lineHeight: 1.5 }}>{t("update_required_desc")}</div>
+              <button
+                onClick={startUpdatePolling}
+                style={{ width: "100%", padding: "13px 0", borderRadius: 12, border: "none", background: "var(--brand-primary)", color: "#fff", fontWeight: 700, fontSize: 14.5, cursor: "pointer" }}
+              >
+                {t("update_required_btn")}
+              </button>
+            </>
+          )}
         </div>
       </div>
     )}
