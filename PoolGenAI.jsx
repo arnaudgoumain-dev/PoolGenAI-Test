@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.74.0";
+const APP_VERSION = "1.75.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -547,6 +547,8 @@ const TRANSLATIONS = {
     reco_note_combined: "Chlore combiné = chloramines, signe d'une désinfection insuffisante. Verser le soir, filtration en continu.",
     reco_note_sel: "Utiliser du sel spécial piscine (NaCl pur ≥ 99%). Dissoudre avant l'ajout ou verser directement près du skimmer, filtration en marche 24h.",
     reco_note_o2: "Ne pas mélanger avec le chlore. Filtration en marche pendant 4h.",
+    prod_name_o2_liquide: "Oxygène actif liquide (peroxyde d'hydrogène)",
+    note_o2_liquide: "Ne pas mélanger avec le chlore. Verser devant les buses de refoulement, filtration en marche.",
     reco_note_brome: "Verser loin des arrivées d'eau, filtration en marche.",
     reco_note_cya: "Aucun produit ne fait baisser le CYA chimiquement, seule la dilution fonctionne. Éviter le chlore stabilisé tant que le CYA est haut.",
     reco_cya_block_shock: "Stabilisant trop élevé pour un choc efficace ({val} mg/L)",
@@ -580,11 +582,12 @@ const TRANSLATIONS = {
     onboarding_step1_title: "Bienvenue sur PoolGenAI",
     onboarding_step1_text: "Suis la chimie de ta piscine facilement : mesures, dosages, plan de traitement personnalisé.",
     onboarding_step2_title: "Deux façons de mesurer",
-    onboarding_step2_text: "Bandelette + photo (analyse automatique des couleurs), ou photomètre avec saisie manuelle. Le détail t'attend au moment de ta première mesure.",
+    onboarding_step2_text: "Photo de ton dispositif de mesure (bandelette ou photomètre) : l'app analyse et remplit les champs automatiquement.\n\nOu saisie manuelle des valeurs, à tout moment.",
     onboarding_step3_title: "Des résultats clairs",
     onboarding_step3_text: "Chaque paramètre est comparé à sa cible. L'app te propose alors les doses à appliquer.",
     onboarding_step4_title: "Prêt à commencer",
-    onboarding_step4_text: "Ajoute ta première mesure quand tu veux. Bassins illimités, rapport PDF et plus : découvre Premium plus tard dans Réglages.",
+    onboarding_step4_text: "Ajoute ta première mesure quand tu veux.\n\nBassins illimités, rapport PDF et plus : découvre Premium plus tard dans Réglages.",
+    onboarding_step3_legend_bad: "Trop haut ou trop bas",
     onboarding_next: "Suivant",
     onboarding_skip: "Passer",
     onboarding_start: "C'est parti",
@@ -1238,6 +1241,8 @@ const TRANSLATIONS = {
     reco_note_combined: "Combined chlorine = chloramines, sign of insufficient disinfection. Add in the evening, keep filtration running.",
     reco_note_sel: "Use pool-grade salt (pure NaCl ≥ 99%). Dissolve before adding or pour directly near the skimmer, run filtration for 24h.",
     reco_note_o2: "Do not mix with chlorine. Run filtration for 4h.",
+    prod_name_o2_liquide: "Liquid active oxygen (hydrogen peroxide)",
+    note_o2_liquide: "Do not mix with chlorine. Pour in front of the return jets, filtration running.",
     reco_note_brome: "Pour away from water inlets, run filtration.",
     reco_note_cya: "No product lowers CYA chemically, only dilution works. Avoid stabilised chlorine while CYA is high.",
     reco_cya_block_shock: "Stabiliser too high for an effective shock ({val} mg/L)",
@@ -1271,11 +1276,12 @@ const TRANSLATIONS = {
     onboarding_step1_title: "Welcome to PoolGenAI",
     onboarding_step1_text: "Track your pool's chemistry with ease: readings, dosing, and a personalized treatment plan.",
     onboarding_step2_title: "Two ways to measure",
-    onboarding_step2_text: "Test strip + photo (automatic color analysis), or photometer with manual entry. Details come at your first reading.",
+    onboarding_step2_text: "Photo of your measuring device (test strip or photometer): the app analyzes it and fills in the fields automatically.\n\nOr enter the values manually, anytime.",
     onboarding_step3_title: "Clear results",
     onboarding_step3_text: "Each parameter is compared to its target. The app then suggests the doses to apply.",
     onboarding_step4_title: "Ready to start",
-    onboarding_step4_text: "Add your first reading whenever you like. Unlimited pools, PDF reports and more: discover Premium later in Settings.",
+    onboarding_step4_text: "Add your first reading whenever you like.\n\nUnlimited pools, PDF reports and more: discover Premium later in Settings.",
+    onboarding_step3_legend_bad: "Too high or too low",
     onboarding_next: "Next",
     onboarding_skip: "Skip",
     onboarding_start: "Let's go",
@@ -1928,6 +1934,8 @@ const TRANSLATIONS = {
     reco_note_combined: "Gebundenes Chlor = Chloramine, Zeichen unzureichender Desinfektion. Abends zugeben, Filtration durchlaufen lassen.",
     reco_note_sel: "Poolsalz (reines NaCl ≥ 99%) verwenden. Vor dem Zugeben auflösen oder direkt beim Skimmer zugeben, 24h filtrieren.",
     reco_note_o2: "Nicht mit Chlor mischen. 4h filtrieren.",
+    prod_name_o2_liquide: "Flüssiger Aktivsauerstoff (Wasserstoffperoxid)",
+    note_o2_liquide: "Nicht mit Chlor mischen. Vor den Rücklaufdüsen eingießen, Filtration eingeschaltet.",
     reco_note_brome: "Weit von Wasserzuläufen entfernt zugeben, Filtration laufen lassen.",
     reco_note_cya: "Kein Produkt senkt CYA chemisch, nur Verdünnung wirkt. Stabilisiertes Chlor vermeiden solange CYA hoch ist.",
     reco_cya_block_shock: "Stabilisator zu hoch für eine wirksame Schockbehandlung ({val} mg/L)",
@@ -1961,11 +1969,12 @@ const TRANSLATIONS = {
     onboarding_step1_title: "Willkommen bei PoolGenAI",
     onboarding_step1_text: "Behalte die Chemie deines Pools im Blick: Messungen, Dosierung und ein persönlicher Behandlungsplan.",
     onboarding_step2_title: "Zwei Messmethoden",
-    onboarding_step2_text: "Teststreifen + Foto (automatische Farbanalyse) oder Photometer mit manueller Eingabe. Details folgen bei deiner ersten Messung.",
+    onboarding_step2_text: "Foto deines Messgeräts (Teststreifen oder Photometer): Die App analysiert es und füllt die Felder automatisch aus.\n\nOder gib die Werte jederzeit manuell ein.",
     onboarding_step3_title: "Klare Ergebnisse",
     onboarding_step3_text: "Jeder Parameter wird mit seinem Zielwert verglichen. Die App schlägt dir dann die passende Dosierung vor.",
     onboarding_step4_title: "Bereit loszulegen",
-    onboarding_step4_text: "Füge deine erste Messung hinzu, wann immer du möchtest. Unbegrenzte Pools, PDF-Berichte und mehr: entdecke Premium später in den Einstellungen.",
+    onboarding_step4_text: "Füge deine erste Messung hinzu, wann immer du möchtest.\n\nUnbegrenzte Pools, PDF-Berichte und mehr: entdecke Premium später in den Einstellungen.",
+    onboarding_step3_legend_bad: "Zu hoch oder zu niedrig",
     onboarding_next: "Weiter",
     onboarding_skip: "Überspringen",
     onboarding_start: "Los geht's",
@@ -2614,6 +2623,8 @@ const TRANSLATIONS = {
     reco_note_combined: "Cloro combinato = cloramine, segno di disinfezione insufficiente. Aggiungere la sera, filtrazione in continuo.",
     reco_note_sel: "Usare sale da piscina (NaCl puro ≥ 99%). Sciogliere prima dell'aggiunta o versare vicino allo skimmer, filtrazione 24h.",
     reco_note_o2: "Non mescolare con il cloro. Filtrazione per 4h.",
+    prod_name_o2_liquide: "Ossigeno attivo liquido (perossido di idrogeno)",
+    note_o2_liquide: "Non mescolare con il cloro. Versare davanti agli ugelli di mandata, filtrazione in funzione.",
     reco_note_brome: "Versare lontano dagli ingressi d'acqua, filtrazione in marcia.",
     reco_note_cya: "Nessun prodotto abbassa il CYA chimicamente, solo la diluizione funziona. Evitare cloro stabilizzato finché il CYA è alto.",
     reco_cya_block_shock: "Stabilizzante troppo alto per uno shock efficace ({val} mg/L)",
@@ -2647,11 +2658,12 @@ const TRANSLATIONS = {
     onboarding_step1_title: "Benvenuto su PoolGenAI",
     onboarding_step1_text: "Tieni sotto controllo la chimica della tua piscina: misurazioni, dosaggi e un piano di trattamento personalizzato.",
     onboarding_step2_title: "Due modi per misurare",
-    onboarding_step2_text: "Striscia reattiva + foto (analisi automatica dei colori), oppure fotometro con inserimento manuale. I dettagli arrivano alla tua prima misurazione.",
+    onboarding_step2_text: "Foto del tuo dispositivo di misurazione (striscia reattiva o fotometro): l'app lo analizza e compila i campi automaticamente.\n\nOppure inserisci i valori manualmente, in qualsiasi momento.",
     onboarding_step3_title: "Risultati chiari",
     onboarding_step3_text: "Ogni parametro viene confrontato con il suo obiettivo. L'app ti suggerisce quindi le dosi da applicare.",
     onboarding_step4_title: "Pronto per iniziare",
-    onboarding_step4_text: "Aggiungi la tua prima misurazione quando vuoi. Piscine illimitate, report PDF e altro: scopri Premium più avanti nelle Impostazioni.",
+    onboarding_step4_text: "Aggiungi la tua prima misurazione quando vuoi.\n\nPiscine illimitate, report PDF e altro: scopri Premium più avanti nelle Impostazioni.",
+    onboarding_step3_legend_bad: "Troppo alto o troppo basso",
     onboarding_next: "Avanti",
     onboarding_skip: "Salta",
     onboarding_start: "Iniziamo",
@@ -3300,6 +3312,8 @@ const TRANSLATIONS = {
     reco_note_combined: "Cloro combinado = cloraminas, señal de desinfección insuficiente. Añadir por la noche, filtración continua.",
     reco_note_sel: "Usar sal de piscina (NaCl puro ≥ 99%). Disolver antes de añadir o verter cerca del skimmer, filtración 24h.",
     reco_note_o2: "No mezclar con cloro. Filtración durante 4h.",
+    prod_name_o2_liquide: "Oxígeno activo líquido (peróxido de hidrógeno)",
+    note_o2_liquide: "No mezclar con cloro. Verter delante de las boquillas de retorno, con la filtración en marcha.",
     reco_note_brome: "Verter lejos de las entradas de agua, filtración en marcha.",
     reco_note_cya: "Ningún producto baja el CYA químicamente, solo la dilución funciona. Evitar cloro estabilizado mientras el CYA sea alto.",
     reco_cya_block_shock: "Estabilizador demasiado alto para un choque eficaz ({val} mg/L)",
@@ -3333,11 +3347,12 @@ const TRANSLATIONS = {
     onboarding_step1_title: "Bienvenido a PoolGenAI",
     onboarding_step1_text: "Controla la química de tu piscina fácilmente: mediciones, dosis y un plan de tratamiento personalizado.",
     onboarding_step2_title: "Dos formas de medir",
-    onboarding_step2_text: "Tira reactiva + foto (análisis automático de colores), o fotómetro con introducción manual. Los detalles llegan en tu primera medición.",
+    onboarding_step2_text: "Foto de tu dispositivo de medición (tira reactiva o fotómetro): la app lo analiza y rellena los campos automáticamente.\n\nO introduce los valores manualmente, cuando quieras.",
     onboarding_step3_title: "Resultados claros",
     onboarding_step3_text: "Cada parámetro se compara con su objetivo. La app te sugiere entonces las dosis a aplicar.",
     onboarding_step4_title: "Listo para empezar",
-    onboarding_step4_text: "Añade tu primera medición cuando quieras. Piscinas ilimitadas, informes en PDF y más: descubre Premium más tarde en Ajustes.",
+    onboarding_step4_text: "Añade tu primera medición cuando quieras.\n\nPiscinas ilimitadas, informes en PDF y más: descubre Premium más tarde en Ajustes.",
+    onboarding_step3_legend_bad: "Demasiado alto o demasiado bajo",
     onboarding_next: "Siguiente",
     onboarding_skip: "Omitir",
     onboarding_start: "Empezar",
@@ -3983,6 +3998,8 @@ const TRANSLATIONS = {
     reco_note_combined: "Cloro combinado = cloraminas, sinal de desinfecção insuficiente. Adicionar à noite, filtração contínua.",
     reco_note_sel: "Usar sal de piscina (NaCl puro ≥ 99%). Dissolver antes de adicionar ou verter perto do skimmer, filtração 24h.",
     reco_note_o2: "Não misturar com cloro. Filtração por 4h.",
+    prod_name_o2_liquide: "Oxigénio ativo líquido (peróxido de hidrogénio)",
+    note_o2_liquide: "Não misturar com cloro. Deitar em frente aos bicais de retorno, com a filtração em funcionamento.",
     reco_note_brome: "Verter longe das entradas de água, filtração em funcionamento.",
     reco_note_cya: "Nenhum produto baixa o CYA quimicamente, só a diluição funciona. Evitar cloro estabilizado enquanto o CYA estiver alto.",
     reco_cya_block_shock: "Estabilizador muito alto para um choque eficaz ({val} mg/L)",
@@ -4016,11 +4033,12 @@ const TRANSLATIONS = {
     onboarding_step1_title: "Bem-vindo ao PoolGenAI",
     onboarding_step1_text: "Acompanha a química da tua piscina com facilidade: medições, dosagens e um plano de tratamento personalizado.",
     onboarding_step2_title: "Duas formas de medir",
-    onboarding_step2_text: "Tira reagente + foto (análise automática de cores), ou fotómetro com introdução manual. Os detalhes chegam na tua primeira medição.",
+    onboarding_step2_text: "Foto do teu dispositivo de medição (tira reagente ou fotómetro): a app analisa e preenche os campos automaticamente.\n\nOu introduz os valores manualmente, a qualquer momento.",
     onboarding_step3_title: "Resultados claros",
     onboarding_step3_text: "Cada parâmetro é comparado com o seu objetivo. A app sugere então as doses a aplicar.",
     onboarding_step4_title: "Pronto para começar",
-    onboarding_step4_text: "Adiciona a tua primeira medição quando quiseres. Piscinas ilimitadas, relatório PDF e mais: descobre o Premium mais tarde em Definições.",
+    onboarding_step4_text: "Adiciona a tua primeira medição quando quiseres.\n\nPiscinas ilimitadas, relatório PDF e mais: descobre o Premium mais tarde em Definições.",
+    onboarding_step3_legend_bad: "Demasiado alto ou demasiado baixo",
     onboarding_next: "Seguinte",
     onboarding_skip: "Saltar",
     onboarding_start: "Vamos lá",
@@ -4407,6 +4425,30 @@ const DEFAULT_PRODUCTS = [
     note: "Ne pas mélanger avec le chlore. Filtration en marche pendant 4h.",
     containerAmount: 1,
     containerUnit: "kg",
+    stockPercent: 100,
+    isDefault: true,
+  },
+  // v1.75.0 — Backlog : dosage liquide pour l'oxygène actif. Le peroxyde
+  // d'hydrogène liquide se dose en volume, avec un ratio différent du
+  // granulé MPS ci-dessus. Dose calibrée sur plusieurs sources convergentes
+  // (entretien hebdomadaire usuel : 6 à 8 cL/m³ pour un plafond cible de
+  // 10 mg/L, produit générique ~30% — cf. Swimmy, leprodestravaux.fr, Delta
+  // Industrie) → 70 mL/10 m³/10 mg/L, milieu de la fourchette. Bidon
+  // courant 5 L.
+  {
+    id: "o2-liquide",
+    name: "Oxygène actif liquide (peroxyde d'hydrogène)",
+    nameKey: "prod_name_o2_liquide",
+    action: "o2",
+    doseAmount: 70,
+    doseUnit: "mL",
+    effectAmount: 10,
+    effectPer: 10,
+    waitHours: 4,
+    noteKey: "note_o2_liquide",
+    note: "Ne pas mélanger avec le chlore. Verser devant les buses de refoulement, filtration en marche.",
+    containerAmount: 5,
+    containerUnit: "L",
     stockPercent: 100,
     isDefault: true,
   },
@@ -14561,7 +14603,7 @@ function OnboardingWizard({ onDone, lang }) {
             {s.icon}
           </div>
           <div style={{ fontWeight: 700, fontSize: s.dark ? 19 : 17, marginBottom: 8 }}>{s.title}</div>
-          <div style={{ fontSize: 13.5, opacity: s.dark ? 0.85 : 1, color: s.dark ? "#fff" : "#4a6480", lineHeight: 1.5 }}>{s.text}</div>
+          <div style={{ fontSize: 13.5, opacity: s.dark ? 0.85 : 1, color: s.dark ? "#fff" : "#4a6480", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</div>
           {s.legend && (
             <div style={{ display: "flex", justifyContent: "center", gap: 16, fontSize: 12, marginTop: 14, color: "#4a6480" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -14570,7 +14612,7 @@ function OnboardingWizard({ onDone, lang }) {
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#c4502f", display: "inline-block" }} />
-                {t("too_high")}
+                {t("onboarding_step3_legend_bad")}
               </span>
             </div>
           )}
