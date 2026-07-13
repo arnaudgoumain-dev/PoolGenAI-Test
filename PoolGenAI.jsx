@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.80.0";
+const APP_VERSION = "1.81.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -15207,7 +15207,16 @@ function AddPoolModal({ onClose, onSave, lang, existingPool, forced }) {
   const filtrationOptions = filtrationTypes.map(ft => ({ value: ft.value, label: ft.label }));
 
   return (
-    <ModalShell onClose={onClose} title={isEdit ? t("edit_pool") : forced ? t("first_pool_title") : t("add_pool_title")} forced={forced}>
+    <ModalShell
+      onClose={onClose}
+      title={isEdit ? t("edit_pool") : forced ? t("first_pool_title") : t("add_pool_title")}
+      forced={forced}
+      footer={
+        <button style={styles.primaryBtn} onClick={handleSave}>
+          {isEdit ? t("save") : t("create_pool")}
+        </button>
+      }
+    >
       {forced && (
         <div style={{ fontSize: 13, color: "var(--brand-text-secondary)", marginBottom: 16, lineHeight: 1.5 }}>
           {t("first_pool_intro")}
@@ -15288,10 +15297,6 @@ function AddPoolModal({ onClose, onSave, lang, existingPool, forced }) {
         onChange={e => setReportEmail(e.target.value)}
         placeholder={t("pool_email_placeholder")}
       />
-
-      <button style={styles.primaryBtn} onClick={handleSave}>
-        {isEdit ? t("save") : t("create_pool")}
-      </button>
     </ModalShell>
   );
 }
@@ -16363,7 +16368,7 @@ function FieldLabel({ children, required, style }) {
 }
 
 // ---------- Modal shell ----------
-function ModalShell({ children, onClose, title, rightAction, forced }) {
+function ModalShell({ children, onClose, title, rightAction, forced, footer }) {
   return (
     <div style={styles.modalOverlay} onClick={forced ? undefined : onClose}>
       <div style={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
@@ -16379,6 +16384,11 @@ function ModalShell({ children, onClose, title, rightAction, forced }) {
           </div>
         </div>
         <div style={styles.modalBody}>{children}</div>
+        {/* v1.81.0 — Footer collant optionnel : reste visible en bas de la
+            fenêtre modale même si le contenu dépasse la hauteur de l'écran,
+            au lieu de compter sur un défilement sans indication visuelle
+            (le bouton "Enregistrer" pouvait passer inaperçu, hors champ). */}
+        {footer && <div style={styles.modalStickyFooter}>{footer}</div>}
       </div>
     </div>
   );
@@ -17302,6 +17312,14 @@ const styles = {
     color: "#c4502f",
   },
   modalBody: { padding: "8px 18px 0" },
+  modalStickyFooter: {
+    position: "sticky",
+    bottom: 0,
+    background: "#ffffff",
+    padding: "12px 18px 18px",
+    borderTop: "1px solid #eef1f0",
+    marginTop: 12,
+  },
   fieldLabel: {
     display: "block",
     fontSize: 12,
