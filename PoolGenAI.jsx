@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.73.0";
+const APP_VERSION = "1.74.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -590,6 +590,10 @@ const TRANSLATIONS = {
     onboarding_start: "C'est parti",
     help_section: "Aide",
     settings_replay_onboarding: "Revoir la présentation",
+    context_switch_premium_title: "Bassin Premium",
+    context_switch_premium_sub: "Ce bassin profite des fonctionnalités Premium de son propriétaire",
+    context_switch_free_title: "Retour à ton bassin",
+    context_switch_free_sub: "Tu es de retour sur ton propre bassin",
     report_print_btn: "Imprimer / Enregistrer en PDF",
     share_report: "Partager le rapport",
     report_email_subject: "Rapport PoolGenAI — {pool}",
@@ -1277,6 +1281,10 @@ const TRANSLATIONS = {
     onboarding_start: "Let's go",
     help_section: "Help",
     settings_replay_onboarding: "Replay the introduction",
+    context_switch_premium_title: "Premium pool",
+    context_switch_premium_sub: "This pool benefits from its owner's Premium features",
+    context_switch_free_title: "Back to your pool",
+    context_switch_free_sub: "You're back on your own pool",
     report_print_btn: "Print / Save as PDF",
     share_report: "Share report",
     report_email_subject: "PoolGenAI report — {pool}",
@@ -1963,6 +1971,10 @@ const TRANSLATIONS = {
     onboarding_start: "Los geht's",
     help_section: "Hilfe",
     settings_replay_onboarding: "Einführung erneut ansehen",
+    context_switch_premium_title: "Premium-Pool",
+    context_switch_premium_sub: "Dieser Pool profitiert von den Premium-Funktionen seines Eigentümers",
+    context_switch_free_title: "Zurück zu deinem Pool",
+    context_switch_free_sub: "Du bist zurück auf deinem eigenen Pool",
     report_print_btn: "Drucken / Als PDF speichern",
     share_report: "Bericht teilen",
     report_email_subject: "PoolGenAI-Bericht — {pool}",
@@ -2645,6 +2657,10 @@ const TRANSLATIONS = {
     onboarding_start: "Iniziamo",
     help_section: "Aiuto",
     settings_replay_onboarding: "Rivedi la presentazione",
+    context_switch_premium_title: "Piscina Premium",
+    context_switch_premium_sub: "Questa piscina beneficia delle funzionalità Premium del suo proprietario",
+    context_switch_free_title: "Ritorno alla tua piscina",
+    context_switch_free_sub: "Sei tornato sulla tua piscina",
     report_print_btn: "Stampa / Salva come PDF",
     share_report: "Condividi il rapporto",
     report_email_subject: "Rapporto PoolGenAI — {pool}",
@@ -3327,6 +3343,10 @@ const TRANSLATIONS = {
     onboarding_start: "Empezar",
     help_section: "Ayuda",
     settings_replay_onboarding: "Volver a ver la presentación",
+    context_switch_premium_title: "Piscina Premium",
+    context_switch_premium_sub: "Esta piscina se beneficia de las funciones Premium de su propietario",
+    context_switch_free_title: "De vuelta a tu piscina",
+    context_switch_free_sub: "Has vuelto a tu propia piscina",
     report_print_btn: "Imprimir / Guardar como PDF",
     share_report: "Compartir informe",
     report_email_subject: "Informe PoolGenAI — {pool}",
@@ -4006,6 +4026,10 @@ const TRANSLATIONS = {
     onboarding_start: "Vamos lá",
     help_section: "Ajuda",
     settings_replay_onboarding: "Rever a apresentação",
+    context_switch_premium_title: "Piscina Premium",
+    context_switch_premium_sub: "Esta piscina beneficia das funcionalidades Premium do seu proprietário",
+    context_switch_free_title: "De volta à tua piscina",
+    context_switch_free_sub: "Estás de volta à tua própria piscina",
     report_print_btn: "Imprimir / Salvar como PDF",
     share_report: "Partilhar relatório",
     report_email_subject: "Relatório PoolGenAI — {pool}",
@@ -7337,6 +7361,7 @@ function PoolApp() {
       poolId: l.poolId,
       poolName: l.poolName,
       pseudo: l.pseudo,
+      ownerIsPremium: l.ownerIsPremium,
     }));
     return [...own, ...invited];
   }, [ownPools, linkedPoolsInfo, lang]);
@@ -7358,11 +7383,20 @@ function PoolApp() {
   const effectiveIsPremium = viewContext ? !!currentLinkedInfo?.ownerIsPremium : isPremium;
 
   function handleSelectSwitcherEntry(entry) {
+    // v1.74.0 — Si le bassin ciblé change le contexte gratuit/premium effectif
+    // (bassin délégué Premium <-> mon bassin gratuit, ou l'inverse), rejoue la
+    // transition effervescente entre les deux couleurs, dans les deux sens.
+    const wasEffectivePremium = effectiveIsPremium;
+    const willBeEffectivePremium = entry.kind === "invited" ? !!entry.ownerIsPremium : isPremium;
     if (entry.kind === "invited") {
       switchToContext({ primaryUid: entry.primaryUid, poolId: entry.poolId, poolName: entry.poolName, pseudo: entry.pseudo });
     } else {
       if (viewContext) switchToContext(null);
       setActivePoolId(entry.id);
+    }
+    if (willBeEffectivePremium !== wasEffectivePremium) {
+      setRevealVariant(willBeEffectivePremium ? "context-premium" : "context-free");
+      setShowPremiumReveal(true);
     }
   }
 
@@ -8426,8 +8460,8 @@ function PoolApp() {
         // les écrans de vente restent en bleu littéral, non thémés (voir
         // PaywallModal et ProductsView) — seule l'identité visuelle
         // "ambiante" de l'app bascule ici.
-        "--brand-primary": effectiveIsPremium ? "#0a6ebd" : "#1f6b4a",
-        "--brand-primary-dark": effectiveIsPremium ? "#064a8a" : "#123f2c",
+        "--brand-primary": effectiveIsPremium ? "#1ca7d1" : "#4a9b82",
+        "--brand-primary-dark": effectiveIsPremium ? "#0c7a9e" : "#2a6553",
         "--brand-text-strong": effectiveIsPremium ? "#0d2b4e" : "#173a2b",
         "--brand-text-secondary": effectiveIsPremium ? "#4a6480" : "#3f6552",
         "--brand-text-muted": effectiveIsPremium ? "#6a7d90" : "#5c7d6c",
@@ -12919,12 +12953,12 @@ function ProductsView({ products, onEdit, onAddNew, onDelete, onResetAll, isPrem
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", gap: 16, textAlign: "center" }}>
         {/* v1.71.0 — Écran de vente Premium : reste en bleu, non thémé, même en mode gratuit (aperçu de ce qu'on achète) */}
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "#f0f6fb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Lock size={26} color="#0a6ebd" />
+          <Lock size={26} color="#1ca7d1" />
         </div>
         <div style={{ fontSize: 17, fontWeight: 700, color: "#0d2b4e" }}>{t("my_products")}</div>
         <div style={{ fontSize: 14, color: "#4a6480", lineHeight: 1.5, maxWidth: 300 }}>{t("products_locked")}</div>
         <button
-          style={{ marginTop: 8, padding: "13px 28px", borderRadius: 12, border: "none", background: "#0a6ebd", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+          style={{ marginTop: 8, padding: "13px 28px", borderRadius: 12, border: "none", background: "#1ca7d1", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
           onClick={onWantPremium}
         >
           <Crown size={15} style={{ marginRight: 7, verticalAlign: "middle" }} />
@@ -14608,7 +14642,7 @@ function PaywallModal({ onClose, onActivate, lang, source }) {
           </div>
         ))}
       </div>
-      <button style={{ ...styles.primaryBtn, background: "#0a6ebd" }} onClick={onActivate}>
+      <button style={{ ...styles.primaryBtn, background: "#1ca7d1" }} onClick={onActivate}>
         {t("paywall_btn")}
       </button>
       <p style={{ ...styles.helpText, textAlign: "center" }}>
@@ -14711,17 +14745,30 @@ function PremiumRevealOverlay({ onDone, lang, variant = "activate" }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const isDowngrade = variant === "downgrade";
-  // v1.73.0 — La transition part désormais de la couleur du contexte QUITTÉ
-  // vers celle du contexte REJOINT (et non plus une couleur fixe pour toute
-  // la durée), dans les deux sens : gratuit→premium passe du vert au bleu,
-  // premium→gratuit passe du bleu au vert.
-  const BLUE_GRADIENT = "linear-gradient(135deg, #0a6ebd, #064a8a)";
-  const GREEN_GRADIENT = "linear-gradient(135deg, #1f6b4a, #123f2c)";
-  const fromGradient = isDowngrade ? BLUE_GRADIENT : GREEN_GRADIENT;
-  const toGradient = isDowngrade ? GREEN_GRADIENT : BLUE_GRADIENT;
-  const titleKey = isDowngrade ? "premium_downgrade_title" : "premium_reveal_title";
-  const subKey = isDowngrade ? "premium_downgrade_sub" : "premium_reveal_sub";
+  // v1.74.0 — 4 variants possibles désormais : "activate"/"downgrade" (mon
+  // propre abonnement) et "context-premium"/"context-free" (changement de
+  // bassin qui bascule le contexte effectif, ex. bassin délégué Premium).
+  // toPremium détermine à lui seul le sens de la transition (couleur de
+  // départ = couleur du contexte quitté, couleur d'arrivée = celle rejointe).
+  const toPremium = variant === "activate" || variant === "context-premium";
+  const BLUE_GRADIENT = "linear-gradient(135deg, #1ca7d1, #0c7a9e)";
+  const GREEN_GRADIENT = "linear-gradient(135deg, #4a9b82, #2a6553)";
+  const fromGradient = toPremium ? GREEN_GRADIENT : BLUE_GRADIENT;
+  const toGradient = toPremium ? BLUE_GRADIENT : GREEN_GRADIENT;
+  const titleKeys = {
+    activate: "premium_reveal_title",
+    downgrade: "premium_downgrade_title",
+    "context-premium": "context_switch_premium_title",
+    "context-free": "context_switch_free_title",
+  };
+  const subKeys = {
+    activate: "premium_reveal_sub",
+    downgrade: "premium_downgrade_sub",
+    "context-premium": "context_switch_premium_sub",
+    "context-free": "context_switch_free_sub",
+  };
+  const titleKey = titleKeys[variant] || titleKeys.activate;
+  const subKey = subKeys[variant] || subKeys.activate;
 
   return (
     <div
@@ -14785,7 +14832,7 @@ function PremiumRevealOverlay({ onDone, lang, variant = "activate" }) {
       )}
 
       <div style={{ position: "relative", textAlign: "center", color: "#fff", padding: 24 }}>
-        <Crown size={48} color={isDowngrade ? "#e4ebf1" : "#f5d999"} style={{ marginBottom: 14 }} />
+        <Crown size={48} color={toPremium ? "#f5d999" : "#e4ebf1"} style={{ marginBottom: 14 }} />
         <div style={{ fontSize: 21, fontWeight: 800, marginBottom: 6 }}>{t(titleKey)}</div>
         <div style={{ fontSize: 13.5, opacity: 0.85 }}>{t(subKey)}</div>
       </div>
