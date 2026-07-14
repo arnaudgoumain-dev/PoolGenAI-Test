@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.88.0";
+const APP_VERSION = "1.89.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -5448,7 +5448,11 @@ const FB = {
   sendVerification: async (user) => {
     if (!user) return;
     const idToken = await user.getIdToken();
-    const res = await fetch("https://poolgenai-proxy.support-poolgenai.workers.dev/send-verification-email", {
+    // v1.89.0 — Fix : cette route était codée en dur vers le Worker PROD,
+    // donc jamais atteinte correctement depuis TEST/DEV (idToken rejeté par
+    // vérification d'audience, aucun mail n'était jamais envoyé). Suit
+    // maintenant l'environnement courant comme le reste des appels au proxy.
+    const res = await fetch(`${PROXY_BASE_URL}/send-verification-email`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${idToken}` },
     });
@@ -5647,7 +5651,8 @@ const FB = {
       ? await window._fbAuth.currentUser.getIdToken()
       : null;
     if (!idToken) throw new Error("Non authentifié");
-    const res = await fetch("https://poolgenai-proxy.support-poolgenai.workers.dev/account-data-request", {
+    // v1.89.0 — Fix : même bug que sendVerification, codé en dur vers PROD.
+    const res = await fetch(`${PROXY_BASE_URL}/account-data-request`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
       body: JSON.stringify({ action, uid, email }),
@@ -6219,7 +6224,10 @@ function PoolGenAIApp() {
     const token = new URLSearchParams(window.location.search).get("token");
     if (!token) return;
     setVerifyLinkStatus("verifying");
-    fetch("https://poolgenai-proxy.support-poolgenai.workers.dev/verify-email", {
+    // v1.89.0 — Fix : le token de vérification vit dans Firestore de
+    // l'environnement courant (test/dev/prod), pas toujours prod — sinon
+    // toujours "invalide" pour les comptes créés sur test/dev.
+    fetch(`${PROXY_BASE_URL}/verify-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
@@ -6579,7 +6587,7 @@ function PoolGenAIApp() {
   const [validatingSelectedRecs, setValidatingSelectedRecs] = useState(null);
   const [showReport, setShowReport] = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
-  const [apiKey, setApiKey] = useState("https://poolgenai-proxy.support-poolgenai.workers.dev");
+  const [apiKey, setApiKey] = useState(PROXY_BASE_URL); // v1.89.0 — cohérent avec l'environnement dès le premier rendu
   const [apiProvider, setApiProvider] = useState("anthropic"); // "anthropic" | "openai"
   const [aiEnabled, setAiEnabled] = useState(false);
   // v1.36.0 — Lot B : opt-out de la contribution aux données de calibration
@@ -7352,10 +7360,11 @@ function PoolGenAIApp() {
       } catch (e) {}
       try {
         const ak = await window.storage.get(STORAGE_KEYS.apiKey);
-        // Toujours forcer l'URL proxy officielle — ignore toute valeur stockée en IndexedDB
-        const FORCED_PROXY = "https://poolgenai-proxy.support-poolgenai.workers.dev";
-        setApiKey(FORCED_PROXY);
-        window.storage.set(STORAGE_KEYS.apiKey, JSON.stringify(FORCED_PROXY)).catch(() => {});
+        // v1.89.0 — Fix : forçait PROD sur les 3 environnements. Force
+        // maintenant l'URL officielle DE L'ENVIRONNEMENT COURANT (ignore
+        // toujours toute valeur stockée en IndexedDB, même logique qu'avant).
+        setApiKey(PROXY_BASE_URL);
+        window.storage.set(STORAGE_KEYS.apiKey, JSON.stringify(PROXY_BASE_URL)).catch(() => {});
         const aie = await window.storage.get(STORAGE_KEYS.aiEnabled);
         if (aie?.value === "true") setAiEnabled(true);
       } catch (e) {}
@@ -8954,7 +8963,7 @@ function PoolGenAIApp() {
           onActivate={() => {
             track("upgrade_activated");
             setIsPremium(true);
-            setApiKey("https://poolgenai-proxy.support-poolgenai.workers.dev");
+            setApiKey(PROXY_BASE_URL); // v1.89.0 — Fix : forçait PROD, suit maintenant l'environnement courant.
             // v1.29.7 — À l'activation du mode illimité (test), la gestion de stock
             // s'active par défaut sur le bassin actif, mais la liste des produits EN
             // STOCK part vide : on garde les produits (nom, dosage — nécessaires au
