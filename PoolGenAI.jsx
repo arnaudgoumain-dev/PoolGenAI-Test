@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.90.0";
+const APP_VERSION = "1.91.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 
 const TRANSLATIONS = {
@@ -6334,32 +6334,6 @@ function PoolGenAIApp() {
       });
   }, []);
 
-  // ── Retour de Stripe Checkout (?stripe=success|cancel) ──
-  // v1.90.0 — success : on attend la confirmation isPremium (webhook Stripe
-  // + snapshot Firestore) avant d'afficher le reveal, plutôt que de faire
-  // confiance au seul retour de navigation (le paiement peut encore être
-  // en cours de traitement côté Stripe/webhook à cet instant précis).
-  useEffect(() => {
-    const stripeParam = new URLSearchParams(window.location.search).get("stripe");
-    if (!stripeParam) return;
-    if (stripeParam === "success") {
-      awaitingStripeActivationRef.current = true;
-      setAwaitingStripeActivation(true);
-    } else if (stripeParam === "cancel") {
-      track("upgrade_checkout_cancelled");
-    }
-    const cleanUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, "", cleanUrl);
-  }, []);
-
-  // Si la confirmation traîne (webhook lent), affiche un message après 15s
-  // plutôt que de laisser l'écran d'attente tourner indéfiniment.
-  useEffect(() => {
-    if (!awaitingStripeActivation) { setStripeActivationTimedOut(false); return; }
-    const id = setTimeout(() => setStripeActivationTimedOut(true), 15000);
-    return () => clearTimeout(id);
-  }, [awaitingStripeActivation]);
-
   // ── Lien de confirmation de fusion base commune entrant (?confirmMerge=xxx&token=yyy) ──
   // Contrairement au lien de vérification email (auto-confirmé au chargement),
   // celui-ci affiche un écran "Confirmer la fusion ?" avec un bouton explicite
@@ -6655,6 +6629,36 @@ function PoolGenAIApp() {
   const [awaitingStripeActivation, setAwaitingStripeActivation] = useState(false);
   const [stripeActivationTimedOut, setStripeActivationTimedOut] = useState(false);
   const awaitingStripeActivationRef = useRef(false);
+
+  // ── Retour de Stripe Checkout (?stripe=success|cancel) ──
+  // v1.90.0 — success : on attend la confirmation isPremium (webhook Stripe
+  // + snapshot Firestore) avant d'afficher le reveal, plutôt que de faire
+  // confiance au seul retour de navigation (le paiement peut encore être
+  // en cours de traitement côté Stripe/webhook à cet instant précis).
+  // Fix : ces 2 effets référencent des states déclarés juste au-dessus —
+  // ils doivent rester après cette déclaration (une 1ère version placée
+  // plus haut dans le composant provoquait un ReferenceError/TDZ au chargement,
+  // "Cannot access 'awaitingStripeActivation' before initialization").
+  useEffect(() => {
+    const stripeParam = new URLSearchParams(window.location.search).get("stripe");
+    if (!stripeParam) return;
+    if (stripeParam === "success") {
+      awaitingStripeActivationRef.current = true;
+      setAwaitingStripeActivation(true);
+    } else if (stripeParam === "cancel") {
+      track("upgrade_checkout_cancelled");
+    }
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
+  }, []);
+
+  // Si la confirmation traîne (webhook lent), affiche un message après 15s
+  // plutôt que de laisser l'écran d'attente tourner indéfiniment.
+  useEffect(() => {
+    if (!awaitingStripeActivation) { setStripeActivationTimedOut(false); return; }
+    const id = setTimeout(() => setStripeActivationTimedOut(true), 15000);
+    return () => clearTimeout(id);
+  }, [awaitingStripeActivation]);
 
   async function handleStartCheckout(plan) {
     if (!authUser) return;
@@ -7174,6 +7178,11 @@ function PoolGenAIApp() {
       setShowPremiumReveal(true);
       track("upgrade_activated", { via: "stripe" });
       setApiKey(PROXY_BASE_URL); // v1.89.0 — suit l'environnement courant, pas figé sur PROD.
+      // v1.91.0 — À chaque activation premium confirmée par Stripe, l'analyse
+      // IA est réactivée par défaut (même logique que manageStock ci-dessous).
+      // Choix assumé : un downgrade puis un re-upgrade repasse aiEnabled à
+      // true, sans mémoriser un choix de désactivation antérieur.
+      setAiEnabled(true);
       // v1.29.7 — À l'activation, la gestion de stock s'active par défaut sur le
       // bassin actif ; on garde les produits (nom, dosage) mais on remet leur
       // pourcentage de stock à 0 pour forcer une saisie réelle.
