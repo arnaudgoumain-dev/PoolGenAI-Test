@@ -36,6 +36,25 @@
  *          scheduled() ci-dessous. Fréquence quotidienne choisie pour que les
  *          modèles s'améliorent rapidement pendant que le volume de données
  *          est encore faible ; à espacer plus tard si le volume grossit.
+ *   8. NOUVEAU v1.96.0 — Play Billing (publication Android). Secrets à ajouter :
+ *        PLAY_BILLING_SERVICE_ACCOUNT : JSON complet du compte de service
+ *                                        play-billing-worker (Google Cloud
+ *                                        Console → IAM → Comptes de service →
+ *                                        play-billing-worker → Clés → Créer
+ *                                        une clé → JSON), sur une seule ligne
+ *        PLAY_BILLING_RTDN_SECRET     : chaîne aléatoire choisie par toi
+ *                                        (ex: générée via un gestionnaire de
+ *                                        mots de passe), sert à authentifier
+ *                                        les appels entrants sur /playbilling/rtdn
+ *      Puis, dans Google Cloud Console → Pub/Sub → topic play-billing-rtdn
+ *      → Abonnements → Créer un abonnement :
+ *        - Type : Push (pas Pull — le Pull existant a servi uniquement au
+ *          test de liaison initial dans Play Console)
+ *        - URL du point de terminaison :
+ *          https://<url-de-ce-worker>/playbilling/rtdn?key=<PLAY_BILLING_RTDN_SECRET>
+ *      Vérifie aussi que ANDROID_PACKAGE_NAME et PLAY_PRODUCT_MONTHLY/
+ *      PLAY_PRODUCT_YEARLY ci-dessous correspondent bien aux valeurs réelles
+ *      de Play Console (nom de package, ID produit des 2 abonnements).
  */
 
 const ANTHROPIC_API = "https://api.anthropic.com";
@@ -51,7 +70,16 @@ const VERIFICATION_LINK_BASE = "https://test.poolgenai.com/"; // ⚠️ À VÉRI
 const VERIFICATION_TOKEN_TTL_HOURS = 24;
 // v1.55.0 — Utilisateurs secondaires (brique 2)
 const INVITATION_TOKEN_TTL_HOURS = 24;
-const MAX_SECONDARY_USERS = 2;
+// v1.95.0 — Avant cette version, MAX_SECONDARY_USERS plafonnait le nombre
+// total d'invités sur l'ENSEMBLE du compte propriétaire, tous bassins
+// confondus, et ce même pour un compte gratuit (aucune vérification
+// isPremium du propriétaire n'existait). Nouvelle règle : un compte gratuit
+// ne peut inviter personne (0), un compte Premium peut inviter jusqu'à 2
+// personnes PAR BASSIN (donc jusqu'à 6 au total sur les 3 bassins max
+// autorisés en Premium). Voir handleInviteSecondaryUser et
+// handleRespondInvitation.
+const MAX_SECONDARY_USERS_PER_POOL = 2;
+const MAX_POOLS_PREMIUM = 3;
 // v1.59.3 — Limite du nombre de bassins sur lesquels un compte gratuit peut
 // avoir le statut invité (tous propriétaires confondus). Aucune limite si le
 // compte invité lui-même est premium (son propre abonnement, jamais celui
@@ -90,8 +118,8 @@ const MIN_VALUE_SPREAD = {
   phos: 50, copper: 0.1, iron: 0.05, temp: 4, brome: 2, o2: 5, sel: 1000,
 };
 
-// ⚠️ À VÉRIFIER contre le Quick Edit actuel de poolgenai-proxy-test
 const ALLOWED_ORIGINS = [
+// ⚠️ À VÉRIFIER contre le Quick Edit actuel de poolgenai-proxy-test
   "https://test.poolgenai.com",
 ];
 
@@ -110,6 +138,27 @@ const DAILY_LIMIT_PER_UID = 300;
 // deux Workers). PROD utilisera les clés live le jour de la bascule.
 const STRIPE_API = "https://api.stripe.com/v1";
 const STRIPE_WEBHOOK_TOLERANCE_SECONDS = 300; // anti-rejeu
+
+// v1.96.0 — Play Billing (publication Android). Compte de service dédié
+// (play-billing-worker@poolgenai-prod.iam.gserviceaccount.com, secret
+// PLAY_BILLING_SERVICE_ACCOUNT), distinct de FIREBASE_SERVICE_ACCOUNT.
+// Package Android et IDs produits Play Console identiques sur les 3
+// environnements (un seul package publié, pas de variante dev/test/prod
+// côté Play Store — contrairement à FIREBASE_PROJECT_ID ci-dessus).
+// Politique d'activation alignée sur Stripe (v1.89.1) : coupure immédiate
+// dès que l'abonnement n'est plus SUBSCRIPTION_STATE_ACTIVE, pas de délai
+// de grâce distinct géré ici (voir handlePlayBillingRTDN).
+const ANDROID_PUBLISHER_API = "https://androidpublisher.googleapis.com/androidpublisher/v3";
+const ANDROID_PACKAGE_NAME = "com.poolgenai.app.twa";
+const PLAY_PRODUCT_MONTHLY = "premium_monthly";
+const PLAY_PRODUCT_YEARLY = "premium_annual";
+
+// v1.97.0 — Spec bandelettes : seuil d'occurrences d'un modèle non reconnu
+// avant d'envoyer un email de signal au support (voir /strip-model-signal).
+// Valeur de départ basse : on préfère être notifié tôt qu'attendre un volume
+// important, ajustable sans redéploiement n'est pas nécessaire ici (pas de
+// coût/risque à se tromper, juste un email de plus ou de moins).
+const STRIP_UNRECOGNIZED_SIGNAL_THRESHOLD = 5;
 
 function corsHeaders(origin) {
   const allowed =
@@ -289,6 +338,74 @@ async function getGoogleAccessToken(env) {
     expiresAt: now + tokenData.expires_in,
   };
   return cachedGoogleToken.token;
+}
+
+// ---------- Obtention d'un access token OAuth2 Google (Play Billing) ----------
+// v1.96.0 — Même principe que getGoogleAccessToken ci-dessus (JWT RS256 signé
+// avec la clé privée d'un compte de service, échangé contre un access token,
+// mis en cache), mais avec un compte de service et un scope différents
+// (androidpublisher, pas datastore/identitytoolkit). Cache séparé
+// (cachedPlayBillingToken) pour ne pas mélanger les deux tokens/scopes.
+let cachedPlayBillingToken = null; // { token, expiresAt }
+
+async function getPlayBillingAccessToken(env) {
+  const now = Math.floor(Date.now() / 1000);
+  if (cachedPlayBillingToken && cachedPlayBillingToken.expiresAt > now + 60) {
+    return cachedPlayBillingToken.token;
+  }
+
+  const serviceAccount = JSON.parse(env.PLAY_BILLING_SERVICE_ACCOUNT);
+  const scopes = "https://www.googleapis.com/auth/androidpublisher";
+
+  const header = { alg: "RS256", typ: "JWT" };
+  const claims = {
+    iss: serviceAccount.client_email,
+    scope: scopes,
+    aud: "https://oauth2.googleapis.com/token",
+    exp: now + 3600,
+    iat: now,
+  };
+
+  const headerB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)));
+  const claimsB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(claims)));
+  const signInput = `${headerB64}.${claimsB64}`;
+
+  const cryptoKey = await crypto.subtle.importKey(
+    "pkcs8",
+    pemToArrayBuffer(serviceAccount.private_key),
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    cryptoKey,
+    new TextEncoder().encode(signInput)
+  );
+
+  const jwt = `${signInput}.${base64UrlEncode(signature)}`;
+
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt,
+    }),
+  });
+
+  if (!tokenResponse.ok) {
+    const errText = await tokenResponse.text();
+    throw new Error(`Échec d'obtention du token Play Billing : ${errText}`);
+  }
+
+  const tokenData = await tokenResponse.json();
+  cachedPlayBillingToken = {
+    token: tokenData.access_token,
+    expiresAt: now + tokenData.expires_in,
+  };
+  return cachedPlayBillingToken.token;
 }
 
 // ---------- Conversion vers le format Firestore REST ----------
@@ -606,6 +723,51 @@ function planFromPriceId(env, priceId) {
   if (priceId === env.STRIPE_PRICE_MONTHLY) return "monthly";
   if (priceId === env.STRIPE_PRICE_YEARLY) return "yearly";
   return null;
+}
+
+// ---------- Play Billing : détermine le plan (monthly/yearly) depuis un product ID ----------
+function planFromPlayProductId(productId) {
+  if (productId === PLAY_PRODUCT_MONTHLY) return "monthly";
+  if (productId === PLAY_PRODUCT_YEARLY) return "yearly";
+  return null;
+}
+
+// ---------- Play Billing : lit l'état d'un achat d'abonnement (subscriptionsv2) ----------
+// v1.96.0 — Utilisée à la fois par /playbilling/verify-purchase (juste après
+// l'achat) et par handlePlayBillingRTDN (sur chaque notification) : plutôt que
+// de déduire l'état à partir du seul type de notification RTDN, on relit
+// systématiquement l'état réel auprès de Google, comme recommandé par la doc
+// Android Publisher — évite tout désynchronisme si un event RTDN est
+// retardé/rejoué ou si son type est mal interprété.
+async function fetchPlaySubscriptionPurchase(env, purchaseToken) {
+  const accessToken = await getPlayBillingAccessToken(env);
+  const url = `${ANDROID_PUBLISHER_API}/applications/${ANDROID_PACKAGE_NAME}/purchases/subscriptionsv2/tokens/${purchaseToken}`;
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Échec de lecture de l'achat Play Billing : ${errText}`);
+  }
+  return response.json();
+}
+
+// ---------- Play Billing : accuse réception d'un achat (obligatoire sous 3 jours) ----------
+// Sans acknowledge, Google rembourse et annule automatiquement l'abonnement.
+// Idempotent côté Google (pas d'erreur si déjà acquitté), mais on vérifie
+// quand même acknowledgementState avant d'appeler pour épargner une requête.
+async function acknowledgePlaySubscriptionPurchase(env, productId, purchaseToken) {
+  const accessToken = await getPlayBillingAccessToken(env);
+  const url = `${ANDROID_PUBLISHER_API}/applications/${ANDROID_PACKAGE_NAME}/purchases/subscriptions/${productId}/tokens/${purchaseToken}:acknowledge`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Échec d'acknowledge Play Billing : ${errText}`);
+  }
 }
 
 // ---------- Firestore : liste des IDs de documents expirés (structured query) ----------
@@ -1381,6 +1543,84 @@ async function sendProductRevalidationEmail(env, productId, oldData, newData) {
   if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
 }
 
+// ---------- v1.97.0 — Spec bandelettes : signal de modèle non reconnu ----------
+// Email envoyé au support quand une bandelette non reconnue a été soumise
+// STRIP_UNRECOGNIZED_SIGNAL_THRESHOLD fois (compteur remis à zéro après
+// envoi, pour ne pas spammer). Aucune fiche modèle n'est jamais générée
+// automatiquement ici — cette route ne fait que notifier qu'une nouvelle
+// fiche mérite d'être créée manuellement (voir section 10.5 de la spec).
+async function sendStripModelUnrecognizedEmail(env, count, sampleNotes) {
+  const notesHtml = (sampleNotes || [])
+    .slice(0, 5)
+    .map((n) => `<li>${n}</li>`)
+    .join("");
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2>Bandelette non reconnue — signal répété</h2>
+      <p>${count} soumissions récentes n'ont pas pu être rattachées à un modèle connu.</p>
+      ${notesHtml ? `<p>Notes de l'IA sur les dernières soumissions :</p><ul>${notesHtml}</ul>` : ""}
+      <p>Vérifie si une nouvelle fiche modèle mérite d'être créée (voir stripModels dans Firestore).</p>
+    </div>
+  `;
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: RESEND_FROM,
+      to: SUPPORT_EMAIL,
+      subject: "PoolGenAI — Bandelette non reconnue (signal répété)",
+      html,
+    }),
+  });
+  if (!response.ok) throw new Error(`Échec d'envoi Resend : ${await response.text()}`);
+}
+
+// ---------- Route : POST /strip-model-signal ----------
+// v1.97.0 — Appelée par le client quand une photo bandelette n'a pu être
+// rattachée à aucun modèle connu (modele_id null / modele_confiance basse).
+// Compteur AGRÉGÉ unique (pas de distinction fine entre modèles différents
+// non reconnus, faute de pouvoir les comparer entre eux sans stocker les
+// photos elles-mêmes) — suffisant pour un signal "va jeter un oeil", pas
+// pour un dédoublonnage précis. À affiner si le volume de nouveaux modèles
+// non reconnus augmente.
+async function handleStripModelSignal(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+  try {
+    await verifyFirebaseIdToken(idToken);
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+  const note = typeof body.note === "string" ? body.note.slice(0, 300) : "";
+
+  try {
+    const existing = await firestoreGetDoc(env, "stripModelSignals", "pending");
+    const notes = [...(existing?.notes || []), note].filter(Boolean).slice(-10);
+    const count = (existing?.count || 0) + 1;
+
+    if (count >= STRIP_UNRECOGNIZED_SIGNAL_THRESHOLD) {
+      await sendStripModelUnrecognizedEmail(env, count, notes);
+      // Reset après envoi pour ne pas spammer à chaque soumission suivante.
+      await firestoreSetDoc(env, "stripModelSignals", "pending", { count: 0, notes: [] });
+    } else {
+      await firestoreSetDoc(env, "stripModelSignals", "pending", { count, notes });
+    }
+  } catch (e) {
+    console.error(`Échec du signal bandelette non reconnue : ${e.message}`);
+    // Non bloquant pour le client : ce n'est qu'un signal interne.
+  }
+
+  return jsonResponse({ success: true }, 200, origin);
+}
+
 async function handleSendVerificationEmail(request, env, origin) {
   const authHeader = request.headers.get("Authorization") || "";
   const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
@@ -1641,10 +1881,20 @@ async function handleInviteSecondaryUser(request, env, origin) {
   const pool = (config?.pools || []).find((p) => p.id === poolId);
   if (!pool) return jsonError("Bassin introuvable", 404, origin);
 
-  const activeSecondaries = existingSecondaries.filter((s) => s.status === "active");
-  if (activeSecondaries.length >= MAX_SECONDARY_USERS) {
-    return jsonError(`Nombre maximum de comptes secondaires atteint (${MAX_SECONDARY_USERS})`, 409, origin);
+  // v1.95.0 — Un compte gratuit ne peut inviter personne. Avant cette
+  // version, aucune vérification isPremium n'existait ici : un compte
+  // gratuit pouvait inviter jusqu'à MAX_SECONDARY_USERS personnes.
+  if (!config?.isPremium) {
+    return jsonError("Les invitations sont réservées à la version Premium", 403, origin, "invite_requires_premium");
   }
+
+  // v1.95.0 — Limite désormais posée PAR BASSIN (poolId), et non plus sur
+  // l'ensemble du compte tous bassins confondus.
+  const activeSecondariesForPool = existingSecondaries.filter((s) => s.status === "active" && s.poolId === poolId);
+  if (activeSecondariesForPool.length >= MAX_SECONDARY_USERS_PER_POOL) {
+    return jsonError(`Nombre maximum d'invités atteint pour ce bassin (${MAX_SECONDARY_USERS_PER_POOL})`, 409, origin);
+  }
+  const activeSecondaries = existingSecondaries.filter((s) => s.status === "active");
   if (activeSecondaries.some((s) => (s.email || "").toLowerCase() === invitedEmail.toLowerCase())) {
     return jsonError("Cette personne a déjà accès à un bassin", 409, origin);
   }
@@ -1730,10 +1980,23 @@ async function handleRespondInvitation(request, env, origin) {
 
   // action === "accept"
   try {
+    // v1.95.0 — Re-vérifie le statut Premium du propriétaire au moment de
+    // l'acceptation (pas seulement à l'envoi de l'invitation) : si le
+    // propriétaire est repassé gratuit entre-temps, l'invitation ne peut
+    // plus être acceptée.
+    const primaryConfig = await firestoreGetDoc(env, `users/${invitation.primaryUid}/config`, "main");
+    if (!primaryConfig?.isPremium) {
+      return jsonError("Ce compte n'est plus en version Premium, l'invitation ne peut pas être acceptée", 403, origin, "invite_requires_premium");
+    }
+
     const existingSecondaries = await firestoreListAllDocs(env, `users/${invitation.primaryUid}/secondaryUsers`);
-    const activeSecondaries = existingSecondaries.filter((s) => s.status === "active" && s.id !== secondaryUid);
-    if (activeSecondaries.length >= MAX_SECONDARY_USERS) {
-      return jsonError(`Nombre maximum de comptes secondaires atteint (${MAX_SECONDARY_USERS})`, 409, origin);
+    // v1.95.0 — Limite par bassin (poolId de l'invitation), plus sur
+    // l'ensemble du compte.
+    const activeSecondariesForPool = existingSecondaries.filter(
+      (s) => s.status === "active" && s.id !== secondaryUid && s.poolId === invitation.poolId
+    );
+    if (activeSecondariesForPool.length >= MAX_SECONDARY_USERS_PER_POOL) {
+      return jsonError(`Nombre maximum d'invités atteint pour ce bassin (${MAX_SECONDARY_USERS_PER_POOL})`, 409, origin);
     }
 
     // v1.59.3 — Limite du nombre de bassins invités pour un compte gratuit
@@ -2228,6 +2491,21 @@ async function handleAnthropicProxy(request, env, origin) {
     return jsonError(`Token invalide : ${e.message}`, 401, origin);
   }
 
+  // v1.93.0 — Contrôle premium côté serveur. Le verrouillage de l'IA aux
+  // comptes premium n'existait jusqu'ici que côté client (bouton masqué) :
+  // un compte gratuit authentifié pouvait appeler cette route directement
+  // et contourner totalement le paywall. On vérifie donc ici isPremium
+  // dans Firestore avant d'autoriser l'appel à l'API Anthropic.
+  let userConfig;
+  try {
+    userConfig = await firestoreGetDoc(env, `users/${uid}/config`, "main");
+  } catch (e) {
+    return jsonError(`Erreur serveur : ${e.message}`, 500, origin);
+  }
+  if (!userConfig?.isPremium) {
+    return jsonError("Analyse IA réservée aux comptes premium", 403, origin);
+  }
+
   // v1.41.0 — Rate-limiting par UID, voir checkAndIncrementRateLimit.
   try {
     const rateCheck = await checkAndIncrementRateLimit(env, uid);
@@ -2457,6 +2735,187 @@ async function handleStripeWebhook(request, env, origin) {
   return jsonResponse({ received: true }, 200, "");
 }
 
+// ---------- POST /playbilling/verify-purchase ----------
+// v1.96.0 — Appelée juste après un achat via Digital Goods API + Payment
+// Request API dans PaywallModal (environnement TWA). Contrairement à Stripe
+// (redirection + webhook asynchrone), l'achat Play Billing est confirmé en
+// direct côté client : cette route vérifie le purchaseToken auprès de Google
+// (source de vérité, jamais le seul retour du client), l'acquitte, et
+// n'active isPremium que si la vérification serveur confirme un abonnement
+// SUBSCRIPTION_STATE_ACTIVE.
+async function handlePlayBillingVerifyPurchase(request, env, origin) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!idToken) return jsonError("Authentification requise", 401, origin);
+
+  let uid;
+  try {
+    const payload = await verifyFirebaseIdToken(idToken);
+    uid = payload.sub;
+  } catch (e) {
+    return jsonError(`Token invalide : ${e.message}`, 401, origin);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError("Corps de requête invalide", 400, origin);
+  }
+
+  const { purchaseToken } = body;
+  if (!purchaseToken) return jsonError("purchaseToken manquant", 400, origin);
+
+  let purchase;
+  try {
+    purchase = await fetchPlaySubscriptionPurchase(env, purchaseToken);
+  } catch (e) {
+    console.error(`Vérification achat Play Billing échouée pour ${uid} : ${e.message}`);
+    return jsonError("Impossible de vérifier l'achat", 500, origin);
+  }
+
+  // v1.96.0 — Le productId retenu est celui renvoyé par Google (lineItems),
+  // jamais celui envoyé par le client : le client ne doit pas pouvoir décider
+  // lui-même quel plan lui est accordé.
+  const productId = purchase.lineItems?.[0]?.productId;
+  const plan = planFromPlayProductId(productId);
+  if (!plan) {
+    console.error(`Achat Play Billing avec productId inattendu (${productId}) pour ${uid}`);
+    return jsonError("Produit inconnu", 400, origin);
+  }
+
+  const isPremium = purchase.subscriptionState === "SUBSCRIPTION_STATE_ACTIVE";
+
+  if (isPremium && purchase.acknowledgementState !== "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED") {
+    try {
+      await acknowledgePlaySubscriptionPurchase(env, productId, purchaseToken);
+    } catch (e) {
+      // Non bloquant pour la réponse : Google réessaiera l'RTDN, et un
+      // acknowledge manqué ne remet pas en cause l'accès premium immédiat.
+      // Mais sans succès sous 3 jours, Google rembourse et annule — à
+      // surveiller si ce log apparaît de façon répétée.
+      console.error(`Acknowledge Play Billing échoué pour ${uid} (productId=${productId}) : ${e.message}`);
+    }
+  }
+
+  try {
+    await firestorePatchDoc(env, `users/${uid}/config`, "main", {
+      isPremium,
+      subscription: {
+        status: purchase.subscriptionState,
+        plan,
+        provider: "play",
+      },
+    });
+    // Filet de secours pour handlePlayBillingRTDN : les notifications RTDN ne
+    // portent que purchaseToken/productId, jamais l'uid Firebase. Même
+    // principe que stripeCustomers pour Stripe.
+    await firestoreSetDoc(env, "playPurchaseTokens", purchaseToken, { uid });
+  } catch (e) {
+    console.error(`Écriture Firestore échouée après achat Play Billing pour ${uid} : ${e.message}`);
+    return jsonError("Achat vérifié mais activation échouée, réessaie", 500, origin);
+  }
+
+  return jsonResponse({ success: true, isPremium }, 200, origin);
+}
+
+// ---------- POST /playbilling/rtdn ----------
+// v1.96.0 — Endpoint appelé par une souscription Pub/Sub PUSH sur le topic
+// play-billing-rtdn (à créer manuellement dans Cloud Console, voir
+// instructions de déploiement en tête de fichier — un push, pas le pull créé
+// pour le test initial des RTDN). Authentification par clé partagée dans
+// l'URL (?key=...), plus simple qu'une vérification OIDC complète et
+// suffisante ici car l'URL n'est jamais exposée côté client (contrairement à
+// verify-purchase) — seule Google Cloud Pub/Sub la connaît.
+// Par sécurité/simplicité, ne fait AUCUNE confiance au type de notification
+// RTDN lui-même : sur réception, on relit systématiquement l'état réel de
+// l'abonnement auprès de Google (fetchPlaySubscriptionPurchase), comme pour
+// verify-purchase. Ça évite tout désynchronisme si un event est retardé,
+// rejoué, ou reçu dans le désordre.
+async function handlePlayBillingRTDN(request, env, origin) {
+  const url = new URL(request.url);
+  if (url.searchParams.get("key") !== env.PLAY_BILLING_RTDN_SECRET) {
+    return new Response("Non autorisé", { status: 401 });
+  }
+
+  let envelope;
+  try {
+    envelope = await request.json();
+  } catch {
+    return new Response("Corps de requête invalide", { status: 400 });
+  }
+
+  const message = envelope.message;
+  if (!message?.data) return new Response("Message vide, ignoré", { status: 200 });
+
+  // Idempotence : messageId Pub/Sub, même principe que stripeEvents.
+  try {
+    await firestoreCreateDoc(env, "playBillingRtdnEvents", message.messageId, {
+      processedAt: new Date(),
+    });
+  } catch (e) {
+    return new Response("Déjà traité", { status: 200 });
+  }
+
+  let notification;
+  try {
+    const decoded = atob(message.data);
+    notification = JSON.parse(decoded);
+  } catch (e) {
+    console.error(`RTDN Play Billing : payload illisible (${e.message})`);
+    return new Response("Payload illisible", { status: 200 }); // 200 pour ne pas faire réessayer indéfiniment
+  }
+
+  // testNotification : envoyée par le bouton "Envoyer une notification test"
+  // de Play Console — rien à traiter, juste confirmer la réception.
+  if (notification.testNotification) {
+    return new Response("Notification de test reçue", { status: 200 });
+  }
+
+  const sub = notification.subscriptionNotification;
+  if (!sub?.purchaseToken) {
+    return new Response("Notification sans purchaseToken, ignorée", { status: 200 });
+  }
+
+  let uid;
+  try {
+    const mapping = await firestoreGetDoc(env, "playPurchaseTokens", sub.purchaseToken);
+    uid = mapping?.uid;
+  } catch (e) {
+    console.error(`Lecture playPurchaseTokens échouée (token ${sub.purchaseToken}) : ${e.message}`);
+  }
+  if (!uid) {
+    // Peut arriver si l'RTDN arrive avant que verify-purchase ait écrit le
+    // mapping (course rare mais possible) — pas grave, /verify-purchase aura
+    // de toute façon déjà activé isPremium ; on log pour repérer une éventuelle
+    // récurrence anormale.
+    console.error(`RTDN Play Billing : aucun uid retrouvé pour le token ${sub.purchaseToken}`);
+    return new Response("uid introuvable, ignoré", { status: 200 });
+  }
+
+  try {
+    const purchase = await fetchPlaySubscriptionPurchase(env, sub.purchaseToken);
+    const productId = purchase.lineItems?.[0]?.productId;
+    const plan = planFromPlayProductId(productId);
+    const isPremium = purchase.subscriptionState === "SUBSCRIPTION_STATE_ACTIVE";
+
+    await firestorePatchDoc(env, `users/${uid}/config`, "main", {
+      isPremium,
+      subscription: {
+        status: purchase.subscriptionState,
+        plan: plan || null,
+        provider: "play",
+      },
+    });
+  } catch (e) {
+    console.error(`Traitement RTDN Play Billing échoué pour ${uid} : ${e.message}`);
+    // 200 quand même : l'event est déjà marqué traité (playBillingRtdnEvents),
+    // un échec ici ne doit pas déclencher un rejeu Pub/Sub indéfini.
+  }
+
+  return new Response("OK", { status: 200 });
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -2541,6 +3000,9 @@ export default {
     if (url.pathname === "/cancel-invitation") {
       return handleCancelInvitation(request, env, origin);
     }
+    if (url.pathname === "/strip-model-signal") {
+      return handleStripModelSignal(request, env, origin);
+    }
     if (url.pathname === "/stripe/create-checkout-session") {
       return handleStripeCreateCheckoutSession(request, env, origin);
     }
@@ -2549,6 +3011,12 @@ export default {
     }
     if (url.pathname === "/stripe/webhook") {
       return handleStripeWebhook(request, env, origin);
+    }
+    if (url.pathname === "/playbilling/verify-purchase") {
+      return handlePlayBillingVerifyPurchase(request, env, origin);
+    }
+    if (url.pathname === "/playbilling/rtdn") {
+      return handlePlayBillingRTDN(request, env, origin);
     }
 
     return new Response("Not found", { status: 404 });
