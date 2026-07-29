@@ -1,0 +1,14 @@
+{
+  "name": "poolgenai-proxy-test",
+  "compatibility_date": "2026-07-28",
+  "main": "poolgenai-proxy-test.js",
+  "r2_buckets": [
+    {
+      "binding": "PRODUCT_PHOTOS",
+      "bucket_name": "poolgenai-photos-test"
+    }
+  ],
+  "triggers": {
+    "crons": ["1 0 1 * *", "0 3 * * *"]
+  }
+}
