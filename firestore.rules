@@ -149,8 +149,11 @@ service cloud.firestore {
         );
       allow update, delete: if false;
     }
+    // v1.100.0 — Lecture retirée du client (servie par le Worker, voir
+    // /strip-calibration-model) : ces coefficients entraînés étaient lisibles
+    // par tout compte authentifié, y compris gratuit.
     match /calibrationModels/{docId} {
-      allow read: if request.auth != null;
+      allow read: if false;
       allow write: if false;
     }
     match /rateLimits/{docId} {
@@ -165,28 +168,31 @@ service cloud.firestore {
     }
 
     // v1.97.0 — Fiches de modèles de bandelette (Mareva, AquaChek...).
-    // Lecture ouverte à tout utilisateur authentifié (nécessaire à chaque
-    // analyse IA, voir FB.listStripModels dans PoolGenAI.jsx) — aucune
-    // donnée sensible (juste échelles de valeurs et structure d'une
-    // bandelette). Écriture réservée au script admin (seed-strip-models.js,
-    // compte de service, hors périmètre de ces règles) SAUF la promotion
-    // automatique de nouvelles fiches (v1.98.9, voir stripModelCandidates
-    // ci-dessous) qui écrit en create depuis un client authentifié — jamais
-    // d'update depuis un client sur une fiche existante (seule la Console/le
-    // script admin corrige une fiche déjà en place).
+    // Écriture réservée au script admin (seed-strip-models.js, compte de
+    // service, hors périmètre de ces règles) SAUF la promotion automatique
+    // de nouvelles fiches (v1.98.9, voir stripModelCandidates ci-dessous)
+    // qui écrit en create depuis un client authentifié — jamais d'update
+    // depuis un client sur une fiche existante (seule la Console/le script
+    // admin corrige une fiche déjà en place).
+    // v1.100.0 — Lecture retirée du client (servie par le Worker, voir
+    // /strip-reference-data) : ces fiches étaient lisibles par tout compte
+    // authentifié, y compris gratuit. "create" conservé (promotion
+    // automatique ci-dessus), distincte de la lecture qu'on ferme ici.
     match /stripModels/{modelId} {
-      allow read: if request.auth != null;
+      allow read: if false;
       allow create: if request.auth != null;
       allow update, delete: if false;
     }
 
     // v1.97.0 — Seuils de confiance par paramètre (config/stripConfidenceThresholds,
     // config/stripConfidenceThresholdsTesters). Collection RACINE "config" —
-    // à ne pas confondre avec users/{uid}/config/main. Lecture ouverte à
-    // tout utilisateur authentifié ; écriture réservée à la Console/au
-    // script admin.
+    // à ne pas confondre avec users/{uid}/config/main. Écriture réservée à
+    // la Console/au script admin.
+    // v1.100.0 — Lecture retirée du client (servie par le Worker, voir
+    // /strip-reference-data) : lisible jusque-là par tout compte
+    // authentifié, y compris gratuit.
     match /config/{docId} {
-      allow read: if request.auth != null;
+      allow read: if false;
       allow write: if false;
     }
 
