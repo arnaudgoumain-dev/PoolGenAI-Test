@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.107.0";
+const APP_VERSION = "1.108.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 // v1.95.0 — Plafond de bassins actifs pour un compte Premium (contrôle
 // client ; la vraie limite est imposée par firestore.rules côté serveur).
@@ -13508,8 +13508,15 @@ function drawStripHandle(ctx, pt, color, scale = 1) {
   ctx.stroke();
 }
 
-function drawStripMagnifier(ctx, canvas, img, pt, color) {
+// v1.107.1 — pt = point en espace "image" (canvas non zoomé), sert à
+// échantillonner la bonne zone de la photo source (natScale suppose ce
+// repère). screenPt = où ce même point apparaît réellement à l'écran une
+// fois le zoom pincé appliqué (voir StripMarker) — sert uniquement à
+// positionner le cercle de la loupe. Sans zoom pincé actif, les 2 sont
+// identiques (screenPt optionnel, retombe sur pt).
+function drawStripMagnifier(ctx, canvas, img, pt, color, screenPt) {
   if (!img) return;
+  const sp = screenPt || pt;
   const mSize = 116;
   const mRadius = mSize / 2;
   const zoom = 2.6;
@@ -13518,9 +13525,9 @@ function drawStripMagnifier(ctx, canvas, img, pt, color) {
   const srcCX = pt.x * natScale;
   const srcCY = pt.y * natScale;
   const offsetY = mRadius + 92;
-  let cy = pt.y - offsetY;
-  if (cy - mRadius < 4) cy = pt.y + offsetY;
-  const cx = Math.max(mRadius + 4, Math.min(canvas.width - mRadius - 4, pt.x));
+  let cy = sp.y - offsetY;
+  if (cy - mRadius < 4) cy = sp.y + offsetY;
+  const cx = Math.max(mRadius + 4, Math.min(canvas.width - mRadius - 4, sp.x));
 
   ctx.save();
   ctx.beginPath();
@@ -13647,15 +13654,17 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
     }
     if (startPt) drawStripHandle(ctx, startPt, "#4ade80", zoom.scale);
     if (endPt) drawStripHandle(ctx, endPt, "#f87171", zoom.scale);
-    // Loupe dessinée HORS transform (taille écran fixe, indépendante du zoom
-    // pincé) — voir drawStripMagnifier, qui attend un point en espace écran.
+    // Loupe dessinée HORS transform (cercle à taille écran fixe) — pt reste
+    // en espace image (échantillonnage photo correct), screenPt indique juste
+    // où placer le cercle à l'écran vu le zoom pincé courant (voir
+    // drawStripMagnifier).
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (dragging === "start" || dragging === "end") {
       const activePt = dragging === "start" ? startPt : endPt;
       if (activePt) {
         const screenPt = { x: activePt.x * zoom.scale + zoom.tx, y: activePt.y * zoom.scale + zoom.ty };
         const activeColor = dragging === "start" ? "#4ade80" : "#f87171";
-        drawStripMagnifier(ctx, canvas, img, screenPt, activeColor);
+        drawStripMagnifier(ctx, canvas, img, activePt, activeColor, screenPt);
       }
     }
   }
@@ -13872,8 +13881,9 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
   const t = useT(lang || "fr");
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
-  const stateRef = useRef({ points: null, dragging: null });
+  const stateRef = useRef({ points: null, dragging: null, zoom: { scale: 1, tx: 0, ty: 0 }, activePointers: new Map(), pinch: null });
   const CORRECTION_EPSILON = 0.004; // fraction de l'image — en dessous, non compté comme une correction
+  const MAX_ZOOM = 4;
 
   useEffect(() => {
     const img = new Image();
@@ -13888,6 +13898,9 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
       stateRef.current = {
         points: padPositions.map(([nx, ny]) => ({ x: nx * canvas.width, y: ny * canvas.height })),
         dragging: null,
+        zoom: { scale: 1, tx: 0, ty: 0 },
+        activePointers: new Map(),
+        pinch: null,
       };
       draw();
     };
@@ -13895,19 +13908,40 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
     // eslint-disable-next-line
   }, [photoDataUrl, padPositions]);
 
-  function canvasPoint(e) {
+  // v1.107.2 — Zoom pincé à 2 doigts, même mécanique que StripMarker : voir
+  // ce composant pour le détail des commentaires (rawCanvasPoint = espace
+  // canvas brut avant inversion du zoom, canvasPoint = espace "image" utilisé
+  // par toute la logique de placement).
+  function rawCanvasPoint(clientX, clientY) {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     return {
-      x: Math.max(0, Math.min(canvas.width, (e.clientX - rect.left) * scaleX)),
-      y: Math.max(0, Math.min(canvas.height, (e.clientY - rect.top) * scaleY)),
+      x: Math.max(0, Math.min(canvas.width, (clientX - rect.left) * scaleX)),
+      y: Math.max(0, Math.min(canvas.height, (clientY - rect.top) * scaleY)),
+    };
+  }
+
+  function canvasPoint(e) {
+    const raw = rawCanvasPoint(e.clientX, e.clientY);
+    const { scale, tx, ty } = stateRef.current.zoom;
+    return { x: (raw.x - tx) / scale, y: (raw.y - ty) / scale };
+  }
+
+  function clampZoom(zoom, canvas) {
+    const { scale } = zoom;
+    const minTx = canvas.width * (1 - scale);
+    const minTy = canvas.height * (1 - scale);
+    return {
+      scale,
+      tx: Math.min(0, Math.max(minTx, zoom.tx)),
+      ty: Math.min(0, Math.max(minTy, zoom.ty)),
     };
   }
 
   // Rayon de reprise dérivé de l'espacement réel entre tampons voisins à
-  // l'écran (bornes 14-28px) : des tampons serrés (photo large ou peu de
+  // l'écran (bornes 21-42px) : des tampons serrés (photo large ou peu de
   // paramètres) ne doivent pas se voler mutuellement les taps.
   function handleRadius() {
     const { points } = stateRef.current;
@@ -13920,16 +13954,19 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
   function draw() {
     const canvas = canvasRef.current;
     const img = imgRef.current;
-    const { points, dragging } = stateRef.current;
+    const { points, dragging, zoom } = stateRef.current;
     if (!canvas || !img || !points) return;
     const ctx = canvas.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(zoom.scale, 0, 0, zoom.scale, zoom.tx, zoom.ty);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     points.forEach((pt, i) => {
       ctx.beginPath();
       ctx.arc(pt.x, pt.y, 16.5, 0, Math.PI * 2);
       ctx.fillStyle = dragging === i ? "rgba(61,219,217,0.95)" : "rgba(255,255,255,0.92)";
       ctx.fill();
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2 / zoom.scale;
       ctx.strokeStyle = "#0d1214";
       ctx.stroke();
       ctx.fillStyle = "#0d1214";
@@ -13938,23 +13975,47 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
       ctx.textBaseline = "middle";
       ctx.fillText((paramOrder && paramOrder[i]) || String(i + 1), pt.x, pt.y);
     });
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (typeof dragging === "number" && points[dragging]) {
-      drawStripMagnifier(ctx, canvas, img, points[dragging], "#3ddbd9");
+      const pt = points[dragging];
+      const screenPt = { x: pt.x * zoom.scale + zoom.tx, y: pt.y * zoom.scale + zoom.ty };
+      drawStripMagnifier(ctx, canvas, img, pt, "#3ddbd9", screenPt);
     }
   }
 
   function handlePointerDown(e) {
-    const { points } = stateRef.current;
-    if (!points) return;
+    const st = stateRef.current;
+    if (!st.points) return;
+    st.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (st.activePointers.size === 2) {
+      st.dragging = null;
+      const ids = Array.from(st.activePointers.keys());
+      const p1 = st.activePointers.get(ids[0]);
+      const p2 = st.activePointers.get(ids[1]);
+      const r1 = rawCanvasPoint(p1.x, p1.y);
+      const r2 = rawCanvasPoint(p2.x, p2.y);
+      st.pinch = {
+        ids,
+        startDist: Math.max(1, distPt(r1, r2)),
+        startMid: { x: (r1.x + r2.x) / 2, y: (r1.y + r2.y) / 2 },
+        startZoom: { ...st.zoom },
+      };
+      draw();
+      e.preventDefault();
+      return;
+    }
+    if (st.activePointers.size > 2) { e.preventDefault(); return; }
+
     const p = canvasPoint(e);
-    const r = handleRadius();
+    const r = handleRadius() / st.zoom.scale;
     let closest = -1, closestDist = Infinity;
-    points.forEach((pt, i) => {
+    st.points.forEach((pt, i) => {
       const d = distPt(p, pt);
       if (d < r && d < closestDist) { closest = i; closestDist = d; }
     });
     if (closest !== -1) {
-      stateRef.current.dragging = closest;
+      st.dragging = closest;
       draw();
     }
     e.preventDefault();
@@ -13962,14 +14023,43 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
 
   function handlePointerMove(e) {
     const st = stateRef.current;
+    if (!st.activePointers.has(e.pointerId)) return;
+    st.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (st.pinch) {
+      const canvas = canvasRef.current;
+      const [id1, id2] = st.pinch.ids;
+      const p1 = st.activePointers.get(id1);
+      const p2 = st.activePointers.get(id2);
+      if (!p1 || !p2) return;
+      const r1 = rawCanvasPoint(p1.x, p1.y);
+      const r2 = rawCanvasPoint(p2.x, p2.y);
+      const dist = Math.max(1, distPt(r1, r2));
+      const mid = { x: (r1.x + r2.x) / 2, y: (r1.y + r2.y) / 2 };
+      const newScale = Math.max(1, Math.min(MAX_ZOOM, st.pinch.startZoom.scale * (dist / st.pinch.startDist)));
+      const anchor = {
+        x: (st.pinch.startMid.x - st.pinch.startZoom.tx) / st.pinch.startZoom.scale,
+        y: (st.pinch.startMid.y - st.pinch.startZoom.ty) / st.pinch.startZoom.scale,
+      };
+      st.zoom = clampZoom({ scale: newScale, tx: mid.x - anchor.x * newScale, ty: mid.y - anchor.y * newScale }, canvas);
+      draw();
+      e.preventDefault();
+      return;
+    }
+
     if (typeof st.dragging !== "number") return;
     st.points[st.dragging] = canvasPoint(e);
     draw();
     e.preventDefault();
   }
 
-  function handlePointerUp() {
+  function handlePointerUp(e) {
     const st = stateRef.current;
+    st.activePointers.delete(e.pointerId);
+    if (st.pinch) {
+      if (st.activePointers.size < 2) st.pinch = null;
+      return;
+    }
     if (typeof st.dragging !== "number") return;
     st.dragging = null;
     draw();
@@ -14001,6 +14091,7 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         />
       </div>
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
@@ -14028,7 +14119,8 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
   const t = useT(lang || "fr");
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
-  const stateRef = useRef({ points: null, dragging: null });
+  const stateRef = useRef({ points: null, dragging: null, zoom: { scale: 1, tx: 0, ty: 0 }, activePointers: new Map(), pinch: null });
+  const MAX_ZOOM = 4;
 
   useEffect(() => {
     const img = new Image();
@@ -14048,21 +14140,40 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
       const points = (Array.isArray(initialPositions) && initialPositions.length === n)
         ? initialPositions.map(([nx, ny]) => ({ x: nx * canvas.width, y: ny * canvas.height }))
         : paramOrder.map((_, i) => ({ x: marginX, y: canvas.height * ((i + 1) / (n + 1)) }));
-      stateRef.current = { points, dragging: null };
+      stateRef.current = { points, dragging: null, zoom: { scale: 1, tx: 0, ty: 0 }, activePointers: new Map(), pinch: null };
       draw();
     };
     img.src = photoDataUrl;
     // eslint-disable-next-line
   }, [photoDataUrl, paramOrder, initialPositions]);
 
-  function canvasPoint(e) {
+  // v1.107.2 — Zoom pincé à 2 doigts, même mécanique que StripMarker/
+  // StripPadPreview.
+  function rawCanvasPoint(clientX, clientY) {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     return {
-      x: Math.max(0, Math.min(canvas.width, (e.clientX - rect.left) * scaleX)),
-      y: Math.max(0, Math.min(canvas.height, (e.clientY - rect.top) * scaleY)),
+      x: Math.max(0, Math.min(canvas.width, (clientX - rect.left) * scaleX)),
+      y: Math.max(0, Math.min(canvas.height, (clientY - rect.top) * scaleY)),
+    };
+  }
+
+  function canvasPoint(e) {
+    const raw = rawCanvasPoint(e.clientX, e.clientY);
+    const { scale, tx, ty } = stateRef.current.zoom;
+    return { x: (raw.x - tx) / scale, y: (raw.y - ty) / scale };
+  }
+
+  function clampZoom(zoom, canvas) {
+    const { scale } = zoom;
+    const minTx = canvas.width * (1 - scale);
+    const minTy = canvas.height * (1 - scale);
+    return {
+      scale,
+      tx: Math.min(0, Math.max(minTx, zoom.tx)),
+      ty: Math.min(0, Math.max(minTy, zoom.ty)),
     };
   }
 
@@ -14077,16 +14188,19 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
   function draw() {
     const canvas = canvasRef.current;
     const img = imgRef.current;
-    const { points, dragging } = stateRef.current;
+    const { points, dragging, zoom } = stateRef.current;
     if (!canvas || !img || !points) return;
     const ctx = canvas.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(zoom.scale, 0, 0, zoom.scale, zoom.tx, zoom.ty);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     points.forEach((pt, i) => {
       ctx.beginPath();
       ctx.arc(pt.x, pt.y, 16.5, 0, Math.PI * 2);
       ctx.fillStyle = dragging === i ? "rgba(61,219,217,0.95)" : "rgba(255,255,255,0.92)";
       ctx.fill();
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2 / zoom.scale;
       ctx.strokeStyle = "#0d1214";
       ctx.stroke();
       ctx.fillStyle = "#0d1214";
@@ -14095,23 +14209,47 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
       ctx.textBaseline = "middle";
       ctx.fillText((paramOrder && paramOrder[i]) || String(i + 1), pt.x, pt.y);
     });
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (typeof dragging === "number" && points[dragging]) {
-      drawStripMagnifier(ctx, canvas, img, points[dragging], "#3ddbd9");
+      const pt = points[dragging];
+      const screenPt = { x: pt.x * zoom.scale + zoom.tx, y: pt.y * zoom.scale + zoom.ty };
+      drawStripMagnifier(ctx, canvas, img, pt, "#3ddbd9", screenPt);
     }
   }
 
   function handlePointerDown(e) {
-    const { points } = stateRef.current;
-    if (!points) return;
+    const st = stateRef.current;
+    if (!st.points) return;
+    st.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (st.activePointers.size === 2) {
+      st.dragging = null;
+      const ids = Array.from(st.activePointers.keys());
+      const p1 = st.activePointers.get(ids[0]);
+      const p2 = st.activePointers.get(ids[1]);
+      const r1 = rawCanvasPoint(p1.x, p1.y);
+      const r2 = rawCanvasPoint(p2.x, p2.y);
+      st.pinch = {
+        ids,
+        startDist: Math.max(1, distPt(r1, r2)),
+        startMid: { x: (r1.x + r2.x) / 2, y: (r1.y + r2.y) / 2 },
+        startZoom: { ...st.zoom },
+      };
+      draw();
+      e.preventDefault();
+      return;
+    }
+    if (st.activePointers.size > 2) { e.preventDefault(); return; }
+
     const p = canvasPoint(e);
-    const r = handleRadius();
+    const r = handleRadius() / st.zoom.scale;
     let closest = -1, closestDist = Infinity;
-    points.forEach((pt, i) => {
+    st.points.forEach((pt, i) => {
       const d = distPt(p, pt);
       if (d < r && d < closestDist) { closest = i; closestDist = d; }
     });
     if (closest !== -1) {
-      stateRef.current.dragging = closest;
+      st.dragging = closest;
       draw();
     }
     e.preventDefault();
@@ -14119,14 +14257,43 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
 
   function handlePointerMove(e) {
     const st = stateRef.current;
+    if (!st.activePointers.has(e.pointerId)) return;
+    st.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (st.pinch) {
+      const canvas = canvasRef.current;
+      const [id1, id2] = st.pinch.ids;
+      const p1 = st.activePointers.get(id1);
+      const p2 = st.activePointers.get(id2);
+      if (!p1 || !p2) return;
+      const r1 = rawCanvasPoint(p1.x, p1.y);
+      const r2 = rawCanvasPoint(p2.x, p2.y);
+      const dist = Math.max(1, distPt(r1, r2));
+      const mid = { x: (r1.x + r2.x) / 2, y: (r1.y + r2.y) / 2 };
+      const newScale = Math.max(1, Math.min(MAX_ZOOM, st.pinch.startZoom.scale * (dist / st.pinch.startDist)));
+      const anchor = {
+        x: (st.pinch.startMid.x - st.pinch.startZoom.tx) / st.pinch.startZoom.scale,
+        y: (st.pinch.startMid.y - st.pinch.startZoom.ty) / st.pinch.startZoom.scale,
+      };
+      st.zoom = clampZoom({ scale: newScale, tx: mid.x - anchor.x * newScale, ty: mid.y - anchor.y * newScale }, canvas);
+      draw();
+      e.preventDefault();
+      return;
+    }
+
     if (typeof st.dragging !== "number") return;
     st.points[st.dragging] = canvasPoint(e);
     draw();
     e.preventDefault();
   }
 
-  function handlePointerUp() {
+  function handlePointerUp(e) {
     const st = stateRef.current;
+    st.activePointers.delete(e.pointerId);
+    if (st.pinch) {
+      if (st.activePointers.size < 2) st.pinch = null;
+      return;
+    }
     if (typeof st.dragging !== "number") return;
     st.dragging = null;
     draw();
@@ -14151,6 +14318,7 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         />
       </div>
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
