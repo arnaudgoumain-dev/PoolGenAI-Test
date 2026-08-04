@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.105.1";
+const APP_VERSION = "1.106.1";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 // v1.95.0 — Plafond de bassins actifs pour un compte Premium (contrôle
 // client ; la vraie limite est imposée par firestore.rules côté serveur).
@@ -361,6 +361,10 @@ const TRANSLATIONS = {
     strip_guided_add_model_error_prefix: "Erreur lors de l'envoi : ",
     strip_guided_add_model_missing_tube: "Ajoute une photo du tube entier avant d'envoyer.",
     strip_guided_add_model_missing_scale: "Ajoute au moins une photo d'échelle avant d'envoyer.",
+    strip_guided_scan_barcode_btn: "Scanner le code-barres",
+    strip_guided_barcode_scanning: "Analyse du code-barres…",
+    strip_guided_barcode_not_detected: "Code-barres non détecté. Réessaie avec une photo plus nette, ou choisis dans la liste.",
+    strip_guided_or_separator: "— ou —",
     strip_guided_checking_orientation: "Vérification du sens…",
     strip_guided_positioning: "Positionnement des tampons…",
     strip_guided_save_error_prefix: "Échec de l'enregistrement : ",
@@ -515,6 +519,8 @@ const TRANSLATIONS = {
     continue_google: "Continuer avec Google",
     or: "ou",
     password: "Mot de passe",
+    show_password: "Afficher le mot de passe",
+    hide_password: "Masquer le mot de passe",
     no_account: "Pas encore de compte ? S'inscrire",
     already_account: "Déjà un compte ? Se connecter",
     forgot_password: "Mot de passe oublié ?",
@@ -1137,6 +1143,10 @@ const TRANSLATIONS = {
     strip_guided_add_model_error_prefix: "Error while sending: ",
     strip_guided_add_model_missing_tube: "Add a photo of the whole tube before sending.",
     strip_guided_add_model_missing_scale: "Add at least one scale photo before sending.",
+    strip_guided_scan_barcode_btn: "Scan the barcode",
+    strip_guided_barcode_scanning: "Scanning barcode…",
+    strip_guided_barcode_not_detected: "Barcode not detected. Try a sharper photo, or pick from the list.",
+    strip_guided_or_separator: "— or —",
     strip_guided_checking_orientation: "Checking direction…",
     strip_guided_positioning: "Positioning pads…",
     strip_guided_save_error_prefix: "Save failed: ",
@@ -1286,6 +1296,8 @@ const TRANSLATIONS = {
     continue_google: "Continue with Google",
     or: "or",
     password: "Password",
+    show_password: "Show password",
+    hide_password: "Hide password",
     no_account: "No account? Sign up",
     already_account: "Already have an account? Sign in",
     forgot_password: "Forgot password?",
@@ -1904,6 +1916,10 @@ const TRANSLATIONS = {
     strip_guided_add_model_error_prefix: "Fehler beim Senden: ",
     strip_guided_add_model_missing_tube: "Füge ein Foto der ganzen Dose hinzu, bevor du sendest.",
     strip_guided_add_model_missing_scale: "Füge mindestens ein Foto einer Skala hinzu, bevor du sendest.",
+    strip_guided_scan_barcode_btn: "Barcode scannen",
+    strip_guided_barcode_scanning: "Barcode wird analysiert…",
+    strip_guided_barcode_not_detected: "Barcode nicht erkannt. Versuch es mit einem schärferen Foto oder wähle aus der Liste.",
+    strip_guided_or_separator: "— oder —",
     strip_guided_checking_orientation: "Richtung wird geprüft…",
     strip_guided_positioning: "Tupfer werden positioniert…",
     strip_guided_save_error_prefix: "Speichern fehlgeschlagen: ",
@@ -2056,6 +2072,8 @@ const TRANSLATIONS = {
     continue_google: "Mit Google fortfahren",
     or: "oder",
     password: "Passwort",
+    show_password: "Passwort anzeigen",
+    hide_password: "Passwort verbergen",
     no_account: "Kein Konto? Registrieren",
     already_account: "Bereits ein Konto? Anmelden",
     forgot_password: "Passwort vergessen?",
@@ -2673,6 +2691,10 @@ const TRANSLATIONS = {
     strip_guided_add_model_error_prefix: "Errore durante l'invio: ",
     strip_guided_add_model_missing_tube: "Aggiungi una foto del tubo intero prima di inviare.",
     strip_guided_add_model_missing_scale: "Aggiungi almeno una foto di una scala prima di inviare.",
+    strip_guided_scan_barcode_btn: "Scansiona il codice a barre",
+    strip_guided_barcode_scanning: "Analisi del codice a barre…",
+    strip_guided_barcode_not_detected: "Codice a barre non rilevato. Riprova con una foto più nitida, oppure scegli dalla lista.",
+    strip_guided_or_separator: "— oppure —",
     strip_guided_checking_orientation: "Verifica del verso…",
     strip_guided_positioning: "Posizionamento dei tamponi…",
     strip_guided_save_error_prefix: "Salvataggio fallito: ",
@@ -2822,6 +2844,8 @@ const TRANSLATIONS = {
     continue_google: "Continua con Google",
     or: "o",
     password: "Password",
+    show_password: "Mostra password",
+    hide_password: "Nascondi password",
     no_account: "Nessun account? Registrati",
     already_account: "Hai già un account? Accedi",
     forgot_password: "Password dimenticata?",
@@ -3439,6 +3463,10 @@ const TRANSLATIONS = {
     strip_guided_add_model_error_prefix: "Error al enviar: ",
     strip_guided_add_model_missing_tube: "Añade una foto del tubo entero antes de enviar.",
     strip_guided_add_model_missing_scale: "Añade al menos una foto de escala antes de enviar.",
+    strip_guided_scan_barcode_btn: "Escanear el código de barras",
+    strip_guided_barcode_scanning: "Analizando el código de barras…",
+    strip_guided_barcode_not_detected: "Código de barras no detectado. Prueba con una foto más nítida, o elige de la lista.",
+    strip_guided_or_separator: "— o —",
     strip_guided_checking_orientation: "Comprobando el sentido…",
     strip_guided_positioning: "Posicionando los tampones…",
     strip_guided_save_error_prefix: "Error al guardar: ",
@@ -3588,6 +3616,8 @@ const TRANSLATIONS = {
     continue_google: "Continuar con Google",
     or: "o",
     password: "Contraseña",
+    show_password: "Mostrar contraseña",
+    hide_password: "Ocultar contraseña",
     no_account: "¿Sin cuenta? Regístrate",
     already_account: "¿Ya tienes cuenta? Inicia sesión",
     forgot_password: "¿Olvidaste tu contraseña?",
@@ -4205,6 +4235,10 @@ const TRANSLATIONS = {
     strip_guided_add_model_error_prefix: "Erro ao enviar: ",
     strip_guided_add_model_missing_tube: "Adiciona uma foto do tubo inteiro antes de enviar.",
     strip_guided_add_model_missing_scale: "Adiciona pelo menos uma foto de escala antes de enviar.",
+    strip_guided_scan_barcode_btn: "Escanear o código de barras",
+    strip_guided_barcode_scanning: "A analisar o código de barras…",
+    strip_guided_barcode_not_detected: "Código de barras não detetado. Tenta com uma foto mais nítida, ou escolhe da lista.",
+    strip_guided_or_separator: "— ou —",
     strip_guided_checking_orientation: "Verificando o sentido…",
     strip_guided_positioning: "Posicionando os tampões…",
     strip_guided_save_error_prefix: "Falha ao salvar: ",
@@ -4351,6 +4385,8 @@ const TRANSLATIONS = {
     continue_google: "Continuar com Google",
     or: "ou",
     password: "Senha",
+    show_password: "Mostrar senha",
+    hide_password: "Ocultar senha",
     no_account: "Sem conta? Cadastre-se",
     already_account: "Já tem conta? Entrar",
     forgot_password: "Esqueceu a senha?",
@@ -7369,6 +7405,7 @@ function LoginScreen({ lang, onSkip, onConsentChange, detectedLang }) {
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [pwd2, setPwd2] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
@@ -7672,12 +7709,22 @@ By creating an account, the user acknowledges having read this document in full 
             {mode !== "reset" && (
               <>
                 <FieldLabel required style={{ fontSize: 12, fontWeight: 600, color: "var(--brand-text-secondary)", display: "block", marginBottom: 4 }}>{t("password")}</FieldLabel>
-                <input
-                  type="password" value={pwd} onChange={e => setPwd(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", fontSize: 14, marginBottom: 10, boxSizing: "border-box" }}
-                  placeholder={mode === "signup" ? t("pwd_min6") : "••••••••"}
-                  onKeyDown={e => e.key === "Enter" && mode === "login" && handleSubmit()}
-                />
+                <div style={{ position: "relative", marginBottom: 10 }}>
+                  <input
+                    type={showPwd ? "text" : "password"} value={pwd} onChange={e => setPwd(e.target.value)}
+                    style={{ width: "100%", padding: "11px 44px 11px 14px", borderRadius: 10, border: "1.5px solid #d0e4f5", fontSize: 14, boxSizing: "border-box" }}
+                    placeholder={mode === "signup" ? t("pwd_min6") : "••••••••"}
+                    onKeyDown={e => e.key === "Enter" && mode === "login" && handleSubmit()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPwd(v => !v)}
+                    aria-label={showPwd ? t("hide_password") : t("show_password")}
+                    style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", padding: 4, display: "flex", color: "var(--brand-text-secondary)" }}
+                  >
+                    {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </>
             )}
 
@@ -14193,9 +14240,12 @@ function stripModelLabel(m) {
 // manuelle ultérieure de la fiche stripModels par Arnaud — pas de
 // parsing/création automatique ici (reste pour plus tard, cf. spec
 // bandelettes).
-function AddStripModelModal({ onClose, onSubmitted, lang }) {
+function AddStripModelModal({ onClose, onSubmitted, lang, initialBarcodePhoto }) {
   const t = useT(lang || "fr");
-  const [barcodePhoto, setBarcodePhoto] = useState(null);
+  // v1.106.0 — Pré-rempli quand on arrive ici depuis un scan de code-barres
+  // sans correspondance (voir GuidedStripFlow.handleBarcodeScan) : la photo
+  // déjà prise sert directement de photo "barcode", pas besoin de la refaire.
+  const [barcodePhoto, setBarcodePhoto] = useState(initialBarcodePhoto || null);
   const [tubePhoto, setTubePhoto] = useState(null);
   const [scalePhotos, setScalePhotos] = useState([]);
   const [sending, setSending] = useState(false);
@@ -14395,8 +14445,18 @@ function GuidedStripFlow({ onClose, onComplete, lang }) {
   // v1.105.0 — "Ajouter un modèle non référencé" : bascule vers
   // AddStripModelModal plutôt que le picker/la capture habituels.
   const [showAddModel, setShowAddModel] = useState(false);
+  // v1.106.0 — Scan code-barres (voir handleBarcodeScan) : décodage local
+  // (ZXing, voir decodeBarcodeFromDataUrl) d'une photo du code-barres,
+  // rapproché du champ "code_barre" des fiches connues. Pas de correspondance
+  // → bascule sur AddStripModelModal en pré-remplissant la photo déjà prise
+  // comme photo "barcode" (voir barcodePhotoForNewModel), pour éviter de la
+  // reprendre.
+  const [scanningBarcode, setScanningBarcode] = useState(false);
+  const [barcodeScanError, setBarcodeScanError] = useState(null);
+  const [barcodePhotoForNewModel, setBarcodePhotoForNewModel] = useState(null);
   const cameraInputRef = useRef(null);
   const galleryInputRef = useRef(null);
+  const barcodeScanInputRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -14422,6 +14482,41 @@ function GuidedStripFlow({ onClose, onComplete, lang }) {
     reader.onload = (ev) => { setPhotoDataUrl(ev.target.result); setMarkResult(null); setManualPlacement(false); setManualPlacementIsCorrection(false); setPadPreviewConfirmed(false); setPadPositions(null); };
     reader.readAsDataURL(file);
     e.target.value = "";
+  }
+
+  // v1.106.0 — Photo du code-barres → décodage local (ZXing) → rapprochement
+  // avec le champ "code_barre" des fiches connues (même mécanisme que pour
+  // les fiches produit, voir decodeBarcodeFromDataUrl). Correspondance
+  // trouvée : sélectionne directement le modèle (repli sur le picker
+  // classique sinon possible via "Changer"). Pas de correspondance : bascule
+  // sur "Ajouter un modèle non référencé" avec la photo déjà prise comme
+  // photo "barcode" — décision explicite d'Arnaud, pas de refaire scanner.
+  async function handleBarcodeScan(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    setBarcodeScanError(null);
+    setScanningBarcode(true);
+    try {
+      const dataUrl = await compressImageDataUrl(await fileToDataUrl(file));
+      const decoded = await decodeBarcodeFromDataUrl(dataUrl);
+      if (!decoded) {
+        setBarcodeScanError(t("strip_guided_barcode_not_detected"));
+        return;
+      }
+      const match = (knownModels || []).find((m) => m.code_barre && m.code_barre === decoded);
+      if (match) {
+        setSelectedModelId(match.modele_id);
+        setModelSearchText(stripModelLabel(match));
+      } else {
+        setBarcodePhotoForNewModel(dataUrl);
+        setShowAddModel(true);
+      }
+    } catch (e) {
+      setBarcodeScanError(t("strip_guided_barcode_not_detected"));
+    } finally {
+      setScanningBarcode(false);
+    }
   }
 
   async function handleMarkConfirm(r) {
@@ -14600,8 +14695,9 @@ function GuidedStripFlow({ onClose, onComplete, lang }) {
         {showAddModel && (
           <AddStripModelModal
             lang={lang}
-            onClose={() => setShowAddModel(false)}
-            onSubmitted={() => setShowAddModel(false)}
+            initialBarcodePhoto={barcodePhotoForNewModel}
+            onClose={() => { setShowAddModel(false); setBarcodePhotoForNewModel(null); }}
+            onSubmitted={() => { setShowAddModel(false); setBarcodePhotoForNewModel(null); }}
           />
         )}
 
@@ -14609,6 +14705,21 @@ function GuidedStripFlow({ onClose, onComplete, lang }) {
           <div>
             <div style={{ fontSize: 13, marginBottom: 10, color: "var(--brand-text-strong)" }}>
               {t("strip_guided_pick_model")}
+            </div>
+            <button
+              type="button"
+              onClick={() => barcodeScanInputRef.current && barcodeScanInputRef.current.click()}
+              disabled={scanningBarcode}
+              style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: scanningBarcode ? "default" : "pointer", fontSize: 13, marginBottom: 8 }}
+            >
+              📷 {scanningBarcode ? t("strip_guided_barcode_scanning") : t("strip_guided_scan_barcode_btn")}
+            </button>
+            <input ref={barcodeScanInputRef} type="file" accept="image/*" capture="environment" onChange={handleBarcodeScan} style={{ display: "none" }} />
+            {barcodeScanError && (
+              <div style={{ fontSize: 12.5, color: "#c0392b", marginBottom: 8 }}>{barcodeScanError}</div>
+            )}
+            <div style={{ fontSize: 11.5, color: "#999", textAlign: "center", margin: "4px 0 10px" }}>
+              {t("strip_guided_or_separator")}
             </div>
             {/* v1.102.0 — Autocomplétion (datalist native) à la place du menu
                 déroulant brut : suggestions filtrées au fur et à mesure de la
@@ -14654,8 +14765,20 @@ function GuidedStripFlow({ onClose, onComplete, lang }) {
             {t("strip_guided_no_models")}
             <button
               type="button"
+              onClick={() => barcodeScanInputRef.current && barcodeScanInputRef.current.click()}
+              disabled={scanningBarcode}
+              style={{ width: "100%", marginTop: 10, padding: 10, borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: scanningBarcode ? "default" : "pointer", fontSize: 13 }}
+            >
+              📷 {scanningBarcode ? t("strip_guided_barcode_scanning") : t("strip_guided_scan_barcode_btn")}
+            </button>
+            <input ref={barcodeScanInputRef} type="file" accept="image/*" capture="environment" onChange={handleBarcodeScan} style={{ display: "none" }} />
+            {barcodeScanError && (
+              <div style={{ fontSize: 12.5, color: "#c0392b", marginTop: 8 }}>{barcodeScanError}</div>
+            )}
+            <button
+              type="button"
               onClick={() => setShowAddModel(true)}
-              style={{ width: "100%", marginTop: 10, padding: 10, borderRadius: 8, border: "1px dashed #999", background: "#fff", cursor: "pointer", fontSize: 13 }}
+              style={{ width: "100%", marginTop: 8, padding: 10, borderRadius: 8, border: "1px dashed #999", background: "#fff", cursor: "pointer", fontSize: 13 }}
             >
               ➕ {t("strip_guided_add_model_btn")}
             </button>
