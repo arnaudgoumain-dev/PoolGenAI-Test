@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.106.1";
+const APP_VERSION = "1.107.0";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 // v1.95.0 — Plafond de bassins actifs pour un compte Premium (contrôle
 // client ; la vraie limite est imposée par firestore.rules côté serveur).
@@ -13498,12 +13498,12 @@ function MeasureRow({ measure, onDelete, onEdit, onValidateApplication, applicat
 // bloc canvas dans les deux composants.
 function distPt(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 
-function drawStripHandle(ctx, pt, color) {
+function drawStripHandle(ctx, pt, color, scale = 1) {
   ctx.beginPath();
   ctx.arc(pt.x, pt.y, 9, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2 / scale;
   ctx.strokeStyle = "#0d1214";
   ctx.stroke();
 }
@@ -13552,9 +13552,21 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
   const t = useT(lang || "fr");
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
-  const stateRef = useRef({ startPt: null, endPt: null, dragging: null });
+  const stateRef = useRef({
+    startPt: null, endPt: null, dragging: null,
+    // v1.106.2 — Zoom pincé à 2 doigts (voir handlePointerDown/Move) : scale/
+    // translate appliqués comme transform canvas globale au rendu, indépendant
+    // du marquage (mêmes startPt/endPt en espace "image", jamais en espace
+    // écran — le pincement ne fait que changer comment cet espace est projeté
+    // à l'écran). activePointers/pinch tenus en ref, pas de re-render React
+    // par frame de geste.
+    zoom: { scale: 1, tx: 0, ty: 0 },
+    activePointers: new Map(),
+    pinch: null,
+  });
   const [hasTrace, setHasTrace] = useState(false);
   const HANDLE_R = 32; // px canvas — zone de reprise élargie, identique départ/arrivée
+  const MAX_ZOOM = 4;
 
   useEffect(() => {
     const img = new Image();
@@ -13566,21 +13578,50 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
       const scale = Math.min(1, maxDisplay / img.naturalWidth);
       canvas.width = Math.round(img.naturalWidth * scale);
       canvas.height = Math.round(img.naturalHeight * scale);
-      stateRef.current = { startPt: null, endPt: null, dragging: null };
+      stateRef.current = {
+        startPt: null, endPt: null, dragging: null,
+        zoom: { scale: 1, tx: 0, ty: 0 },
+        activePointers: new Map(),
+        pinch: null,
+      };
       setHasTrace(false);
       draw();
     };
     img.src = photoDataUrl;
   }, [photoDataUrl]);
 
-  function canvasPoint(e) {
+  // Coordonnée "brute" : résolution canvas, AVANT inversion du zoom pincé —
+  // c'est l'espace dans lequel se fait la géométrie du pincement lui-même
+  // (distance/milieu entre les 2 doigts).
+  function rawCanvasPoint(clientX, clientY) {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     return {
-      x: Math.max(0, Math.min(canvas.width, (e.clientX - rect.left) * scaleX)),
-      y: Math.max(0, Math.min(canvas.height, (e.clientY - rect.top) * scaleY)),
+      x: Math.max(0, Math.min(canvas.width, (clientX - rect.left) * scaleX)),
+      y: Math.max(0, Math.min(canvas.height, (clientY - rect.top) * scaleY)),
+    };
+  }
+
+  // Coordonnée en espace "image" (après inversion du zoom pincé) — celle
+  // qu'utilise toute la logique de marquage (startPt/endPt), inchangée par le
+  // zoom : un repère posé zoomé reste au même endroit une fois dézoomé.
+  function canvasPoint(e) {
+    const raw = rawCanvasPoint(e.clientX, e.clientY);
+    const { scale, tx, ty } = stateRef.current.zoom;
+    return { x: (raw.x - tx) / scale, y: (raw.y - ty) / scale };
+  }
+
+  // Empêche de pincer/glisser la photo hors du cadre visible.
+  function clampZoom(zoom, canvas) {
+    const { scale } = zoom;
+    const minTx = canvas.width * (1 - scale);
+    const minTy = canvas.height * (1 - scale);
+    return {
+      scale,
+      tx: Math.min(0, Math.max(minTx, zoom.tx)),
+      ty: Math.min(0, Math.max(minTy, zoom.ty)),
     };
   }
 
@@ -13589,39 +13630,71 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
     const img = imgRef.current;
     if (!canvas || !img) return;
     const ctx = canvas.getContext("2d");
-    const { startPt, endPt, dragging } = stateRef.current;
+    const { startPt, endPt, dragging, zoom } = stateRef.current;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(zoom.scale, 0, 0, zoom.scale, zoom.tx, zoom.ty);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     if (startPt && endPt) {
       ctx.strokeStyle = "#3ddbd9";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 5]);
+      ctx.lineWidth = 2 / zoom.scale;
+      ctx.setLineDash([6 / zoom.scale, 5 / zoom.scale]);
       ctx.beginPath();
       ctx.moveTo(startPt.x, startPt.y);
       ctx.lineTo(endPt.x, endPt.y);
       ctx.stroke();
       ctx.setLineDash([]);
     }
-    if (startPt) drawStripHandle(ctx, startPt, "#4ade80");
-    if (endPt) drawStripHandle(ctx, endPt, "#f87171");
+    if (startPt) drawStripHandle(ctx, startPt, "#4ade80", zoom.scale);
+    if (endPt) drawStripHandle(ctx, endPt, "#f87171", zoom.scale);
+    // Loupe dessinée HORS transform (taille écran fixe, indépendante du zoom
+    // pincé) — voir drawStripMagnifier, qui attend un point en espace écran.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (dragging === "start" || dragging === "end") {
       const activePt = dragging === "start" ? startPt : endPt;
-      const activeColor = dragging === "start" ? "#4ade80" : "#f87171";
-      if (activePt) drawStripMagnifier(ctx, canvas, img, activePt, activeColor);
+      if (activePt) {
+        const screenPt = { x: activePt.x * zoom.scale + zoom.tx, y: activePt.y * zoom.scale + zoom.ty };
+        const activeColor = dragging === "start" ? "#4ade80" : "#f87171";
+        drawStripMagnifier(ctx, canvas, img, screenPt, activeColor);
+      }
     }
   }
 
   function handlePointerDown(e) {
     if (!imgRef.current) return;
-    const p = canvasPoint(e);
     const st = stateRef.current;
+    st.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (st.activePointers.size === 2) {
+      // 2 doigts = démarrage d'un pincement, jamais un marquage — annule une
+      // éventuelle reprise de repère en cours avec le 1er doigt.
+      st.dragging = null;
+      const ids = Array.from(st.activePointers.keys());
+      const p1 = st.activePointers.get(ids[0]);
+      const p2 = st.activePointers.get(ids[1]);
+      const r1 = rawCanvasPoint(p1.x, p1.y);
+      const r2 = rawCanvasPoint(p2.x, p2.y);
+      st.pinch = {
+        ids,
+        startDist: Math.max(1, distPt(r1, r2)),
+        startMid: { x: (r1.x + r2.x) / 2, y: (r1.y + r2.y) / 2 },
+        startZoom: { ...st.zoom },
+      };
+      draw();
+      e.preventDefault();
+      return;
+    }
+    if (st.activePointers.size > 2) { e.preventDefault(); return; }
+
+    const p = canvasPoint(e);
     if (st.startPt && st.endPt) {
       // Un tracé existe déjà : seule la reprise d'une poignée fait quelque
       // chose. Taper ailleurs sur la photo ne déclenche rien — repartir de
       // zéro passe uniquement par le bouton "Recommencer".
-      if (distPt(p, st.startPt) < HANDLE_R) {
+      if (distPt(p, st.startPt) < HANDLE_R / st.zoom.scale) {
         st.dragging = "start";
         draw();
-      } else if (distPt(p, st.endPt) < HANDLE_R) {
+      } else if (distPt(p, st.endPt) < HANDLE_R / st.zoom.scale) {
         st.dragging = "end";
         draw();
       }
@@ -13639,6 +13712,33 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
 
   function handlePointerMove(e) {
     const st = stateRef.current;
+    if (!st.activePointers.has(e.pointerId)) return;
+    st.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (st.pinch) {
+      const canvas = canvasRef.current;
+      const [id1, id2] = st.pinch.ids;
+      const p1 = st.activePointers.get(id1);
+      const p2 = st.activePointers.get(id2);
+      if (!p1 || !p2) return;
+      const r1 = rawCanvasPoint(p1.x, p1.y);
+      const r2 = rawCanvasPoint(p2.x, p2.y);
+      const dist = Math.max(1, distPt(r1, r2));
+      const mid = { x: (r1.x + r2.x) / 2, y: (r1.y + r2.y) / 2 };
+      const newScale = Math.max(1, Math.min(MAX_ZOOM, st.pinch.startZoom.scale * (dist / st.pinch.startDist)));
+      // Ancre : le point image sous le milieu des 2 doigts au démarrage du
+      // pincement doit rester sous leur milieu courant (zoom "sous les
+      // doigts", pas depuis le coin de la photo).
+      const anchor = {
+        x: (st.pinch.startMid.x - st.pinch.startZoom.tx) / st.pinch.startZoom.scale,
+        y: (st.pinch.startMid.y - st.pinch.startZoom.ty) / st.pinch.startZoom.scale,
+      };
+      st.zoom = clampZoom({ scale: newScale, tx: mid.x - anchor.x * newScale, ty: mid.y - anchor.y * newScale }, canvas);
+      draw();
+      e.preventDefault();
+      return;
+    }
+
     if (!st.dragging) return;
     const p = canvasPoint(e);
     if (st.dragging === "start") st.startPt = p;
@@ -13647,8 +13747,13 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
     e.preventDefault();
   }
 
-  function handlePointerUp() {
+  function handlePointerUp(e) {
     const st = stateRef.current;
+    st.activePointers.delete(e.pointerId);
+    if (st.pinch) {
+      if (st.activePointers.size < 2) st.pinch = null;
+      return;
+    }
     if (!st.dragging) return;
     st.dragging = null;
     draw();
@@ -13656,7 +13761,13 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
   }
 
   function handleReset() {
-    stateRef.current = { startPt: null, endPt: null, dragging: null };
+    // Le zoom courant est une aide de visualisation, pas un état du tracé —
+    // on le garde (l'utilisateur reste zoomé sur la zone qui l'intéresse).
+    stateRef.current = {
+      ...stateRef.current,
+      startPt: null, endPt: null, dragging: null,
+      activePointers: new Map(), pinch: null,
+    };
     setHasTrace(false);
     draw();
   }
@@ -13683,6 +13794,7 @@ function StripMarker({ photoDataUrl, onConfirm, onCancel, lang }) {
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         />
       </div>
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
@@ -13802,7 +13914,7 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
     if (!points || points.length < 2) return 22;
     let minDist = Infinity;
     for (let i = 1; i < points.length; i++) minDist = Math.min(minDist, distPt(points[i], points[i - 1]));
-    return Math.max(14, Math.min(28, minDist * 0.5));
+    return Math.max(21, Math.min(42, minDist * 0.5));
   }
 
   function draw() {
@@ -13814,14 +13926,14 @@ function StripPadPreview({ photoDataUrl, padPositions, paramOrder, onConfirm, on
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     points.forEach((pt, i) => {
       ctx.beginPath();
-      ctx.arc(pt.x, pt.y, 11, 0, Math.PI * 2);
+      ctx.arc(pt.x, pt.y, 16.5, 0, Math.PI * 2);
       ctx.fillStyle = dragging === i ? "rgba(61,219,217,0.95)" : "rgba(255,255,255,0.92)";
       ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = "#0d1214";
       ctx.stroke();
       ctx.fillStyle = "#0d1214";
-      ctx.font = "bold 10px sans-serif";
+      ctx.font = "bold 15px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText((paramOrder && paramOrder[i]) || String(i + 1), pt.x, pt.y);
@@ -13959,7 +14071,7 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
     if (!points || points.length < 2) return 22;
     let minDist = Infinity;
     for (let i = 1; i < points.length; i++) minDist = Math.min(minDist, distPt(points[i], points[i - 1]));
-    return Math.max(14, Math.min(28, minDist * 0.5));
+    return Math.max(21, Math.min(42, minDist * 0.5));
   }
 
   function draw() {
@@ -13971,14 +14083,14 @@ function StripManualPadPlacement({ photoDataUrl, paramOrder, initialPositions, o
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     points.forEach((pt, i) => {
       ctx.beginPath();
-      ctx.arc(pt.x, pt.y, 11, 0, Math.PI * 2);
+      ctx.arc(pt.x, pt.y, 16.5, 0, Math.PI * 2);
       ctx.fillStyle = dragging === i ? "rgba(61,219,217,0.95)" : "rgba(255,255,255,0.92)";
       ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = "#0d1214";
       ctx.stroke();
       ctx.fillStyle = "#0d1214";
-      ctx.font = "bold 10px sans-serif";
+      ctx.font = "bold 15px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText((paramOrder && paramOrder[i]) || String(i + 1), pt.x, pt.y);
