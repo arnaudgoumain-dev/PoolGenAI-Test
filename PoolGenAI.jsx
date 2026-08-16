@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.108.0";
+const APP_VERSION = "1.108.2";
 const CGU_VERSION = "1.3"; // v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 // v1.95.0 — Plafond de bassins actifs pour un compte Premium (contrôle
 // client ; la vraie limite est imposée par firestore.rules côté serveur).
@@ -8285,7 +8285,7 @@ function PoolGenAIApp() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
         await paymentResponse.complete("fail").catch(() => {});
-        setCheckoutError(data.error || t("checkout_error"));
+        setCheckoutError(`${data.error || t("checkout_error")} [Play Billing]`);
         setCheckoutBusy(false);
         return;
       }
@@ -8297,7 +8297,7 @@ function PoolGenAIApp() {
       setCheckoutBusy(false);
     } catch (e) {
       console.error("Achat Play Billing échoué :", e);
-      setCheckoutError(t("checkout_error"));
+      setCheckoutError(`${t("checkout_error")} [Play Billing${e?.message ? " : " + e.message : ""}]`);
       setCheckoutBusy(false);
     }
   }
@@ -8323,14 +8323,14 @@ function PoolGenAIApp() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.url) {
-        setCheckoutError(data.error || t("checkout_error"));
+        setCheckoutError(`${data.error || t("checkout_error")} [Stripe]`);
         setCheckoutBusy(false);
         return;
       }
       window.location.href = data.url;
       // Pas de setCheckoutBusy(false) ici : la page quitte l'app.
     } catch (e) {
-      setCheckoutError(t("checkout_error"));
+      setCheckoutError(`${t("checkout_error")} [Stripe${e?.message ? " : " + e.message : ""}]`);
       setCheckoutBusy(false);
     }
   }
@@ -20961,7 +20961,15 @@ function ModalShell({ children, onClose, title, rightAction, forced, footer }) {
     <div style={styles.modalOverlay} onClick={forced ? undefined : onClose}>
       <div style={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
         <div style={styles.modalHeader}>
-          <span style={styles.modalTitle}>{title}</span>
+          <span style={styles.modalTitle}>
+            {title}
+            {/* v1.108.1 — Version visible sur chaque popup : un testeur qui
+                envoie une capture d'écran d'erreur permet de savoir quelle
+                version tournait, sans avoir à le lui redemander. */}
+            <span style={{ fontSize: 9, fontWeight: 600, color: "#b7c3cf", marginLeft: 6, verticalAlign: "middle" }}>
+              v{APP_VERSION}
+            </span>
+          </span>
           <div style={{ display: "flex", gap: 8 }}>
             {rightAction}
             {!forced && (
