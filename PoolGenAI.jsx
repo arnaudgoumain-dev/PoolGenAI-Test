@@ -9,7 +9,7 @@ const {
 } = LucideReact;
 
 // ---------- Constantes / cibles ----------
-const APP_VERSION = "1.183.0";
+const APP_VERSION = "1.184.1";
 const CGU_VERSION = "1.8"; // v1.8 : article « Crédits d'analyses IA supplémentaires » (pack de 50, sans date de validité, perte à la fin de l'abonnement, rétractation) et limite de 30 analyses par mois précisée dans l'article Premium — ré-acceptation requise ; v1.7 : texte complet réaligné (version gratuite et Premium payant : abonnement, renouvellement, résiliation ; 16 articles, 6 langues ; hébergement GitHub, Inc. / Google Cloud EMEA / Cloudflare) — ré-acceptation requise ; v1.6 : sections « Données de filtration enregistrées » (températures saisies, programmations, historique de l'air, configuration thermique, coefficient d'inertie) et « Bilan et estimations d'économies » (hypothèses, prix d'achat, estimations indicatives) ; v1.5 : section 6 complétée (altitude du bassin : IGN, Open Topo Data) ; v1.4 : section 6 « Météo et durée de filtration » (coordonnées approximatives transmises à MET Norway) ; v1.3 : clause 5 corrigée (clé API proxy, éditeur sous-traitant RGPD), article 12 - contribution photo base commune
 // v1.95.0 — Plafond de bassins actifs pour un compte Premium (contrôle
 // client ; la vraie limite est imposée par firestore.rules côté serveur).
@@ -778,6 +778,13 @@ const TRANSLATIONS = {
     credits_cancelled: "Achat annulé. Aucun paiement n'a été effectué.",
     credits_error: "Impossible de finaliser l'achat. Réessayez plus tard ou écrivez à support@poolgenai.com.",
     cgu_scroll_hint: "Faites défiler le texte jusqu'à la fin pour pouvoir accepter.",
+    plan_validated_by: "par {name}",
+    plan_conflict_title: "Étape déjà traitée",
+    plan_conflict_done: "{name} vient de valider cette étape ({time}). Votre saisie n'a pas été enregistrée et aucun produit n'a été décompté du stock.",
+    plan_conflict_skipped: "{name} vient de passer cette étape ({time}). Votre saisie n'a pas été enregistrée.",
+    plan_conflict_changed: "Le plan a été modifié par une autre personne. Vérifiez l'étape en cours avant d'appliquer un produit.",
+    plan_conflict_someone: "Une autre personne",
+    plan_conflict_ok: "Compris",
     reco_parts_summary_max: "En {n} applications (maximum {max} par ajout)",
     reco_parts_summary: "En {n} applications",
     reco_parts_locked: "Quantité et moment de chaque ajout : avec Premium",
@@ -1973,6 +1980,13 @@ const TRANSLATIONS = {
     credits_cancelled: "Purchase cancelled. No payment was made.",
     credits_error: "The purchase could not be completed. Try again later or write to support@poolgenai.com.",
     cgu_scroll_hint: "Scroll to the end of the text to be able to accept.",
+    plan_validated_by: "by {name}",
+    plan_conflict_title: "Step already handled",
+    plan_conflict_done: "{name} just validated this step ({time}). Your entry was not saved and no product was deducted from stock.",
+    plan_conflict_skipped: "{name} just skipped this step ({time}). Your entry was not saved.",
+    plan_conflict_changed: "The plan was changed by someone else. Check the current step before applying a product.",
+    plan_conflict_someone: "Someone else",
+    plan_conflict_ok: "Got it",
     reco_parts_summary_max: "In {n} applications (maximum {max} per addition)",
     reco_parts_summary: "In {n} applications",
     reco_parts_locked: "Amount and timing of each addition: with Premium",
@@ -3164,6 +3178,13 @@ const TRANSLATIONS = {
     credits_cancelled: "Kauf abgebrochen. Es wurde keine Zahlung vorgenommen.",
     credits_error: "Der Kauf konnte nicht abgeschlossen werden. Versuchen Sie es später erneut oder schreiben Sie an support@poolgenai.com.",
     cgu_scroll_hint: "Scrollen Sie bis zum Ende des Textes, um zustimmen zu können.",
+    plan_validated_by: "von {name}",
+    plan_conflict_title: "Schritt bereits bearbeitet",
+    plan_conflict_done: "{name} hat diesen Schritt gerade bestätigt ({time}). Ihre Eingabe wurde nicht gespeichert und es wurde kein Produkt vom Bestand abgezogen.",
+    plan_conflict_skipped: "{name} hat diesen Schritt gerade übersprungen ({time}). Ihre Eingabe wurde nicht gespeichert.",
+    plan_conflict_changed: "Der Plan wurde von jemand anderem geändert. Prüfen Sie den aktuellen Schritt, bevor Sie ein Produkt anwenden.",
+    plan_conflict_someone: "Eine andere Person",
+    plan_conflict_ok: "Verstanden",
     reco_parts_summary_max: "In {n} Anwendungen (maximal {max} pro Zugabe)",
     reco_parts_summary: "In {n} Anwendungen",
     reco_parts_locked: "Menge und Zeitpunkt jeder Zugabe: mit Premium",
@@ -4354,6 +4375,13 @@ const TRANSLATIONS = {
     credits_cancelled: "Acquisto annullato. Nessun pagamento effettuato.",
     credits_error: "Impossibile completare l'acquisto. Riprova più tardi o scrivi a support@poolgenai.com.",
     cgu_scroll_hint: "Scorri il testo fino alla fine per poter accettare.",
+    plan_validated_by: "da {name}",
+    plan_conflict_title: "Passaggio già gestito",
+    plan_conflict_done: "{name} ha appena convalidato questo passaggio ({time}). Il vostro inserimento non è stato salvato e nessun prodotto è stato scalato dalle scorte.",
+    plan_conflict_skipped: "{name} ha appena saltato questo passaggio ({time}). Il vostro inserimento non è stato salvato.",
+    plan_conflict_changed: "Il piano è stato modificato da un'altra persona. Controllate il passaggio corrente prima di applicare un prodotto.",
+    plan_conflict_someone: "Un'altra persona",
+    plan_conflict_ok: "Ho capito",
     reco_parts_summary_max: "In {n} applicazioni (massimo {max} per aggiunta)",
     reco_parts_summary: "In {n} applicazioni",
     reco_parts_locked: "Quantità e momento di ogni aggiunta: con Premium",
@@ -5544,6 +5572,13 @@ const TRANSLATIONS = {
     credits_cancelled: "Compra cancelada. No se ha realizado ningún pago.",
     credits_error: "No se pudo completar la compra. Inténtalo más tarde o escribe a support@poolgenai.com.",
     cgu_scroll_hint: "Desplázate hasta el final del texto para poder aceptar.",
+    plan_validated_by: "por {name}",
+    plan_conflict_title: "Paso ya tratado",
+    plan_conflict_done: "{name} acaba de validar este paso ({time}). Su entrada no se guardó y no se descontó ningún producto del stock.",
+    plan_conflict_skipped: "{name} acaba de omitir este paso ({time}). Su entrada no se guardó.",
+    plan_conflict_changed: "El plan fue modificado por otra persona. Compruebe el paso actual antes de aplicar un producto.",
+    plan_conflict_someone: "Otra persona",
+    plan_conflict_ok: "Entendido",
     reco_parts_summary_max: "En {n} aplicaciones (máximo {max} por adición)",
     reco_parts_summary: "En {n} aplicaciones",
     reco_parts_locked: "Cantidad y momento de cada adición: con Premium",
@@ -6734,6 +6769,13 @@ const TRANSLATIONS = {
     credits_cancelled: "Compra cancelada. Nenhum pagamento foi efetuado.",
     credits_error: "Não foi possível concluir a compra. Tente novamente mais tarde ou escreva para support@poolgenai.com.",
     cgu_scroll_hint: "Desloque o texto até ao fim para poder aceitar.",
+    plan_validated_by: "por {name}",
+    plan_conflict_title: "Passo já tratado",
+    plan_conflict_done: "{name} acabou de validar este passo ({time}). A sua entrada não foi guardada e nenhum produto foi descontado do stock.",
+    plan_conflict_skipped: "{name} acabou de saltar este passo ({time}). A sua entrada não foi guardada.",
+    plan_conflict_changed: "O plano foi alterado por outra pessoa. Verifique o passo atual antes de aplicar um produto.",
+    plan_conflict_someone: "Outra pessoa",
+    plan_conflict_ok: "Entendido",
     reco_parts_summary_max: "Em {n} aplicações (máximo {max} por adição)",
     reco_parts_summary: "Em {n} aplicações",
     reco_parts_locked: "Quantidade e momento de cada adição: com Premium",
@@ -10391,6 +10433,15 @@ const FB = {
     const snap = await window._fbGetDoc(window._fbDoc(window._fbDb, "users", uid, "config", "main"));
     return snap.exists() ? snap.data() : null;
   },
+  // v1.184.0 — Plan partagé : « première validation gagne ». Dans une transaction, relit l'étape du plan dans le cloud et ne l'écrit
+  // que si elle est encore en attente ; sinon renvoie le conflit (qui l'a validée, quand). N'écrit QUE l'étape concernée (le plan complet
+  // suit par la synchro habituelle). Aucune règle Firestore nouvelle : un invité peut déjà écrire activePlan de son propre bassin.
+  claimPlanStep: async (uid, poolId, measureId, stepIdx, title, patch) => {
+    if (!window._fbDb || !window._fbRunTransaction || !window._fbDoc) return { ok: true, unguarded: true };
+    const ref = window._fbDoc(window._fbDb, "users", uid, "config", "main");
+    const run = window._fbRunTransaction(window._fbDb, (tx) => planStepClaimTransaction(tx, ref, poolId, measureId, stepIdx, title, patch));
+    return Promise.race([run, new Promise((r) => setTimeout(() => r({ ok: true, unguarded: true, timeout: true }), 5000))]);
+  },
   // v1.70.0 — errCb optionnel : Firestore n'appelle jamais cb() en cas de
   // permission-denied (accès secondaire révoqué), l'écoute restait donc
   // bloquée en silence dans "context_loading" indéfiniment. errCb permet de
@@ -11679,6 +11730,36 @@ function PoolGenAIApp() {
   const activePlan = activePlanByPool[activePoolId] || null;
   function setActivePlan(value) {
     setActivePlanByPool((prev) => ({ ...prev, [activePoolId]: value }));
+  }
+  // v1.184.0 — Plan partagé : le propriétaire connaît ses invités actifs ; un invité (viewContext) est toujours en plan partagé. Seul un
+  // plan partagé enregistre l'auteur de chaque validation et passe par la transaction « première validation gagne » ; sans invité, le
+  // comportement reste exactement celui d'avant.
+  const [ownerGuests, setOwnerGuests] = useState([]);
+  const [planConflict, setPlanConflict] = useState(null);
+  useEffect(() => {
+    if (!authUser?.uid || viewContext || !FB.ready()) { setOwnerGuests([]); return undefined; }
+    return FB.onSecondaryUsers(authUser.uid, setOwnerGuests);
+  }, [authUser?.uid, !!viewContext]);
+  const planShared = !!viewContext || ownerGuests.some((g) => g.status === "active" && g.poolId === activePoolId);
+  function sharedActor() {
+    if (!planShared || !authUser?.uid) return null;
+    return { appliedBy: authUser.uid, appliedByName: String(myPseudo || (authUser.email || "").split("@")[0] || "").slice(0, 40) };
+  }
+  // Renvoie true si l'étape peut être traitée ; false (et affiche l'information) si une autre personne l'a traitée avant.
+  async function claimSharedStep(stepIdx, patch) {
+    if (!planShared || !activePlan || !dataUid || !FB.ready()) return true;
+    try {
+      const res = await FB.claimPlanStep(dataUid, activePoolId, activePlan.measureId, stepIdx, activePlan.steps[stepIdx] && activePlan.steps[stepIdx].title, patch);
+      if (res && res.conflict) {
+        setPlanConflict(res);
+        if (res.plan && Array.isArray(res.plan.steps)) {
+          const idx = res.plan.steps.findIndex((st) => !(st.skipped || st.appliedAt));
+          setActivePlan({ ...res.plan, currentStepIdx: idx >= 0 ? idx : res.plan.currentStepIdx });
+        }
+        return false;
+      }
+    } catch (e) { /* hors ligne ou refus : on continue comme avant */ }
+    return true;
   }
   // v1.146.3 — Plans déjà en cours dont une étape a été passée avant ce
   // correctif : l'horaire de la suite est recalé (voir rescheduleAfterSkips).
@@ -13233,6 +13314,8 @@ function PoolGenAIApp() {
       doseUnit: s.doseUnit,
       appliedAt: s.appliedAt, skipped: s.skipped, scheduledAt: s.scheduledAt,
       mode: s.mode, doseText: s.doseText,
+      // v1.184.0 — Plan partagé : auteur de la validation.
+      ...(s.appliedBy ? { appliedBy: s.appliedBy, appliedByName: s.appliedByName || "" } : {}),
       // v1.124.0 — Conserve le marquage des étapes de complément (voir
       // applyWizardStep) dans l'application enregistrée, pour que la carte
       // "Complément" du plan reste correctement associée à son étape mère.
@@ -13404,10 +13487,19 @@ function PoolGenAIApp() {
   }
 
   // Valide une étape du wizard — version sans appel de setter dans setter
-  function applyWizardStep(stepIdx, amount, appliedAt, productName, wantsSplit) {
+  async function applyWizardStep(stepIdx, amount, appliedAt, productName, wantsSplit) {
     if (!activePlan) return;
     const now = appliedAt || new Date().toISOString();
     const origStep = activePlan.steps[stepIdx];
+    // v1.184.0 — Plan partagé : auteur de la validation + première validation gagne (avant tout effet : stock, historique, plan).
+    const actor = sharedActor();
+    if (actor) {
+      const claimed = await claimSharedStep(stepIdx, {
+        appliedAt: now, appliedAmount: amount, skipped: false, ...actor,
+        ...(productName && productName !== origStep.productName ? { appliedProductName: productName } : {}),
+      });
+      if (!claimed) return;
+    }
 
     // v1.113.0 — Application partielle : certains produits imposent une dose
     // maximale par prise (ex. pH- liquide concentré : 500 mL max en une fois
@@ -13469,7 +13561,7 @@ function PoolGenAIApp() {
     }
     const needsSplit = !doSubstitute && laterRun.length === 0 && rawRemainder > epsilon && !!wantsSplit;
 
-    const newSteps = doSubstitute
+    const newStepsBase = doSubstitute
       ? buildSubstitutionSteps(activePlan.steps, stepIdx, amount, now, subCtx, activePool?.volume || 0, tFn)
       : activePlan.steps.map((s, i) => {
       if (i !== stepIdx) return s;
@@ -13490,6 +13582,7 @@ function PoolGenAIApp() {
         } : {}),
       };
     });
+    const newSteps = actor ? newStepsBase.map((st, i) => (i === stepIdx ? { ...st, ...actor } : st)) : newStepsBase;
 
     let stepsWithSplit = newSteps;
     if (laterRun.length > 0) {
@@ -13714,10 +13807,13 @@ function PoolGenAIApp() {
   }
 
   // Passe une étape
-  function skipWizardStep(stepIdx) {
+  async function skipWizardStep(stepIdx) {
     if (!activePlan) return;
+    const skipAt = new Date().toISOString();
+    const actor = sharedActor();
+    if (actor && !(await claimSharedStep(stepIdx, { skipped: true, appliedAt: skipAt, ...actor }))) return;
     let newSteps = activePlan.steps.map((s, i) =>
-      i === stepIdx ? { ...s, skipped: true, appliedAt: new Date().toISOString() } : s
+      i === stepIdx ? { ...s, skipped: true, appliedAt: skipAt, ...(actor || {}) } : s
     );
     // v1.146.2/3 — Une étape passée n'a rien changé à l'eau : le délai avant la
     // suite ne court que depuis la dernière étape RÉELLEMENT appliquée.
@@ -14154,6 +14250,7 @@ function PoolGenAIApp() {
             onOpenManualApply={() => setShowManualApply(true)}
             authUid={dataUid}
             airDaily={activePool?.airDaily}
+            meUid={authUser?.uid}
           />
         )}
         {tab === "filtration" && activePool && (
@@ -15059,6 +15156,8 @@ function PoolGenAIApp() {
           onWantAddProduct={() => { setShowWizard(false); setTab("products"); }}
         />
       )}
+
+      {planConflict && <PlanConflictModal conflict={planConflict} lang={lang} onClose={() => setPlanConflict(null)} />}
 
       {showManualApply && (
         <ManualApplyModal
@@ -18335,7 +18434,7 @@ function ProductPriceSection({ prix, onChange, defaultSize, defaultUnit, lang })
   );
 }
 
-function Dashboard({ latest, recentApplications, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang, activePlan, onResumePlan, onResumePlanForMeasure, onOpenManualApply, authUid, airDaily }) {
+function Dashboard({ latest, recentApplications, volume, products, manageStock, onAddMeasure, onEditMeasure, onValidateApplication, applicationForLatest, blockedByLimit, isPremium, onWantPremium, apiKey, apiProvider, recentMeasures, effectiveTargets, activeParamKeys, lang, activePlan, onResumePlan, onResumePlanForMeasure, onOpenManualApply, authUid, airDaily, meUid }) {
   const t = useT(lang);
   const [aiComment, setAiComment] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -18597,6 +18696,7 @@ Réponds directement en français, sans titre ni introduction.`;
                     parts={buildCardParts(g.main, g.extras, groups[i]?.main || null, groups[i]?.complements || [])}
                     isPremium={isPremium}
                     onWantPremium={onWantPremium}
+                    meUid={meUid}
                   />
                   {(groups[i]?.subs || []).map((sub, k) => {
                     const sr = substituteReco(g.main, sub.main, sub.complements, products);
@@ -18612,6 +18712,7 @@ Réponds directement en français, sans titre ni introduction.`;
                         parts={sr.parts}
                         isPremium={isPremium}
                         onWantPremium={onWantPremium}
+                        meUid={meUid}
                       />
                     );
                   })}
@@ -19059,6 +19160,8 @@ function buildCardParts(mainRec, extraRecs, planMain, planComplements) {
       skipped: !!st.skipped,
       appliedAt: st.appliedAt || null,
       scheduledAt: usePlan ? (st.scheduledAt || null) : null,
+      byName: st.appliedByName || null,
+      byUid: st.appliedBy || null,
       afterHours: cumul,
     };
     cumul += st.waitHours || 0;
@@ -19147,8 +19250,10 @@ function PlanCauseCard({ hints, lang }) {
   );
 }
 
-function RecoCard({ reco, isLast, manageStock, products, lang, appliedStep, parts, isPremium = true, onWantPremium }) {
+function RecoCard({ reco, isLast, manageStock, products, lang, appliedStep, parts, isPremium = true, onWantPremium, meUid }) {
   const t = useT(lang || "fr");
+  // v1.184.0 — Plan partagé : « · par {name} » quand une autre personne que moi a validé l'étape.
+  const byTxt = (name, uid) => (name && uid && uid !== meUid ? " · " + t("plan_validated_by", { name }) : "");
   const hasParts = !!parts && parts.length > 1;
   const isInfo = !!reco.noAction;
   // v1.123.7 — Une fois l'étape appliquée avec un AUTRE produit que celui du
@@ -19289,8 +19394,8 @@ function RecoCard({ reco, isLast, manageStock, products, lang, appliedStep, part
               <span style={{ fontWeight: 700, minWidth: 16 }}>{i + 1}.</span>
               <span style={{ fontWeight: 700, color: p.applied ? "var(--tx-1a8fd1,#1a8fd1)" : "var(--brand-text-strong)" }}>{formatDose(p.amount, p.unit)}</span>
               <span style={{ color: "var(--brand-text-secondary)" }}>
-                {p.skipped ? `— ⊘ ${t("treatment_skipped")}`
-                  : p.applied ? `— ✓ ${formatDate(p.appliedAt)}`
+                {p.skipped ? `— ⊘ ${t("treatment_skipped")}${byTxt(p.byName, p.byUid)}`
+                  : p.applied ? `— ✓ ${formatDate(p.appliedAt)}${byTxt(p.byName, p.byUid)}`
                   : p.scheduledAt ? `— ${t("complement_from", { date: formatDate(p.scheduledAt) })}`
                   : `— ${p.afterHours > 0 ? t("reco_part_after_h", { h: p.afterHours }) : t("reco_part_now")}`}
               </span>
@@ -19305,6 +19410,7 @@ function RecoCard({ reco, isLast, manageStock, products, lang, appliedStep, part
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--tx-1a8fd1,#1a8fd1)", marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
           <CheckCircle2 size={13} />
           {t("applied_amount", { amount: formatDose(appliedStep.appliedAmount, appliedStep.doseUnit || reco.doseUnit || "g") })}
+          {byTxt(appliedStep.appliedByName, appliedStep.appliedBy)}
         </div>
       )}
       {/* v1.108.3 — Garde-fou dose anormale (voir isDoseRateAnomalous) :
@@ -29145,6 +29251,36 @@ function OnboardingWizard({ onDone, lang }) {
   );
 }
 
+// v1.184.0 — Cœur de FB.claimPlanStep (voir plus haut) : tx = transaction Firestore (get/set), ref = config/main du propriétaire du bassin.
+async function planStepClaimTransaction(tx, ref, poolId, measureId, stepIdx, title, patch) {
+  const snap = await tx.get(ref);
+  const data = snap && snap.exists() ? snap.data() : null;
+  const plan = data && data.activePlan ? data.activePlan[poolId] : null;
+  if (!plan || !Array.isArray(plan.steps)) return { ok: true, unguarded: true }; // plan pas encore synchronisé : rien à protéger
+  if (plan.measureId !== measureId) return { conflict: "changed", plan };
+  const cur = plan.steps[stepIdx];
+  if (!cur || cur.title !== title) return { conflict: "changed", plan };
+  if (cur.appliedAt || cur.skipped) return { conflict: "done", by: cur.appliedByName || null, byUid: cur.appliedBy || null, at: cur.appliedAt || null, skipped: !!cur.skipped, plan };
+  const steps = plan.steps.map((st, i) => (i === stepIdx ? JSON.parse(JSON.stringify({ ...st, ...patch })) : st));
+  tx.set(ref, { activePlan: { [poolId]: { steps } }, updatedAt: new Date().toISOString() }, { merge: true });
+  return { ok: true };
+}
+
+// v1.184.0 — Information affichée quand une autre personne a traité l'étape avant nous (rien n'a été enregistré ni décompté).
+function PlanConflictModal({ conflict, lang, onClose }) {
+  const t = useT(lang || "fr");
+  const name = conflict.by || t("plan_conflict_someone");
+  const text = conflict.conflict === "done"
+    ? t(conflict.skipped ? "plan_conflict_skipped" : "plan_conflict_done", { name, time: conflict.at ? formatDate(conflict.at) : "" })
+    : t("plan_conflict_changed");
+  return (
+    <ModalShell onClose={onClose} title={t("plan_conflict_title")}>
+      <p data-testid="plan-conflict-text" style={{ fontSize: 14, lineHeight: 1.5, margin: "0 0 16px", color: "var(--brand-text-strong)" }}>{text}</p>
+      <button type="button" data-testid="plan-conflict-ok" style={styles.primaryBtn} onClick={onClose}>{t("plan_conflict_ok")}</button>
+    </ModalShell>
+  );
+}
+
 function PaywallModal({ onClose, onActivate, lang, source, busy, error }) {
   const t = useT(lang || "fr");
   const [plan, setPlan] = useState("monthly"); // v1.90.0 — mensuel présélectionné
@@ -29203,7 +29339,7 @@ function PaywallModal({ onClose, onActivate, lang, source, busy, error }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "16px 2px" }}>
         {perks.map((perk, i) => (
           <div key={i} style={styles.paywallPerk}>
-            <CheckCircle2 size={16} color="#1a8fd1" />
+            <span style={{ display: "flex", flexShrink: 0 }}><CheckCircle2 size={16} color="#1a8fd1" /></span>
             <span>{perk}</span>
           </div>
         ))}
@@ -29252,7 +29388,7 @@ function PremiumDowngradeConfirmModal({ onClose, onConfirm, lang }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "0 2px 20px" }}>
         {perks.map((perk, i) => (
           <div key={i} style={styles.paywallPerk}>
-            <Lock size={14} color="#8095a8" />
+            <span style={{ display: "flex", flexShrink: 0 }}><Lock size={14} color="#8095a8" /></span>
             <span>{perk}</span>
           </div>
         ))}
